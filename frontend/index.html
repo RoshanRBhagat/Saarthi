@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Saarthi | Smart Car Rental</title>
+
+
+    <!-- =====================================================
+         GOOGLE FONTS
+    ====================================================== -->
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- =====================================================
+         FONT AWESOME
+    ====================================================== -->
+
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        rel="stylesheet"
+    >
+
+
+    <!-- =====================================================
+         HOMEPAGE CSS
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="css/index.css"
+    >
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         NAVIGATION
+    ====================================================== -->
+
+    <nav class="navbar">
+
+        <div class="nav-container">
+
+
+            <!-- LOGO -->
+
+            <a
+                href="index.html"
+                class="logo"
+            >
+
+                <i
+                    class="fa-solid fa-car-side"
+                ></i>
+
+                <span>
+                    Saarthi
+                </span>
+
+            </a>
+
+
+            <!-- NAVIGATION -->
+
+            <div class="nav-links">
+
+                <a href="index.html">
+                    Home
+                </a>
+
+
+                <a href="cars.html">
+                    Browse Cars
+                </a>
+
+
+                <a href="ai-trip-planner.html">
+                    AI Trip Planner
+                </a>
+
+
+                <a href="host.html">
+                    Host Your Car
+                </a>
+
+                <!--
+                    DO NOT ADD A LOGIN BUTTON HERE.
+
+                    auth-ui.js automatically adds:
+
+                    - Log In when logged out
+                    - My Bookings + account menu for customer
+                    - Host Dashboard + account menu for host
+                -->
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
+
+    <header class="hero">
+
+        <div class="hero-overlay"></div>
+
+
+        <div class="hero-content">
+
+
+            <h1>
+                Smart Travel, Instant Rides.
+            </h1>
+
+
+
+            <!-- =================================================
+                 SEARCH BOX
+            ================================================== -->
+
+            <div class="search-box">
+
+
+                <!-- LOCATION -->
+
+                <div
+                    class="search-field location-field"
+                >
+
+                    <label
+                        for="locationInput"
+                    >
+                        Location
+                    </label>
+
+
+                    <div
+                        class="location-input-wrap"
+                    >
+
+                        <i
+                            class="fa-solid fa-location-dot location-icon"
+                        ></i>
+
+
+                        <input
+                            id="locationInput"
+                            type="text"
+                            placeholder="e.g. Nagpur, Maharashtra"
+                            autocomplete="off"
+                        >
+
+                    </div>
+
+
+                    <!-- LOCATION DROPDOWN -->
+
+                    <div
+                        id="locationDropdown"
+                        class="location-dropdown"
+                    ></div>
+
+                </div>
+
+
+
+                <!-- AI TRIP VIBE -->
+
+                <div
+                    class="search-field divider"
+                >
+
+                    <label
+                        for="tripVibeInput"
+                    >
+                        Trip Vibe (AI Search)
+                    </label>
+
+
+                    <input
+                        id="tripVibeInput"
+                        type="text"
+                        placeholder="e.g. Weekend getaway for 4"
+                    >
+
+                </div>
+
+
+
+                <!-- SEARCH -->
+
+                <button
+                    class="btn-search"
+                    type="button"
+                >
+
+                    <i
+                        class="fa-solid fa-wand-magic-sparkles"
+                    ></i>
+
+                    Find Cars
+
+                </button>
+
+
+            </div>
+
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer>
+
+        <div class="footer-content">
+
+
+            <h2>
+                Ready to hit the road?
+            </h2>
+
+
+            <p>
+                Join as a driver or host your car
+                to start earning today.
+            </p>
+
+
+            <div class="footer-buttons">
+
+
+                <button
+                    class="btn-primary"
+                    type="button"
+                    onclick="window.location.href='cars.html'"
+                >
+
+                    Book Now
+
+                </button>
+
+
+                <button
+                    class="btn-outline"
+                    type="button"
+                    onclick="window.location.href='host.html'"
+                >
+
+                    Become a Host
+
+                </button>
+
+
+            </div>
+
+
+            <div class="copyright">
+
+                &copy; 2026 Saarthi Smart Car Rental.
+                All rights reserved.
+
+            </div>
+
+
+        </div>
+
+    </footer>
+
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+
+    <!-- City Database -->
+
+    <script src="js/data/cities.js"></script>
+
+
+    <!-- Homepage JavaScript -->
+
+    <script src="js/pages/index.js"></script>
+
+
+    <!-- Shared Authentication UI -->
+
+    <script src="js/core/auth-ui.js"></script>
+
+
+</body>
+
+</html>

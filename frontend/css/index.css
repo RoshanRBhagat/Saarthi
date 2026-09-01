@@ -1,0 +1,688 @@
+/* =========================================================
+   Saarthi Homepage - index.css
+   ========================================================= */
+
+
+/* -----------------------------
+   Root Variables
+----------------------------- */
+
+:root {
+
+    --primary-blue: #2563eb;
+    --primary-blue-hover: #1d4ed8;
+
+    --text-dark: #111827;
+    --text-gray: #4b5563;
+
+    --bg-light: #f9fafb;
+
+    --white: #ffffff;
+
+    --border-light: #e5e7eb;
+
+}
+
+
+/* -----------------------------
+   Reset
+----------------------------- */
+
+* {
+
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
+
+}
+
+
+/* -----------------------------
+   Body
+----------------------------- */
+
+body {
+
+    font-family: 'Inter', sans-serif;
+
+    background-color: var(--bg-light);
+
+    color: var(--text-dark);
+
+    line-height: 1.6;
+
+}
+
+
+/* -----------------------------
+   Links
+----------------------------- */
+
+a {
+
+    text-decoration: none;
+
+    color: var(--text-gray);
+
+    transition: color 0.3s;
+
+}
+
+
+a:hover {
+
+    color: var(--primary-blue);
+
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+.navbar {
+
+    background-color: var(--white);
+
+    box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.1);
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 100;
+
+}
+
+
+.nav-container {
+
+    max-width: 1200px;
+
+    margin: 0 auto;
+
+    padding: 0 20px;
+
+    height: 70px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+}
+
+
+/* Logo */
+
+.logo {
+
+    display: flex;
+
+    align-items: center;
+
+    font-size: 1.5rem;
+
+    font-weight: 800;
+
+    color: var(--text-dark);
+
+}
+
+
+.logo i {
+
+    color: var(--primary-blue);
+
+    margin-right: 8px;
+
+}
+
+
+/* Navigation Links */
+
+.nav-links {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 30px;
+
+    font-weight: 500;
+
+}
+
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.btn-primary {
+
+    background-color: var(--primary-blue);
+
+    color: var(--white);
+
+    padding: 10px 24px;
+
+    border-radius: 8px;
+
+    border: none;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: background-color 0.3s;
+
+}
+
+
+.btn-primary:hover {
+
+    background-color: var(--primary-blue-hover);
+
+    color: var(--white);
+
+}
+
+
+.btn-outline {
+
+    background-color: transparent;
+
+    color: var(--white);
+
+    border: 2px solid var(--white);
+
+    padding: 10px 24px;
+
+    border-radius: 8px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all 0.3s;
+
+}
+
+
+.btn-outline:hover {
+
+    background-color: var(--white);
+
+    color: var(--text-dark);
+
+}
+
+
+/* =========================================================
+   HERO SECTION
+========================================================= */
+
+.hero {
+
+    position: relative;
+
+    height: 75vh;
+
+    min-height: 600px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background-image: url(
+        'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&q=80'
+    );
+
+    background-size: cover;
+
+    background-position: center;
+
+}
+
+
+.hero-overlay {
+
+    position: absolute;
+
+    inset: 0;
+
+    background-color:
+        rgba(17, 24, 39, 0.7);
+
+}
+
+
+.hero-content {
+
+    position: relative;
+
+    z-index: 10;
+
+    text-align: center;
+
+    max-width: 1000px;
+
+    width: 100%;
+
+    padding: 0 20px;
+
+}
+
+
+.hero-content h1 {
+
+    color: var(--white);
+
+    font-size: 3.5rem;
+
+    font-weight: 800;
+
+    line-height: 1.2;
+
+    margin-bottom: 40px;
+
+}
+
+
+/* =========================================================
+   SEARCH BOX
+========================================================= */
+
+.search-box {
+
+    background: var(--white);
+
+    padding: 15px;
+
+    border-radius: 12px;
+
+    display: flex;
+
+    align-items: center;
+
+    box-shadow:
+        0 10px 25px rgba(0, 0, 0, 0.2);
+
+    text-align: left;
+
+}
+
+
+.search-field {
+
+    flex: 1;
+
+    padding: 0 20px;
+
+    min-width: 0;
+
+}
+
+
+.search-field label {
+
+    display: block;
+
+    font-size: 0.75rem;
+
+    text-transform: uppercase;
+
+    color: #6b7280;
+
+    font-weight: 700;
+
+    margin-bottom: 5px;
+
+}
+
+
+.search-field input {
+
+    width: 100%;
+
+    border: none;
+
+    border-bottom: 2px solid transparent;
+
+    padding: 8px 0;
+
+    font-size: 1rem;
+
+    outline: none;
+
+    transition: border-color 0.3s;
+
+}
+
+
+.search-field input:focus {
+
+    border-bottom-color: var(--primary-blue);
+
+}
+
+
+/* Divider */
+
+.divider {
+
+    border-left: 1px solid var(--border-light);
+
+}
+
+
+/* =========================================================
+   LOCATION AUTOCOMPLETE
+========================================================= */
+
+.location-field {
+
+    position: relative;
+
+}
+
+
+.location-input-wrap {
+
+    display: flex;
+
+    align-items: center;
+
+}
+
+
+.location-icon {
+
+    color: var(--primary-blue);
+
+    margin-right: 10px;
+
+}
+
+
+.location-input-wrap input {
+
+    flex: 1;
+
+}
+
+
+/* Dropdown */
+
+.location-dropdown {
+
+    position: absolute;
+
+    left: 20px;
+
+    right: 20px;
+
+    top: calc(100% + 5px);
+
+    background-color: var(--white);
+
+    border: 1px solid var(--border-light);
+
+    border-radius: 8px;
+
+    box-shadow:
+        0 10px 25px rgba(0, 0, 0, 0.15);
+
+    overflow-y: auto;
+
+    max-height: 280px;
+
+    z-index: 1000;
+
+    display: none;
+
+}
+
+
+.location-dropdown.show {
+
+    display: block;
+
+}
+
+
+/* Individual City */
+
+.location-option {
+
+    width: 100%;
+
+    border: none;
+
+    background: var(--white);
+
+    padding: 12px 14px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    transition: background-color 0.2s;
+
+}
+
+
+.location-option:hover,
+.location-option.active {
+
+    background-color: #f3f4f6;
+
+}
+
+
+.location-option i {
+
+    color: var(--primary-blue);
+
+    width: 18px;
+
+}
+
+
+/* City + State */
+
+.location-option-text {
+
+    display: flex;
+
+    flex-direction: column;
+
+}
+
+
+.location-option-city {
+
+    color: var(--text-dark);
+
+    font-size: 0.95rem;
+
+    font-weight: 600;
+
+}
+
+
+.location-option-state {
+
+    color: #6b7280;
+
+    font-size: 0.78rem;
+
+}
+
+
+/* =========================================================
+   SEARCH BUTTON
+========================================================= */
+
+.btn-search {
+
+    background-color: var(--primary-blue);
+
+    color: var(--white);
+
+    border: none;
+
+    padding: 16px 32px;
+
+    border-radius: 8px;
+
+    font-weight: 700;
+
+    font-size: 1rem;
+
+    cursor: pointer;
+
+    transition: background-color 0.3s;
+
+    white-space: nowrap;
+
+}
+
+
+.btn-search:hover {
+
+    background-color: var(--primary-blue-hover);
+
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+footer {
+
+    background-color: #111827;
+
+    color: var(--white);
+
+    padding: 60px 20px 30px;
+
+    text-align: center;
+
+}
+
+
+.footer-content h2 {
+
+    font-size: 2rem;
+
+    margin-bottom: 10px;
+
+}
+
+
+.footer-content p {
+
+    color: #9ca3af;
+
+    margin-bottom: 30px;
+
+}
+
+
+.footer-buttons {
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 15px;
+
+    margin-bottom: 50px;
+
+}
+
+
+.copyright {
+
+    border-top: 1px solid #374151;
+
+    padding-top: 20px;
+
+    color: #6b7280;
+
+    font-size: 0.875rem;
+
+}
+
+
+/* =========================================================
+   RESPONSIVE DESIGN
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .nav-links {
+
+        display: none;
+
+    }
+
+
+    .search-box {
+
+        flex-direction: column;
+
+        gap: 15px;
+
+        align-items: stretch;
+
+    }
+
+
+    .divider {
+
+        border-left: none;
+
+        border-top: 1px solid var(--border-light);
+
+        padding-top: 15px;
+
+    }
+
+
+    .btn-search {
+
+        width: 100%;
+
+    }
+
+
+    .hero-content h1 {
+
+        font-size: 2.5rem;
+
+    }
+
+
+    .location-dropdown {
+
+        left: 20px;
+
+        right: 20px;
+
+    }
+
+}

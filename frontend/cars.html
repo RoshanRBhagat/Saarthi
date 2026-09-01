@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Available Cars | Saarthi</title>
+
+
+    <!-- =====================================================
+         GOOGLE FONTS
+    ====================================================== -->
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- =====================================================
+         FONT AWESOME
+    ====================================================== -->
+
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        rel="stylesheet"
+    >
+
+
+    <!-- =====================================================
+         SAARTHI CSS
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/cars.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         NAVIGATION
+    ====================================================== -->
+
+    <nav class="navbar">
+
+        <div class="nav-container">
+
+
+            <!-- Logo -->
+
+            <a
+                href="index.html"
+                class="logo"
+            >
+
+                <i
+                    class="fa-solid fa-car-side"
+                ></i>
+
+                <span>
+                    Saarthi
+                </span>
+
+            </a>
+
+
+            <!-- Navigation links -->
+
+            <div class="nav-links">
+
+                <a href="index.html">
+                    Home
+                </a>
+
+                <a href="ai-trip-planner.html">
+                    AI Trip Planner
+                </a>
+
+                <a href="host.html">
+                    Host Your Car
+                </a>
+
+                
+            </div>
+
+        </div>
+
+    </nav>
+
+
+
+    <!-- =====================================================
+         MAIN PAGE
+    ====================================================== -->
+
+    <main class="page">
+
+
+        <!-- =================================================
+             PAGE INTRO
+        ================================================== -->
+
+        <section class="page-header">
+
+
+            <!-- Left side -->
+
+            <div>
+
+                <span class="eyebrow">
+
+                    <i
+                        class="fa-solid fa-car"
+                    ></i>
+
+                    Saarthi inventory
+
+                </span>
+
+
+                <h1>
+                    Available cars
+                </h1>
+
+
+                <p id="resultSummary">
+                    Select your preferences and search for cars.
+                </p>
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =================================================
+             UNIFIED SEARCH PANEL
+        ================================================== -->
+
+        <section class="car-search-panel">
+
+
+            <!-- =================================================
+                 SEARCH HEADER
+            ================================================== -->
+
+            <div class="car-search-header">
+
+                <div>
+
+                    <span class="search-eyebrow">
+
+                        <i
+                            class="fa-solid fa-wand-magic-sparkles"
+                        ></i>
+
+                        Saarthi Smart Search
+
+                    </span>
+
+
+                    <h2>
+                        Find the right car for your trip
+                    </h2>
+
+
+                    <p>
+
+                        Choose your location, group size,
+                        budget and trip style. Saarthi will
+                        find and recommend the best available cars.
+
+                    </p>
+
+                </div>
+
+
+                <span class="search-ai-badge">
+
+                    <i
+                        class="fa-solid fa-sparkles"
+                    ></i>
+
+                    AI Included
+
+                </span>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 BASIC SEARCH FIELDS
+            ================================================== -->
+
+            <div class="car-search-fields">
+
+
+                <!-- STATE -->
+
+                <div class="filter-group">
+
+                    <label for="stateInput">
+                        State
+                    </label>
+
+
+                    <select
+                        id="stateInput"
+                    >
+
+                        <option
+                            value=""
+                            selected
+                            disabled
+                        >
+                            Select State
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- CITY -->
+
+                <div class="filter-group">
+
+                    <label for="cityInput">
+                        City
+                    </label>
+
+
+                    <select
+                        id="cityInput"
+                        disabled
+                    >
+
+                        <option
+                            value=""
+                            selected
+                        >
+                            Select state first
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- TRAVELERS -->
+
+                <div class="filter-group">
+
+                    <label for="travelersInput">
+                        Travelers
+                    </label>
+
+
+                    <select
+                        id="travelersInput"
+                    >
+
+                        <option value="">
+                            Any
+                        </option>
+
+                        <option value="2">
+                            2+
+                        </option>
+
+                        <option
+                            value="4"
+                            selected
+                        >
+                            4+
+                        </option>
+
+                        <option value="5">
+                            5+
+                        </option>
+
+                        <option value="7">
+                            7+
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- MAX DAILY PRICE -->
+
+                <div class="filter-group">
+
+                    <label for="maxPriceInput">
+                        Max daily price
+                    </label>
+
+
+                    <div class="price-input">
+
+                        <span>
+                            ₹
+                        </span>
+
+
+                        <input
+                            id="maxPriceInput"
+                            type="number"
+                            min="0"
+                            placeholder="3000"
+                        >
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 TRIP PREFERENCES
+            ================================================== -->
+
+            <div class="search-preferences">
+
+
+                <div class="preferences-heading">
+
+
+                    <div>
+
+                        <span>
+                            Trip preference
+                        </span>
+
+                        <small>
+                            Choose one or more
+                        </small>
+
+                    </div>
+
+
+                    <span
+                        id="aiPreferenceSummary"
+                        class="preference-summary"
+                    >
+                        No preference selected
+                    </span>
+
+
+                </div>
+
+
+
+                <!-- Preference buttons -->
+
+                <div class="ai-preferences">
+
+
+                    <!-- Adventure -->
+
+                    <button
+                        type="button"
+                        class="ai-preference"
+                        data-preference="Adventure"
+                    >
+
+                        <i
+                            class="fa-solid fa-mountain"
+                        ></i>
+
+                        Adventure
+
+                    </button>
+
+
+
+                    <!-- Nature -->
+
+                    <button
+                        type="button"
+                        class="ai-preference"
+                        data-preference="Nature"
+                    >
+
+                        <i
+                            class="fa-solid fa-leaf"
+                        ></i>
+
+                        Nature
+
+                    </button>
+
+
+
+                    <!-- Relaxation -->
+
+                    <button
+                        type="button"
+                        class="ai-preference"
+                        data-preference="Relaxation"
+                    >
+
+                        <i
+                            class="fa-solid fa-mug-hot"
+                        ></i>
+
+                        Relaxation
+
+                    </button>
+
+
+
+                    <!-- Family -->
+
+                    <button
+                        type="button"
+                        class="ai-preference"
+                        data-preference="Family"
+                    >
+
+                        <i
+                            class="fa-solid fa-people-group"
+                        ></i>
+
+                        Family
+
+                    </button>
+
+
+
+                    <!-- Romantic -->
+
+                    <button
+                        type="button"
+                        class="ai-preference"
+                        data-preference="Romantic"
+                    >
+
+                        <i
+                            class="fa-solid fa-heart"
+                        ></i>
+
+                        Romantic
+
+                    </button>
+
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 SEARCH ACTION
+            ================================================== -->
+
+            <div class="search-action-row">
+
+
+                <div class="search-helper">
+
+                    <i
+                        class="fa-solid fa-circle-info"
+                    ></i>
+
+                    <span>
+
+                        Saarthi AI will rank the best cars
+                        from the matching inventory.
+
+                    </span>
+
+                </div>
+
+
+                <button
+                    id="searchCarsBtn"
+                    class="main-search-btn"
+                    type="button"
+                >
+
+                    <i
+                        class="fa-solid fa-wand-magic-sparkles"
+                    ></i>
+
+                    Find My Car
+
+                </button>
+
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =================================================
+             AI RECOMMENDED RESULTS
+        ================================================== -->
+
+        <section
+            id="aiResultsSection"
+            class="ai-results-section hidden"
+        >
+
+
+            <div class="ai-results-header">
+
+
+                <div>
+
+                    <span class="ai-eyebrow">
+
+                        <i
+                            class="fa-solid fa-sparkles"
+                        ></i>
+
+                        Saarthi AI
+
+                    </span>
+
+
+                    <h2>
+                        Recommended for you
+                    </h2>
+
+
+                    <p id="aiResultsSummary">
+
+                        Best matches based on your preferences.
+
+                    </p>
+
+                </div>
+
+
+            </div>
+
+
+            <div
+                id="aiRecommendationsGrid"
+                class="ai-recommendations-grid"
+            >
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =================================================
+             LOADING
+        ================================================== -->
+
+        <section class="cars-section">
+
+
+            <div
+                id="loading"
+                class="message hidden"
+            >
+
+                <i
+                    class="fa-solid fa-spinner fa-spin"
+                ></i>
+
+                <p>
+                    Loading available cars...
+                </p>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 ERROR
+            ================================================== -->
+
+            <div
+                id="error"
+                class="message error hidden"
+            ></div>
+
+
+
+            <!-- =================================================
+                 NO RESULTS
+            ================================================== -->
+
+            <div
+                id="empty"
+                class="message hidden"
+            >
+
+                <i
+                    class="fa-solid fa-car-side"
+                ></i>
+
+
+                <h3>
+                    No cars found
+                </h3>
+
+
+                <p>
+                    Try changing your filters.
+                </p>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 NORMAL CAR RESULTS
+            ================================================== -->
+
+            <div
+                id="carGrid"
+                class="car-grid"
+            >
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+
+    <!-- Location database -->
+
+    <script src="js/data/cities.js"></script>
+
+
+    <!-- State → City dropdown -->
+
+    <script src="js/pages/cars-location.js"></script>
+
+
+    <!-- Car search + AI recommendations -->
+
+    <script src="js/pages/cars.js"></script>
+    <script src="js/core/auth-ui.js"></script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Trip Planner | Saarthi</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Trip Planner CSS -->
+    <link rel="stylesheet" href="css/ai-trip-planner.css">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <i class="fa-solid fa-car-side"></i>
+                <span>Saarthi</span>
+            </a>
+
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="host.html">Host Your Car</a>
+                <a href="#" class="active">AI Trip Planner</a>
+                <a href="auth.html" class="btn-primary">Log In</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main -->
+    <main>
+
+        <!-- Hero -->
+        <section class="planner-hero">
+            <div class="hero-glow hero-glow-one"></div>
+            <div class="hero-glow hero-glow-two"></div>
+
+            <div class="planner-container">
+
+                <div class="hero-copy">
+                    <span class="eyebrow">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        AI-powered travel planning
+                    </span>
+
+                    <h1>
+                        Tell Saarthi about your trip.
+                        <span>We'll plan the rest.</span>
+                    </h1>
+
+                    <p>
+                        Describe your journey or fill in a few details.
+                        Saarthi will create a personalized itinerary, suggest
+                        a suitable car, estimate your budget, and surface useful offers.
+                    </p>
+                </div>
+
+                <!-- Planner Card -->
+                <section class="planner-card">
+
+                    <div class="card-header">
+                        <div>
+                            <p class="section-kicker">Start with a prompt</p>
+                            <h2>Plan your perfect road trip</h2>
+                        </div>
+
+                        <div class="ai-badge">
+                            <i class="fa-solid fa-sparkles"></i>
+                            Saarthi AI
+                        </div>
+                    </div>
+
+                    <!-- Natural language input -->
+                    <div class="prompt-area">
+                        <label for="tripPrompt">Describe your trip</label>
+
+                        <textarea
+                            id="tripPrompt"
+                            rows="3"
+                            placeholder="Example: Plan a 3-day trip from Nagpur for 4 friends, focused on nature and adventure, under ₹15,000."
+                        ></textarea>
+
+                        <div class="prompt-hints">
+                            <button type="button" class="prompt-chip" data-prompt="Plan a 3-day trip from Nagpur for 4 friends, focused on nature and adventure, under ₹15,000.">
+                                Weekend adventure
+                            </button>
+
+                            <button type="button" class="prompt-chip" data-prompt="Plan a relaxed 2-day family trip from Pune with good food and scenic places under ₹12,000.">
+                                Family getaway
+                            </button>
+
+                            <button type="button" class="prompt-chip" data-prompt="Plan a romantic 3-day road trip from Mumbai with scenic places and comfortable travel under ₹20,000.">
+                                Romantic road trip
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Structured inputs -->
+                    <div class="field-grid">
+
+                        <div class="field-group">
+                            <label for="origin">Starting from</label>
+                            <div class="input-with-icon">
+                                <i class="fa-solid fa-location-dot"></i>
+                                <input id="origin" type="text" placeholder="Nagpur, Maharashtra" value="Nagpur, Maharashtra">
+                            </div>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="destination">Destination</label>
+                            <div class="input-with-icon">
+                                <i class="fa-solid fa-map-pin"></i>
+                                <input id="destination" type="text" placeholder="Pench National Park" value="Pench National Park">
+                            </div>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="startDate">Start date</label>
+                            <input id="startDate" type="date">
+                        </div>
+
+                        <div class="field-group">
+                            <label for="endDate">End date</label>
+                            <input id="endDate" type="date">
+                        </div>
+
+                        <div class="field-group">
+                            <label for="travelers">Travelers</label>
+                            <select id="travelers">
+                                <option value="1">1 traveler</option>
+                                <option value="2">2 travelers</option>
+                                <option value="3">3 travelers</option>
+                                <option value="4" selected>4 travelers</option>
+                                <option value="5">5 travelers</option>
+                                <option value="6">6 travelers</option>
+                                <option value="7">7 travelers</option>
+                                <option value="8">8 travelers</option>
+                            </select>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="budget">Budget</label>
+                            <div class="input-with-icon currency-input">
+                                <span>₹</span>
+                                <input id="budget" type="number" min="1000" step="500" value="15000" placeholder="15000">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Preferences -->
+                    <div class="preferences">
+                        <div class="preferences-header">
+                            <div>
+                                <p class="section-kicker">Personalize it</p>
+                                <h3>What kind of trip do you want?</h3>
+                            </div>
+
+                            <span class="selected-count" id="selectedCount">0 selected</span>
+                        </div>
+
+                        <div class="preference-grid">
+
+                            <button type="button" class="preference-pill" data-preference="Adventure">
+                                <i class="fa-solid fa-mountain"></i>
+                                Adventure
+                            </button>
+
+                            <button type="button" class="preference-pill" data-preference="Nature">
+                                <i class="fa-solid fa-leaf"></i>
+                                Nature
+                            </button>
+
+                            <button type="button" class="preference-pill" data-preference="Relaxation">
+                                <i class="fa-solid fa-mug-hot"></i>
+                                Relaxation
+                            </button>
+
+                            <button type="button" class="preference-pill" data-preference="Family">
+                                <i class="fa-solid fa-people-group"></i>
+                                Family
+                            </button>
+
+                            <button type="button" class="preference-pill" data-preference="Romantic">
+                                <i class="fa-solid fa-heart"></i>
+                                Romantic
+                            </button>
+
+                            <button type="button" class="preference-pill" data-preference="Food">
+                                <i class="fa-solid fa-utensils"></i>
+                                Food
+                            </button>
+
+                            <button type="button" class="preference-pill" data-preference="Historical">
+                                <i class="fa-solid fa-landmark"></i>
+                                Historical
+                            </button>
+
+                            <button type="button" class="preference-pill" data-preference="Road Trip">
+                                <i class="fa-solid fa-road"></i>
+                                Road Trip
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="button" class="generate-btn" id="generateTripBtn">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        Generate My Trip
+                    </button>
+                </section>
+
+            </div>
+        </section>
+
+
+        <!-- Result Section -->
+        <section class="results-section hidden" id="resultsSection">
+
+            <div class="results-container">
+
+                <!-- Result heading -->
+                <div class="results-heading">
+                    <div>
+                        <span class="eyebrow small">
+                            <i class="fa-solid fa-route"></i>
+                            Your personalized plan
+                        </span>
+
+                        <h2 id="tripTitle">Your road trip is ready.</h2>
+                        <p id="tripSummary"></p>
+                    </div>
+
+                    <button type="button" class="edit-plan-btn" id="editPlanBtn">
+                        <i class="fa-solid fa-sliders"></i>
+                        Edit plan
+                    </button>
+                </div>
+
+                <!-- Quick stats -->
+                <div class="trip-stats">
+
+                    <div class="stat-card">
+                        <span class="stat-icon blue">
+                            <i class="fa-solid fa-calendar-days"></i>
+                        </span>
+                        <div>
+                            <small>Duration</small>
+                            <strong id="durationStat">3 days</strong>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <span class="stat-icon green">
+                            <i class="fa-solid fa-users"></i>
+                        </span>
+                        <div>
+                            <small>Travelers</small>
+                            <strong id="travelersStat">4 people</strong>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <span class="stat-icon purple">
+                            <i class="fa-solid fa-wallet"></i>
+                        </span>
+                        <div>
+                            <small>Estimated spend</small>
+                            <strong id="estimatedStat">₹13,500</strong>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <span class="stat-icon orange">
+                            <i class="fa-solid fa-gauge-high"></i>
+                        </span>
+                        <div>
+                            <small>Trip pace</small>
+                            <strong>Balanced</strong>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="results-layout">
+
+                    <!-- Itinerary -->
+                    <div class="itinerary-column">
+
+                        <div class="panel-card">
+                            <div class="panel-heading">
+                                <div>
+                                    <p class="section-kicker">Day by day</p>
+                                    <h3>Your itinerary</h3>
+                                </div>
+                                <span class="ai-generated">
+                                    <i class="fa-solid fa-sparkles"></i>
+                                    AI generated
+                                </span>
+                            </div>
+
+                            <div class="itinerary-list" id="itineraryList"></div>
+                        </div>
+
+
+                        <!-- Modify trip -->
+                        <div class="modify-card">
+                            <div class="modify-icon">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            </div>
+
+                            <div class="modify-content">
+                                <span class="section-kicker">Want to change something?</span>
+                                <h3>Modify your trip with AI</h3>
+
+                                <div class="modify-input-row">
+                                    <input
+                                        id="modifyInput"
+                                        type="text"
+                                        placeholder="e.g. Make Day 2 more relaxed..."
+                                    >
+
+                                    <button type="button" id="modifyTripBtn">
+                                        Apply
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <!-- Recommendations -->
+                    <aside class="recommendation-column">
+
+                        <!-- Car recommendation -->
+                        <div class="panel-card recommendation-card">
+
+                            <div class="panel-heading compact">
+                                <div>
+                                    <p class="section-kicker">AI recommendation</p>
+                                    <h3>Your car</h3>
+                                </div>
+
+                                <span class="match-score">94% match</span>
+                            </div>
+
+                            <div class="car-visual">
+                                <div class="car-visual-content">
+                                    <span>Recommended for your trip</span>
+                                    <i class="fa-solid fa-car-side"></i>
+                                </div>
+                            </div>
+
+                            <div class="car-info">
+                                <h4 id="recommendedCar">Mahindra XUV700</h4>
+
+                                <p>
+                                    <i class="fa-solid fa-users"></i>
+                                    Comfortable for 4–7 travelers
+                                </p>
+
+                                <p>
+                                    <i class="fa-solid fa-suitcase"></i>
+                                    Excellent luggage space
+                                </p>
+
+                                <p>
+                                    <i class="fa-solid fa-road"></i>
+                                    Suitable for long drives
+                                </p>
+
+                                <div class="price-row">
+                                    <div>
+                                        <small>Estimated rental</small>
+                                        <strong id="carPrice">₹4,800</strong>
+                                    </div>
+
+                                    <button type="button" class="secondary-btn">
+                                        View Car
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <!-- Cost breakdown -->
+                        <div class="panel-card">
+
+                            <div class="panel-heading compact">
+                                <div>
+                                    <p class="section-kicker">Budget planner</p>
+                                    <h3>Trip estimate</h3>
+                                </div>
+                            </div>
+
+                            <div class="cost-list">
+
+                                <div class="cost-row">
+                                    <span>Car rental</span>
+                                    <strong id="rentalCost">₹4,800</strong>
+                                </div>
+
+                                <div class="cost-row">
+                                    <span>Fuel estimate</span>
+                                    <strong id="fuelCost">₹3,200</strong>
+                                </div>
+
+                                <div class="cost-row">
+                                    <span>Tolls & parking</span>
+                                    <strong id="tollCost">₹1,400</strong>
+                                </div>
+
+                                <div class="cost-row">
+                                    <span>Food & activities</span>
+                                    <strong id="activityCost">₹4,100</strong>
+                                </div>
+
+                                <div class="cost-divider"></div>
+
+                                <div class="cost-row total">
+                                    <span>Estimated total</span>
+                                    <strong id="totalCost">₹13,500</strong>
+                                </div>
+
+                            </div>
+
+                            <div class="budget-status" id="budgetStatus">
+                                <i class="fa-solid fa-circle-check"></i>
+                                You are within your budget.
+                            </div>
+                        </div>
+
+
+                        <!-- Offer -->
+                        <div class="offer-card">
+
+                            <div class="offer-icon">
+                                <i class="fa-solid fa-ticket"></i>
+                            </div>
+
+                            <div>
+                                <span>Best available offer</span>
+                                <strong>WEEKEND10</strong>
+                                <p>Save 10% on eligible rentals.</p>
+                            </div>
+
+                            <button type="button" aria-label="Apply coupon">
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+
+                        </div>
+
+
+                        <button type="button" class="book-car-btn">
+                            <i class="fa-solid fa-car"></i>
+                            Continue to Cars
+                        </button>
+
+                    </aside>
+
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+
+    <!-- Toast -->
+    <div class="toast hidden" id="toast">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="toastMessage">Trip updated.</span>
+    </div>
+
+
+    <script src="js/pages/ai-trip-planner.js"></script>
+    <script src="js/core/auth-ui.js"></script>
+
+</body>
+</html>

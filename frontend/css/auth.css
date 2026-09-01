@@ -1,0 +1,346 @@
+/* =========================================================
+   SAARTHI AUTHENTICATION
+========================================================= */
+
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+.auth-page {
+
+    min-height:
+        calc(100vh - 80px);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 50px 20px 70px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f8fbff,
+            #eef4ff
+        );
+
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.auth-card {
+
+    width: 100%;
+
+    max-width: 480px;
+
+    padding: 34px;
+
+    border:
+        1px solid #dbe3ef;
+
+    border-radius: 20px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 20px 55px
+        rgba(
+            15,
+            23,
+            42,
+            0.09
+        );
+
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.auth-header {
+
+    margin-bottom: 25px;
+
+}
+
+
+.auth-eyebrow {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    color: #2563eb;
+
+    font-size: 0.74rem;
+
+    font-weight: 800;
+
+    letter-spacing: 0.08em;
+
+    text-transform: uppercase;
+
+}
+
+
+.auth-header h1 {
+
+    margin: 8px 0 0;
+
+    color: #111827;
+
+    font-size: 2rem;
+
+    line-height: 1.1;
+
+}
+
+
+.auth-header p {
+
+    margin: 9px 0 0;
+
+    color: #64748b;
+
+    line-height: 1.55;
+
+}
+
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.auth-form {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 15px;
+
+}
+
+
+.auth-form-group label {
+
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #374151;
+
+    font-size: 0.76rem;
+
+    font-weight: 800;
+
+}
+
+
+.auth-form-group input,
+.auth-form-group select {
+
+    width: 100%;
+
+    height: 46px;
+
+    padding: 0 13px;
+
+    border:
+        1px solid #dbe3ef;
+
+    border-radius: 9px;
+
+    background: #ffffff;
+
+    color: #111827;
+
+    font: inherit;
+
+    outline: none;
+
+}
+
+
+.auth-form-group input:focus,
+.auth-form-group select:focus {
+
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(
+            37,
+            99,
+            235,
+            0.12
+        );
+
+}
+
+
+/* =========================================================
+   SUBMIT
+========================================================= */
+
+.auth-submit-btn {
+
+    min-height: 47px;
+
+    margin-top: 3px;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #2563eb;
+
+    color: #ffffff;
+
+    font: inherit;
+
+    font-weight: 800;
+
+    cursor: pointer;
+
+}
+
+
+.auth-submit-btn:hover {
+
+    background: #1d4ed8;
+
+}
+
+
+.auth-submit-btn:disabled {
+
+    opacity: 0.65;
+
+    cursor: not-allowed;
+
+}
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.auth-error {
+
+    padding: 11px 13px;
+
+    border-radius: 9px;
+
+    background: #fef2f2;
+
+    color: #b91c1c;
+
+    font-size: 0.8rem;
+
+    font-weight: 600;
+
+}
+
+
+/* =========================================================
+   SWITCH
+========================================================= */
+
+.auth-switch {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 6px;
+
+    margin-top: 22px;
+
+    padding-top: 20px;
+
+    border-top:
+        1px solid #edf0f3;
+
+    color: #64748b;
+
+    font-size: 0.82rem;
+
+}
+
+
+.auth-switch button {
+
+    padding: 0;
+
+    border: none;
+
+    background: transparent;
+
+    color: #2563eb;
+
+    font: inherit;
+
+    font-weight: 800;
+
+    cursor: pointer;
+
+}
+
+
+/* =========================================================
+   HIDDEN
+========================================================= */
+
+.hidden {
+
+    display: none !important;
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (
+    max-width: 600px
+) {
+
+    .auth-page {
+
+        padding:
+            30px 15px 50px;
+
+    }
+
+
+    .auth-card {
+
+        padding: 25px 20px;
+
+        border-radius: 16px;
+
+    }
+
+}

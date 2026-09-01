@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Edit Vehicle | Saarthi</title>
+
+
+    <!-- =====================================================
+         GOOGLE FONT
+    ====================================================== -->
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- =====================================================
+         FONT AWESOME
+    ====================================================== -->
+
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        rel="stylesheet"
+    >
+
+
+    <!-- =====================================================
+         CSS
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/edit-vehicle.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         NAVIGATION
+    ====================================================== -->
+
+    <nav class="navbar">
+
+        <div class="nav-container">
+
+            <a
+                href="index.html"
+                class="logo"
+            >
+
+                <i
+                    class="fa-solid fa-car-side"
+                ></i>
+
+                <span>
+                    Saarthi
+                </span>
+
+            </a>
+
+
+            <div class="nav-links">
+
+                <a href="index.html">
+                    Home
+                </a>
+
+                <a href="cars.html">
+                    Browse Cars
+                </a>
+
+                <a href="host.html">
+                    Host Your Car
+                </a>
+
+                <a href="host-dashboard.html">
+                    Dashboard
+                </a>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="edit-page">
+
+
+        <!-- =================================================
+             HEADER
+        ================================================== -->
+
+        <section class="edit-header">
+
+            <a
+                href="host-dashboard.html"
+                class="back-link"
+            >
+
+                <i
+                    class="fa-solid fa-arrow-left"
+                ></i>
+
+                Back to Dashboard
+
+            </a>
+
+
+            <span class="edit-eyebrow">
+
+                <i
+                    class="fa-solid fa-pen-to-square"
+                ></i>
+
+                Vehicle Management
+
+            </span>
+
+
+            <h1>
+                Edit your vehicle
+            </h1>
+
+
+            <p id="editSubtitle">
+                Update the information customers see on Saarthi.
+            </p>
+
+        </section>
+
+
+
+        <!-- =================================================
+             LOADING
+        ================================================== -->
+
+        <div
+            id="editLoading"
+            class="edit-loading"
+        >
+
+            <i
+                class="fa-solid fa-spinner fa-spin"
+            ></i>
+
+            <span>
+                Loading vehicle details...
+            </span>
+
+        </div>
+
+
+
+        <!-- =================================================
+             ERROR
+        ================================================== -->
+
+        <div
+            id="editError"
+            class="edit-error hidden"
+        ></div>
+
+
+
+        <!-- =================================================
+             FORM
+        ================================================== -->
+
+        <section
+            id="editContent"
+            class="edit-card hidden"
+        >
+
+            <form id="editVehicleForm">
+
+
+                <!-- =================================================
+                     VEHICLE OVERVIEW
+                ================================================== -->
+
+                <div class="edit-section">
+
+                    <div class="edit-section-heading">
+
+                        <span class="edit-section-number">
+                            01
+                        </span>
+
+
+                        <div>
+
+                            <h2>
+                                Vehicle information
+                            </h2>
+
+                            <p>
+                                Update the vehicle details shown to customers.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="edit-grid">
+
+
+                        <!-- MAKE -->
+
+                        <div class="edit-group">
+
+                            <label for="carMake">
+                                Car Make
+                            </label>
+
+                            <input
+                                id="carMake"
+                                name="make"
+                                type="text"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- MODEL -->
+
+                        <div class="edit-group">
+
+                            <label for="carModel">
+                                Car Model
+                            </label>
+
+                            <input
+                                id="carModel"
+                                name="model"
+                                type="text"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- YEAR -->
+
+                        <div class="edit-group">
+
+                            <label for="carYear">
+                                Year
+                            </label>
+
+                            <input
+                                id="carYear"
+                                name="year"
+                                type="number"
+                                min="1900"
+                                max="2100"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- CATEGORY -->
+
+                        <div class="edit-group">
+
+                            <label for="carCategory">
+                                Category
+                            </label>
+
+                            <select
+                                id="carCategory"
+                                name="category"
+                                required
+                            >
+
+                                <option value="hatchback">
+                                    Hatchback
+                                </option>
+
+                                <option value="sedan">
+                                    Sedan
+                                </option>
+
+                                <option value="suv">
+                                    SUV
+                                </option>
+
+                                <option value="muv">
+                                    MUV
+                                </option>
+
+                                <option value="luxury">
+                                    Luxury
+                                </option>
+
+                                <option value="ev">
+                                    EV
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- SEATS -->
+
+                        <div class="edit-group">
+
+                            <label for="carSeats">
+                                Seats
+                            </label>
+
+                            <select
+                                id="carSeats"
+                                name="seats"
+                                required
+                            >
+
+                                <option value="2">
+                                    2 Seats
+                                </option>
+
+                                <option value="4">
+                                    4 Seats
+                                </option>
+
+                                <option value="5">
+                                    5 Seats
+                                </option>
+
+                                <option value="6">
+                                    6 Seats
+                                </option>
+
+                                <option value="7">
+                                    7 Seats
+                                </option>
+
+                                <option value="8">
+                                    8 Seats
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- LUGGAGE -->
+
+                        <div class="edit-group">
+
+                            <label for="luggageCapacity">
+                                Luggage Capacity
+                            </label>
+
+                            <select
+                                id="luggageCapacity"
+                                name="luggageCapacity"
+                                required
+                            >
+
+                                <option value="1">
+                                    1 Large Bag
+                                </option>
+
+                                <option value="2">
+                                    2 Large Bags
+                                </option>
+
+                                <option value="3">
+                                    3 Large Bags
+                                </option>
+
+                                <option value="4">
+                                    4 Large Bags
+                                </option>
+
+                                <option value="5">
+                                    5+ Large Bags
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- FUEL -->
+
+                        <div class="edit-group">
+
+                            <label for="fuelType">
+                                Fuel Type
+                            </label>
+
+                            <select
+                                id="fuelType"
+                                name="fuelType"
+                                required
+                            >
+
+                                <option value="petrol">
+                                    Petrol
+                                </option>
+
+                                <option value="diesel">
+                                    Diesel
+                                </option>
+
+                                <option value="cng">
+                                    CNG
+                                </option>
+
+                                <option value="electric">
+                                    Electric
+                                </option>
+
+                                <option value="hybrid">
+                                    Hybrid
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- TRANSMISSION -->
+
+                        <div class="edit-group">
+
+                            <label for="transmission">
+                                Transmission
+                            </label>
+
+                            <select
+                                id="transmission"
+                                name="transmission"
+                                required
+                            >
+
+                                <option value="manual">
+                                    Manual
+                                </option>
+
+                                <option value="automatic">
+                                    Automatic
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     LOCATION
+                ================================================== -->
+
+                <div class="edit-section">
+
+                    <div class="edit-section-heading">
+
+                        <span class="edit-section-number">
+                            02
+                        </span>
+
+
+                        <div>
+
+                            <h2>
+                                Location
+                            </h2>
+
+                            <p>
+                                Update where customers can pick up the vehicle.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="edit-grid">
+
+
+                        <div class="edit-group">
+
+                            <label for="state">
+                                State
+                            </label>
+
+
+                            <select
+                                id="state"
+                                name="state"
+                                required
+                            >
+
+                                <option value="">
+                                    Select State
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="edit-group">
+
+                            <label for="city">
+                                City
+                            </label>
+
+
+                            <select
+                                id="city"
+                                name="city"
+                                required
+                                disabled
+                            >
+
+                                <option value="">
+                                    Select state first
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     PRICE
+                ================================================== -->
+
+                <div class="edit-section">
+
+                    <div class="edit-section-heading">
+
+                        <span class="edit-section-number">
+                            03
+                        </span>
+
+
+                        <div>
+
+                            <h2>
+                                Pricing
+                            </h2>
+
+                            <p>
+                                Update your daily rental price.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="edit-group">
+
+                        <label for="dailyPrice">
+                            Daily Rental Price (₹)
+                        </label>
+
+
+                        <input
+                            id="dailyPrice"
+                            name="dailyPrice"
+                            type="number"
+                            min="0"
+                            step="100"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     DESCRIPTION
+                ================================================== -->
+
+                <div class="edit-section">
+
+                    <div class="edit-section-heading">
+
+                        <span class="edit-section-number">
+                            04
+                        </span>
+
+
+                        <div>
+
+                            <h2>
+                                Description
+                            </h2>
+
+                            <p>
+                                Update the description customers will read.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="edit-group">
+
+                        <label for="carDescription">
+                            Vehicle Description
+                        </label>
+
+
+                        <textarea
+                            id="carDescription"
+                            name="description"
+                            rows="5"
+                        ></textarea>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     ACTIONS
+                ================================================== -->
+
+                <div class="edit-actions">
+
+                    <a
+                        href="host-dashboard.html"
+                        class="cancel-edit-btn"
+                    >
+                        Cancel
+                    </a>
+
+
+                    <button
+                        id="saveVehicleBtn"
+                        type="submit"
+                        class="save-vehicle-btn"
+                    >
+
+                        <i
+                            class="fa-solid fa-floppy-disk"
+                        ></i>
+
+                        Save Changes
+
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="saveSuccess"
+                    class="save-success hidden"
+                >
+
+                    <i
+                        class="fa-solid fa-circle-check"
+                    ></i>
+
+                    Vehicle updated successfully.
+
+                </div>
+
+
+            </form>
+
+        </section>
+
+
+    </main>
+
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+    <script src="js/data/cities.js"></script>
+
+    <script src="js/pages/edit-vehicle.js"></script>
+    <script src="js/core/auth-ui.js"></script>
+
+</body>
+
+</html>

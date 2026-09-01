@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>My Bookings | Saarthi</title>
+
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        rel="stylesheet"
+    >
+
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/bookings.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         NAVIGATION
+    ====================================================== -->
+
+    <nav class="navbar">
+
+        <div class="nav-container">
+
+            <a
+                href="index.html"
+                class="logo"
+            >
+
+                <i class="fa-solid fa-car-side"></i>
+
+                <span>
+                    Saarthi
+                </span>
+
+            </a>
+
+
+            <div class="nav-links">
+
+                <a href="index.html">
+                    Home
+                </a>
+
+                <a href="cars.html">
+                    Browse Cars
+                </a>
+
+                <a href="ai-trip-planner.html">
+                    AI Trip Planner
+                </a>
+
+                <a href="host.html">
+                    Host Your Car
+                </a>
+
+                <a
+                    href="bookings.html"
+                    class="btn-primary"
+                >
+                    My Bookings
+                </a>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="bookings-page">
+
+
+        <!-- =================================================
+             HEADER
+        ================================================== -->
+
+        <section class="bookings-header">
+
+            <span class="bookings-eyebrow">
+
+                <i
+                    class="fa-solid fa-calendar-check"
+                ></i>
+
+                Saarthi bookings
+
+            </span>
+
+
+            <h1>
+                My Bookings
+            </h1>
+
+
+            <p id="welcomeMessage">
+                Loading your account...
+            </p>
+
+        </section>
+
+
+
+        <!-- =================================================
+             LOADING
+        ================================================== -->
+
+        <div
+            id="loading"
+            class="booking-message"
+        >
+
+            <i
+                class="fa-solid fa-spinner fa-spin"
+            ></i>
+
+            <span>
+                Loading your bookings...
+            </span>
+
+        </div>
+
+
+
+        <!-- =================================================
+             ERROR
+        ================================================== -->
+
+        <div
+            id="error"
+            class="booking-message booking-error hidden"
+        ></div>
+
+
+
+        <!-- =================================================
+             EMPTY
+        ================================================== -->
+
+        <div
+            id="empty"
+            class="booking-message hidden"
+        >
+
+            <i
+                class="fa-solid fa-calendar-xmark"
+            ></i>
+
+
+            <h3>
+                No bookings yet
+            </h3>
+
+
+            <p>
+                Your confirmed Saarthi reservations will appear here.
+            </p>
+
+
+            <a
+                href="cars.html"
+                class="browse-cars-btn"
+            >
+
+                Browse Cars
+
+            </a>
+
+        </div>
+
+
+
+        <!-- =================================================
+             RESULTS
+        ================================================== -->
+
+        <section
+            id="bookingsSection"
+            class="hidden"
+        >
+
+            <div class="results-heading">
+
+                <div>
+
+                    <span class="results-eyebrow">
+                        Your reservations
+                    </span>
+
+
+                    <h2>
+                        Booking history
+                    </h2>
+
+                </div>
+
+
+                <span
+                    id="bookingCount"
+                    class="booking-count"
+                >
+                    0 bookings
+                </span>
+
+            </div>
+
+
+            <div
+                id="bookingsGrid"
+                class="bookings-grid"
+            ></div>
+
+
+        </section>
+
+    </main>
+
+
+    <script src="js/pages/bookings.js"></script>
+    <script src="js/core/auth-ui.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Booking Confirmed | Saarthi</title>
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+    <style>
+
+        .success-page {
+
+            min-height: calc(100vh - 80px);
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 50px 20px;
+
+        }
+
+
+        .success-card {
+
+            width: 100%;
+
+            max-width: 650px;
+
+            padding: 45px 35px;
+
+            text-align: center;
+
+            border:
+                1px solid #dbe3ef;
+
+            border-radius: 22px;
+
+            background: #ffffff;
+
+            box-shadow:
+                0 20px 55px
+                rgba(
+                    15,
+                    23,
+                    42,
+                    0.08
+                );
+
+        }
+
+
+        .success-icon {
+
+            width: 72px;
+
+            height: 72px;
+
+            margin: 0 auto 20px;
+
+            display: grid;
+
+            place-items: center;
+
+            border-radius: 50%;
+
+            background: #dcfce7;
+
+            color: #16a34a;
+
+            font-size: 2rem;
+
+        }
+
+
+        .success-card h1 {
+
+            margin: 0;
+
+            color: #111827;
+
+            font-size: 2rem;
+
+        }
+
+
+        .success-card p {
+
+            margin: 12px 0;
+
+            color: #64748b;
+
+            line-height: 1.6;
+
+        }
+
+
+        .booking-id {
+
+            margin: 22px 0;
+
+            padding: 14px;
+
+            border-radius: 10px;
+
+            background: #f8fafc;
+
+        }
+
+
+        .booking-id span {
+
+            display: block;
+
+            color: #94a3b8;
+
+            font-size: 0.72rem;
+
+            font-weight: 800;
+
+            text-transform: uppercase;
+
+        }
+
+
+        .booking-id strong {
+
+            display: block;
+
+            margin-top: 5px;
+
+            color: #111827;
+
+            font-size: 1.15rem;
+
+        }
+
+
+        .success-actions {
+
+            display: flex;
+
+            justify-content: center;
+
+            gap: 12px;
+
+            margin-top: 25px;
+
+        }
+
+
+        .success-actions a {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            min-height: 44px;
+
+            padding: 0 18px;
+
+            border-radius: 9px;
+
+            text-decoration: none;
+
+            font-weight: 700;
+
+        }
+
+
+        .success-primary {
+
+            background: #2563eb;
+
+            color: #ffffff;
+
+        }
+
+
+        .success-secondary {
+
+            border:
+                1px solid #dbe3ef;
+
+            color: #374151;
+
+            background: #ffffff;
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <nav class="navbar">
+
+        <div class="nav-container">
+
+            <a
+                href="index.html"
+                class="logo"
+            >
+
+                <i class="fa-solid fa-car-side"></i>
+
+                <span>
+                    Saarthi
+                </span>
+
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <main class="success-page">
+
+        <section class="success-card">
+
+            <div class="success-icon">
+
+                <i class="fa-solid fa-check"></i>
+
+            </div>
+
+
+            <h1>
+                Booking confirmed!
+            </h1>
+
+
+            <p>
+                Your Saarthi vehicle reservation has been
+                successfully created.
+            </p>
+
+
+            <div class="booking-id">
+
+                <span>
+                    Booking ID
+                </span>
+
+                <strong id="bookingId">
+                    —
+                </strong>
+
+            </div>
+
+
+            <p>
+                Keep this booking ID for your records.
+            </p>
+
+
+            <div class="success-actions">
+
+                <a
+                    href="cars.html"
+                    class="success-primary"
+                >
+                    Browse more cars
+                </a>
+
+
+                <a
+                    href="index.html"
+                    class="success-secondary"
+                >
+                    Back to home
+                </a>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script>
+
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
+
+
+        const bookingId =
+            params.get(
+                "bookingId"
+            );
+
+
+        document.getElementById(
+            "bookingId"
+        ).textContent =
+            bookingId ||
+            "Not available";
+
+    </script>
+
+    <script src="js/core/auth-ui.js"></script>
+
+</body>
+
+</html>

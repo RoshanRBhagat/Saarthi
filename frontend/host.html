@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Host Your Car | Saarthi</title>
+
+
+    <!-- =====================================================
+         GOOGLE FONTS
+    ====================================================== -->
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- =====================================================
+         FONT AWESOME
+    ====================================================== -->
+
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        rel="stylesheet"
+    >
+
+
+    <!-- =====================================================
+         CUSTOM CSS
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/host-vehicle.css"
+    >
+
+</head>
+
+
+<body class="host-page">
+
+
+    <!-- =====================================================
+         NAVIGATION
+    ====================================================== -->
+
+    <nav class="navbar">
+
+        <div class="nav-container">
+
+
+            <a
+                href="index.html"
+                class="logo"
+            >
+
+                <i
+                    class="fa-solid fa-car-side"
+                ></i>
+
+                <span>
+                    Saarthi
+                </span>
+
+            </a>
+
+
+            <div class="nav-links">
+
+                <a href="index.html">
+                    Home
+                </a>
+
+
+                
+
+
+                <a href="host-dashboard.html">
+                    Host Dashboard
+                </a>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+
+    <!-- =====================================================
+         MAIN HERO & REGISTRATION SECTION
+    ====================================================== -->
+
+    <main class="host-hero">
+
+        <div class="host-bg-overlay"></div>
+
+
+        <div class="host-container">
+
+
+            <!-- =================================================
+                 LEFT SIDE: VALUE PROPOSITION
+            ================================================== -->
+
+            <div class="host-value-prop">
+
+                <span class="tagline">
+                    Become a Host
+                </span>
+
+
+                <h1>
+                    Turn your parked car into a
+                    <span class="highlight">
+                        paycheck.
+                    </span>
+                </h1>
+
+
+                <p class="description">
+
+                    Join the Saarthi network. You control the
+                    calendar, we handle the dynamic pricing,
+                    and our AI ensures your vehicle is protected
+                    against unrecorded damages.
+
+                </p>
+
+
+                <div class="feature-list">
+
+
+                    <div class="feature-item">
+
+                        <i
+                            class="fa-solid fa-shield-halved text-green"
+                        ></i>
+
+
+                        <div class="feature-text">
+
+                            <h4>
+                                AI Damage Detection
+                            </h4>
+
+
+                            <p>
+                                Snap before & after photos;
+                                our computer vision logs the rest.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="feature-item">
+
+                        <i
+                            class="fa-solid fa-money-bill-trend-up text-blue"
+                        ></i>
+
+
+                        <div class="feature-text">
+
+                            <h4>
+                                Smart Pricing
+                            </h4>
+
+
+                            <p>
+                                Earn more during weekends
+                                and festivals automatically.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 RIGHT SIDE: REGISTRATION BOX
+            ================================================== -->
+
+            <div class="host-form-card">
+
+
+                <h2>
+                    Register your vehicle
+                </h2>
+
+
+                <p class="form-subtitle">
+                    Takes less than 2 minutes to get started.
+                </p>
+
+
+                <form
+                    action="#"
+                    method="POST"
+                    class="host-form"
+                >
+
+
+                    <!-- =================================================
+                         PERSONAL DETAILS
+                    ================================================== -->
+
+                    <div class="form-row">
+
+
+                        <div class="form-group">
+
+                            <label>
+                                First Name
+                            </label>
+
+
+                            <input
+                                id="firstName"
+                                name="firstName"
+                                type="text"
+                                placeholder="Rahul"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label>
+                                Last Name
+                            </label>
+
+
+                            <input
+                                id="lastName"
+                                name="lastName"
+                                type="text"
+                                placeholder="Sharma"
+                                required
+                            >
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         CONTACT
+                    ================================================== -->
+
+                    <div class="form-group">
+
+                        <label>
+                            Mobile Number
+                        </label>
+
+
+                        <input
+                            id="mobileNumber"
+                            name="mobileNumber"
+                            type="tel"
+                            placeholder="+91 98765 43210"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         EMAIL
+                    ================================================== -->
+
+                    <div class="form-group">
+
+                        <label>
+                            Email Address
+                        </label>
+
+
+                        <input
+                            id="email"
+                            name="email"
+                            type="email"
+                            placeholder="e.g. rahul.sharma@example.com"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         VEHICLE INFORMATION
+                    ================================================== -->
+
+                    <div class="vehicle-section">
+
+
+                        <div class="section-heading">
+
+                            <span class="section-icon">
+
+                                <i
+                                    class="fa-solid fa-car"
+                                ></i>
+
+                            </span>
+
+
+                            <div>
+
+                                <h3>
+                                    Vehicle information
+                                </h3>
+
+
+                                <p>
+                                    Add the details customers will see on Saarthi.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- MAKE + MODEL -->
+
+                        <div class="form-row">
+
+
+                            <div class="form-group">
+
+                                <label for="carMake">
+                                    Car Make
+                                </label>
+
+
+                                <input
+                                    id="carMake"
+                                    name="carMake"
+                                    type="text"
+                                    placeholder="e.g. Mahindra"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="carModel">
+                                    Car Model
+                                </label>
+
+
+                                <input
+                                    id="carModel"
+                                    name="carModel"
+                                    type="text"
+                                    placeholder="e.g. XUV700"
+                                    required
+                                >
+
+                            </div>
+
+
+                        </div>
+
+
+
+                        <!-- YEAR + CATEGORY -->
+
+                        <div class="form-row">
+
+
+                            <div class="form-group">
+
+                                <label for="carYear">
+                                    Year
+                                </label>
+
+
+                                <input
+                                    id="carYear"
+                                    name="carYear"
+                                    type="number"
+                                    min="1990"
+                                    max="2035"
+                                    placeholder="e.g. 2025"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="carCategory">
+                                    Category
+                                </label>
+
+
+                                <select
+                                    id="carCategory"
+                                    name="carCategory"
+                                    required
+                                >
+
+                                    <option
+                                        value=""
+                                        selected
+                                        disabled
+                                    >
+                                        Select category
+                                    </option>
+
+
+                                    <option value="hatchback">
+                                        Hatchback
+                                    </option>
+
+
+                                    <option value="sedan">
+                                        Sedan
+                                    </option>
+
+
+                                    <option value="suv">
+                                        SUV
+                                    </option>
+
+
+                                    <option value="muv">
+                                        MUV
+                                    </option>
+
+
+                                    <option value="luxury">
+                                        Luxury
+                                    </option>
+
+
+                                    <option value="ev">
+                                        EV
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                        </div>
+
+
+
+                        <!-- SEATS + LUGGAGE -->
+
+                        <div class="form-row">
+
+
+                            <div class="form-group">
+
+                                <label for="carSeats">
+                                    Seats
+                                </label>
+
+
+                                <select
+                                    id="carSeats"
+                                    name="carSeats"
+                                    required
+                                >
+
+                                    <option
+                                        value=""
+                                        selected
+                                        disabled
+                                    >
+                                        Select seats
+                                    </option>
+
+
+                                    <option value="2">
+                                        2 Seats
+                                    </option>
+
+
+                                    <option value="4">
+                                        4 Seats
+                                    </option>
+
+
+                                    <option value="5">
+                                        5 Seats
+                                    </option>
+
+
+                                    <option value="6">
+                                        6 Seats
+                                    </option>
+
+
+                                    <option value="7">
+                                        7 Seats
+                                    </option>
+
+
+                                    <option value="8">
+                                        8 Seats
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="luggageCapacity">
+                                    Luggage Capacity
+                                </label>
+
+
+                                <select
+                                    id="luggageCapacity"
+                                    name="luggageCapacity"
+                                    required
+                                >
+
+                                    <option
+                                        value=""
+                                        selected
+                                        disabled
+                                    >
+                                        Select capacity
+                                    </option>
+
+
+                                    <option value="1">
+                                        1 Large Bag
+                                    </option>
+
+
+                                    <option value="2">
+                                        2 Large Bags
+                                    </option>
+
+
+                                    <option value="3">
+                                        3 Large Bags
+                                    </option>
+
+
+                                    <option value="4">
+                                        4 Large Bags
+                                    </option>
+
+
+                                    <option value="5">
+                                        5+ Large Bags
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                        </div>
+
+
+
+                        <!-- FUEL + TRANSMISSION -->
+
+                        <div class="form-row">
+
+
+                            <div class="form-group">
+
+                                <label for="fuelType">
+                                    Fuel Type
+                                </label>
+
+
+                                <select
+                                    id="fuelType"
+                                    name="fuelType"
+                                    required
+                                >
+
+                                    <option
+                                        value=""
+                                        selected
+                                        disabled
+                                    >
+                                        Select fuel type
+                                    </option>
+
+
+                                    <option value="petrol">
+                                        Petrol
+                                    </option>
+
+
+                                    <option value="diesel">
+                                        Diesel
+                                    </option>
+
+
+                                    <option value="cng">
+                                        CNG
+                                    </option>
+
+
+                                    <option value="electric">
+                                        Electric
+                                    </option>
+
+
+                                    <option value="hybrid">
+                                        Hybrid
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="transmission">
+                                    Transmission
+                                </label>
+
+
+                                <select
+                                    id="transmission"
+                                    name="transmission"
+                                    required
+                                >
+
+                                    <option
+                                        value=""
+                                        selected
+                                        disabled
+                                    >
+                                        Select transmission
+                                    </option>
+
+
+                                    <option value="manual">
+                                        Manual
+                                    </option>
+
+
+                                    <option value="automatic">
+                                        Automatic
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                        </div>
+
+
+
+                        <!-- DAILY PRICE -->
+
+                        <div class="form-group">
+
+                            <label for="dailyPrice">
+                                Daily Rental Price (₹)
+                            </label>
+
+
+                            <input
+                                id="dailyPrice"
+                                name="dailyPrice"
+                                type="number"
+                                min="0"
+                                step="100"
+                                placeholder="e.g. 2400"
+                                required
+                            >
+
+                        </div>
+
+
+
+                        <!-- DESCRIPTION -->
+
+                        <div class="form-group">
+
+                            <label for="carDescription">
+                                Vehicle Description
+                            </label>
+
+
+                            <textarea
+                                id="carDescription"
+                                name="carDescription"
+                                rows="4"
+                                placeholder="Tell customers about the vehicle, comfort, special features, and ideal use..."
+                            ></textarea>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         VEHICLE IMAGES
+                    ================================================== -->
+
+                    <div class="vehicle-section image-section">
+
+
+                        <div class="section-heading">
+
+
+                            <span
+                                class="section-icon image-icon"
+                            >
+
+                                <i
+                                    class="fa-solid fa-images"
+                                ></i>
+
+                            </span>
+
+
+                            <div>
+
+                                <h3>
+                                    Vehicle images
+                                </h3>
+
+
+                                <p>
+                                    Upload clear photos that customers can view before booking.
+                                </p>
+
+                            </div>
+
+
+                        </div>
+
+
+
+                        <div class="image-upload-box">
+
+
+                            <label
+                                for="carImages"
+                                class="upload-label"
+                            >
+
+                                <i
+                                    class="fa-solid fa-cloud-arrow-up"
+                                ></i>
+
+
+                                <span>
+                                    Choose vehicle photos
+                                </span>
+
+
+                                <small>
+                                    JPG, JPEG, PNG · Up to 8 images · Maximum 5 MB each
+                                </small>
+
+                            </label>
+
+
+                            <input
+                                id="carImages"
+                                name="carImages"
+                                type="file"
+                                accept="image/jpeg,image/png,image/jpg"
+                                multiple
+                            >
+
+                        </div>
+
+
+                        <div
+                            id="imagePreview"
+                            class="image-preview"
+                        ></div>
+
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         STATE
+                    ================================================== -->
+
+                    <div class="form-group">
+
+                        <label for="state">
+                            State
+                        </label>
+
+
+                        <select
+                            id="state"
+                            name="state"
+                            required
+                        >
+
+                            <option
+                                value=""
+                                selected
+                                disabled
+                            >
+                                Select State
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         CITY
+                    ================================================== -->
+
+                    <div class="form-group">
+
+                        <label for="city">
+                            City
+                        </label>
+
+
+                        <select
+                            id="city"
+                            name="city"
+                            required
+                            disabled
+                        >
+
+                            <option
+                                value=""
+                                selected
+                            >
+                                Select state first
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         SUBMIT
+                    ================================================== -->
+
+                    <button
+                        type="submit"
+                        class="btn-submit"
+                    >
+                        Start Hosting
+                    </button>
+
+
+                    <p class="terms-text">
+
+                        By clicking Start Hosting, you agree to our
+                        <a href="#">
+                            Terms & Conditions
+                        </a>.
+
+                    </p>
+
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+
+    <!-- =====================================================
+         OTP MODAL
+    ====================================================== -->
+
+    <div
+        id="otpModal"
+        class="modal-overlay hidden"
+    >
+
+        <div class="modal-card">
+
+
+            <h2>
+                Verify Mobile Number
+            </h2>
+
+
+            <p>
+                We've sent a 4-digit OTP to your number.
+            </p>
+
+
+
+            <div class="otp-inputs">
+
+                <input
+                    type="text"
+                    maxlength="1"
+                    class="otp-box"
+                >
+
+                <input
+                    type="text"
+                    maxlength="1"
+                    class="otp-box"
+                >
+
+                <input
+                    type="text"
+                    maxlength="1"
+                    class="otp-box"
+                >
+
+                <input
+                    type="text"
+                    maxlength="1"
+                    class="otp-box"
+                >
+
+            </div>
+
+
+
+            <button
+                id="verifyOtpBtn"
+                class="btn-submit w-full"
+            >
+                Verify & Register
+            </button>
+
+
+            <button
+                id="closeModalBtn"
+                class="btn-cancel"
+            >
+                Cancel
+            </button>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+    <script src="js/data/cities.js"></script>
+
+    <script src="js/pages/host-location.js"></script>
+
+    <script src="js/pages/host-form.js"></script>
+
+    <script src="js/core/auth-ui.js"></script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Host Dashboard | Saarthi</title>
+
+
+    <!-- =====================================================
+         GOOGLE FONT
+    ====================================================== -->
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- =====================================================
+         FONT AWESOME
+    ====================================================== -->
+
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        rel="stylesheet"
+    >
+
+
+    <!-- =====================================================
+         SAARTHI CSS
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/host-dashboard.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         NAVIGATION
+    ====================================================== -->
+
+    <nav class="navbar">
+
+        <div class="nav-container">
+
+
+            <a
+                href="index.html"
+                class="logo"
+            >
+
+                <i class="fa-solid fa-car-side"></i>
+
+                <span>
+                    Saarthi
+                </span>
+
+            </a>
+
+
+            <div class="nav-links">
+
+                <a href="index.html">
+                    Home
+                </a>
+
+
+                <a href="cars.html">
+                    Browse Cars
+                </a>
+
+
+                <a href="ai-trip-planner.html">
+                    AI Trip Planner
+                </a>
+
+
+                <a href="host.html">
+                    Add Vehicle
+                </a>
+
+
+                <a
+                    href="host-dashboard.html"
+                    class="btn-primary"
+                >
+                    Dashboard
+                </a>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+
+    <!-- =====================================================
+         MAIN DASHBOARD
+    ====================================================== -->
+
+    <main class="dashboard-page">
+
+
+        <!-- =================================================
+             DASHBOARD HEADER
+        ================================================== -->
+
+        <section class="dashboard-header">
+
+            <div>
+
+                <span class="dashboard-eyebrow">
+
+                    <i
+                        class="fa-solid fa-chart-line"
+                    ></i>
+
+                    Saarthi Host
+
+                </span>
+
+
+                <h1>
+                    Host Dashboard
+                </h1>
+
+
+                <p id="welcomeMessage">
+                    Loading your host account...
+                </p>
+
+            </div>
+
+
+            <a
+                href="host.html"
+                class="add-vehicle-btn"
+            >
+
+                <i
+                    class="fa-solid fa-plus"
+                ></i>
+
+                Add Vehicle
+
+            </a>
+
+        </section>
+
+
+
+        <!-- =================================================
+             LOADING
+        ================================================== -->
+
+        <div
+            id="dashboardLoading"
+            class="dashboard-loading"
+        >
+
+            <i
+                class="fa-solid fa-spinner fa-spin"
+            ></i>
+
+            <span>
+                Loading your dashboard...
+            </span>
+
+        </div>
+
+
+
+        <!-- =================================================
+             ERROR
+        ================================================== -->
+
+        <div
+            id="dashboardError"
+            class="dashboard-error hidden"
+        ></div>
+
+
+
+        <!-- =================================================
+             DASHBOARD CONTENT
+        ================================================== -->
+
+        <section
+            id="dashboardContent"
+            class="hidden"
+        >
+
+
+            <!-- =================================================
+                 STATS
+            ================================================== -->
+
+            <div class="dashboard-stats">
+
+
+                <!-- My Vehicles -->
+
+                <article class="stat-card">
+
+                    <div class="stat-icon">
+
+                        <i class="fa-solid fa-car"></i>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            My Vehicles
+                        </span>
+
+                        <strong id="vehicleCount">
+                            0
+                        </strong>
+
+                    </div>
+
+                </article>
+
+
+
+                <!-- Active Vehicles -->
+
+                <article class="stat-card">
+
+                    <div class="stat-icon">
+
+                        <i class="fa-solid fa-circle-check"></i>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            Active Vehicles
+                        </span>
+
+                        <strong id="activeVehicleCount">
+                            0
+                        </strong>
+
+                    </div>
+
+                </article>
+
+
+
+                <!-- Pending Bookings -->
+
+                <article class="stat-card">
+
+                    <div class="stat-icon">
+
+                        <i class="fa-solid fa-clock"></i>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            Pending Bookings
+                        </span>
+
+                        <strong id="pendingBookingCount">
+                            0
+                        </strong>
+
+                    </div>
+
+                </article>
+
+
+
+                <!-- Confirmed Bookings -->
+
+                <article class="stat-card">
+
+                    <div class="stat-icon">
+
+                        <i class="fa-solid fa-calendar-check"></i>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            Confirmed Bookings
+                        </span>
+
+                        <strong id="confirmedBookingCount">
+                            0
+                        </strong>
+
+                    </div>
+
+                </article>
+
+
+
+                <!-- Booking Value -->
+
+                <article class="stat-card stat-card-wide">
+
+                    <div class="stat-icon">
+
+                        <i class="fa-solid fa-indian-rupee-sign"></i>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            Booking Value
+                        </span>
+
+                        <strong id="earningsAmount">
+                            ₹0
+                        </strong>
+
+                    </div>
+
+                </article>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 MY VEHICLES
+            ================================================== -->
+
+            <section class="dashboard-section">
+
+
+                <div class="section-header">
+
+                    <div>
+
+                        <span class="section-eyebrow">
+                            Your inventory
+                        </span>
+
+
+                        <h2>
+                            My Vehicles
+                        </h2>
+
+                    </div>
+
+
+                    <span
+                        id="vehicleSummary"
+                        class="section-count"
+                    >
+                        0 vehicles
+                    </span>
+
+                </div>
+
+
+                <div
+                    id="vehiclesGrid"
+                    class="vehicles-grid"
+                ></div>
+
+
+                <div
+                    id="noVehicles"
+                    class="empty-dashboard hidden"
+                >
+
+                    <i
+                        class="fa-solid fa-car"
+                    ></i>
+
+
+                    <h3>
+                        No vehicles yet
+                    </h3>
+
+
+                    <p>
+                        Add your first vehicle to start hosting on Saarthi.
+                    </p>
+
+
+                    <a
+                        href="host.html"
+                        class="empty-action-btn"
+                    >
+                        Add Vehicle
+                    </a>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 INCOMING BOOKINGS
+            ================================================== -->
+
+            <section class="dashboard-section">
+
+
+                <div class="section-header booking-section-heading">
+
+                    <div>
+
+                        <span class="section-eyebrow">
+                            Rental activity
+                        </span>
+
+
+                        <h2>
+                            Incoming Bookings
+                        </h2>
+
+                    </div>
+
+
+                    <span
+                        id="bookingSummary"
+                        class="section-count"
+                    >
+                        0 bookings
+                    </span>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     BOOKING FILTERS
+                ================================================== -->
+
+                <div class="booking-filters">
+
+                    <button
+                        type="button"
+                        class="booking-filter active"
+                        data-status="all"
+                    >
+
+                        <span>
+                            All
+                        </span>
+
+                        <strong id="allFilterCount">
+                            0
+                        </strong>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="booking-filter"
+                        data-status="pending"
+                    >
+
+                        <span>
+                            Pending
+                        </span>
+
+                        <strong id="pendingFilterCount">
+                            0
+                        </strong>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="booking-filter"
+                        data-status="confirmed"
+                    >
+
+                        <span>
+                            Confirmed
+                        </span>
+
+                        <strong id="confirmedFilterCount">
+                            0
+                        </strong>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="booking-filter"
+                        data-status="cancelled"
+                    >
+
+                        <span>
+                            Cancelled
+                        </span>
+
+                        <strong id="cancelledFilterCount">
+                            0
+                        </strong>
+
+                    </button>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     BOOKINGS GRID
+                ================================================== -->
+
+                <div
+                    id="bookingsGrid"
+                    class="host-bookings-grid"
+                ></div>
+
+
+                <!-- =================================================
+                     FILTER EMPTY STATE
+                ================================================== -->
+
+                <div
+                    id="noFilteredBookings"
+                    class="empty-dashboard hidden"
+                >
+
+                    <i
+                        class="fa-solid fa-filter-circle-xmark"
+                    ></i>
+
+
+                    <h3>
+                        No bookings in this category
+                    </h3>
+
+
+                    <p>
+                        Try another booking filter.
+                    </p>
+
+                </div>
+
+
+                <!-- =================================================
+                     NO BOOKINGS AT ALL
+                ================================================== -->
+
+                <div
+                    id="noBookings"
+                    class="empty-dashboard hidden"
+                >
+
+                    <i
+                        class="fa-solid fa-calendar-xmark"
+                    ></i>
+
+
+                    <h3>
+                        No bookings yet
+                    </h3>
+
+
+                    <p>
+                        Bookings for your vehicles will appear here.
+                    </p>
+
+                </div>
+
+
+            </section>
+
+
+        </section>
+
+
+    </main>
+
+
+    <script src="js/pages/host-dashboard.js"></script>
+    <script src="js/core/auth-ui.js"></script>
+
+</body>
+
+</html>

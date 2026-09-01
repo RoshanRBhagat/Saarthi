@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Car Details | Saarthi</title>
+
+    <!-- Google Fonts -->
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Font Awesome -->
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Main Saarthi CSS -->
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+    <!-- Car Details CSS -->
+    <link
+        rel="stylesheet"
+        href="css/car-details.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         NAVIGATION
+    ====================================================== -->
+
+    <nav class="navbar">
+
+        <div class="nav-container">
+
+            <a
+                href="index.html"
+                class="logo"
+            >
+
+                <i
+                    class="fa-solid fa-car-side"
+                ></i>
+
+                <span>
+                    Saarthi
+                </span>
+
+            </a>
+
+
+            <div class="nav-links">
+
+                <a href="index.html">
+                    Home
+                </a>
+
+                <a href="cars.html">
+                    Browse Cars
+                </a>
+
+                <a href="ai-trip-planner.html">
+                    AI Trip Planner
+                </a>
+
+                <a href="host.html">
+                    Host Your Car
+                </a>
+
+                
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="car-details-page">
+
+
+        <!-- Loading -->
+
+        <div
+            id="loading"
+            class="details-message"
+        >
+
+            <i
+                class="fa-solid fa-spinner fa-spin"
+            ></i>
+
+            <p>
+                Loading car details...
+            </p>
+
+        </div>
+
+
+
+        <!-- Error -->
+
+        <div
+            id="error"
+            class="details-message error hidden"
+        >
+
+        </div>
+
+
+
+        <!-- Car details container -->
+
+        <section
+            id="carDetails"
+            class="car-details hidden"
+        >
+
+
+            <!-- =================================================
+                 IMAGE GALLERY
+            ================================================== -->
+
+            <div class="details-gallery">
+
+
+                <!-- Main image -->
+
+                <div class="details-main-image">
+
+                    <img
+                        id="mainCarImage"
+                        src=""
+                        alt="Car"
+                    >
+
+
+                    <button
+                        type="button"
+                        id="previousImage"
+                        class="gallery-arrow gallery-arrow-left"
+                        aria-label="Previous image"
+                    >
+
+                        <i
+                            class="fa-solid fa-chevron-left"
+                        ></i>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="nextImage"
+                        class="gallery-arrow gallery-arrow-right"
+                        aria-label="Next image"
+                    >
+
+                        <i
+                            class="fa-solid fa-chevron-right"
+                        ></i>
+
+                    </button>
+
+                </div>
+
+
+                <!-- Thumbnails -->
+
+                <div
+                    id="imageThumbnails"
+                    class="details-thumbnails"
+                >
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 DETAILS
+            ================================================== -->
+
+            <div class="details-info">
+
+
+                <!-- Header -->
+
+                <div class="details-header">
+
+                    <div>
+
+                        <span
+                            id="carCategory"
+                            class="details-category"
+                        >
+                            Car
+                        </span>
+
+
+                        <h1 id="carName">
+                            Loading...
+                        </h1>
+
+
+                        <div
+                            id="carLocation"
+                            class="details-location"
+                        >
+
+                            <i
+                                class="fa-solid fa-location-dot"
+                            ></i>
+
+                            <span>
+                                Loading...
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="details-price">
+
+                        <strong id="carPrice">
+                            ₹0
+                        </strong>
+
+                        <span>
+                            per day
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- Rating -->
+
+                <div
+                    id="carRating"
+                    class="details-rating"
+                >
+
+                    <i
+                        class="fa-solid fa-star"
+                    ></i>
+
+                    <span>
+                        0.0
+                    </span>
+
+                    <span>
+                        ·
+                    </span>
+
+                    <span>
+                        0 trips
+                    </span>
+
+                </div>
+
+
+
+                <!-- Specifications -->
+
+                <div class="details-section">
+
+                    <h2>
+                        Vehicle information
+                    </h2>
+
+
+                    <div
+                        id="carSpecs"
+                        class="details-specs"
+                    >
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- Features -->
+
+                <div
+                    class="details-section"
+                    id="featuresSection"
+                >
+
+                    <h2>
+                        Features
+                    </h2>
+
+
+                    <div
+                        id="carFeatures"
+                        class="details-features"
+                    >
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- Description -->
+
+                <div class="details-section">
+
+                    <h2>
+                        About this vehicle
+                    </h2>
+
+
+                    <p
+                        id="carDescription"
+                        class="details-description"
+                    >
+
+                    </p>
+
+                </div>
+            
+
+
+
+                <!-- Booking -->
+<!-- =====================================================
+     BOOKING / AVAILABILITY
+====================================================== -->
+
+                <div class="booking-box">
+
+
+                    <!-- DAILY PRICE -->
+
+                    <div class="booking-price-summary">
+
+                        <span>
+                            Daily rental
+                        </span>
+
+                        <strong>
+
+                            <span id="bookingPrice">
+                                ₹0
+                            </span>
+
+                            / day
+
+                        </strong>
+
+                    </div>
+
+
+                    <!-- DATES -->
+
+                    <div class="booking-dates">
+
+
+                        <div class="booking-date-field">
+
+                            <label for="pickupDate">
+                                Pickup date
+                            </label>
+
+                            <input
+                                id="pickupDate"
+                                type="date"
+                            >
+
+                        </div>
+
+
+                        <div class="booking-date-field">
+
+                            <label for="returnDate">
+                                Return date
+                            </label>
+
+                            <input
+                                id="returnDate"
+                                type="date"
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- CHECK BUTTON -->
+
+                    <button
+                        id="checkAvailabilityBtn"
+                        class="booking-btn"
+                        type="button"
+                    >
+
+                        <i class="fa-solid fa-calendar-check"></i>
+
+                        Check Availability
+
+                    </button>
+                    
+
+                    <div
+                        id="availabilityResult"
+                        class="availability-result hidden"
+                    >
+
+                    </div>
+
+                    
+                    <button
+                        id="bookNowBtn"
+                        class="booking-btn booking-btn-secondary hidden"
+                        type="button"
+                    >
+                        <i class="fa-solid fa-car"></i>
+                        Book Now
+                    </button>                   
+
+
+                    <!-- RESULT -->
+
+                    
+
+
+
+                    
+
+
+
+<!-- =====================================================
+     BOOKING FORM
+====================================================== -->
+
+                    <div
+                        id="bookingFormSection"
+                        class="booking-form-section hidden"
+                    >
+
+                        <div class="booking-form-header">
+
+                            <span class="booking-form-eyebrow">
+                                <i class="fa-solid fa-file-signature"></i>
+                                Complete your booking
+                            </span>
+
+                            <h3>
+                                Booking details
+                            </h3>
+
+                            <p>
+                                Enter your contact details to reserve this vehicle.
+                            </p>
+
+                        </div>
+
+
+                        <!-- CUSTOMER NAME -->
+
+                        <div class="booking-form-group">
+
+                            <label for="customerName">
+                                Full name
+                            </label>
+
+                            <input
+                                id="customerName"
+                                type="text"
+                                placeholder="Enter your full name"
+                                autocomplete="name"
+                            >
+
+                        </div>
+
+
+                        <!-- PHONE -->
+
+                        <div class="booking-form-group">
+
+                            <label for="customerPhone">
+                                Mobile number
+                            </label>
+
+                            <input
+                                id="customerPhone"
+                                type="tel"
+                                placeholder="10-digit mobile number"
+                                maxlength="10"
+                                autocomplete="tel"
+                            >
+
+                        </div>
+
+
+                        <!-- EMAIL -->
+
+                        <div class="booking-form-group">
+
+                            <label for="customerEmail">
+                                Email address
+                            </label>
+
+                            <input
+                                id="customerEmail"
+                                type="email"
+                                placeholder="you@example.com"
+                                autocomplete="email"
+                            >
+
+                        </div>
+
+
+                        <!-- DRIVER -->
+
+                        <div class="driver-option">
+
+                            <label class="driver-checkbox">
+
+                                <input
+                                    id="driverRequired"
+                                    type="checkbox"
+                                >
+
+                                <span>
+                                    I need a professional driver
+                                </span>
+
+                            </label>
+
+                            <small>
+                                Driver-on-Demand will be connected in the next phase.
+                            </small>
+
+                        </div>
+
+
+                        <!-- BOOKING SUMMARY -->
+
+                        <div class="booking-form-summary">
+
+                            <div class="summary-row">
+
+                                <span>
+                                    Pickup
+                                </span>
+
+                                <strong id="summaryPickupDate">
+                                    —
+                                </strong>
+
+                            </div>
+
+
+                            <div class="summary-row">
+
+                                <span>
+                                    Return
+                                </span>
+
+                                <strong id="summaryReturnDate">
+                                    —
+                                </strong>
+
+                            </div>
+
+
+                            <div class="summary-row">
+
+                                <span>
+                                    Rental duration
+                                </span>
+
+                                <strong id="summaryTotalDays">
+                                    —
+                                </strong>
+
+                            </div>
+
+
+                            <div class="summary-row total-row">
+
+                                <span>
+                                    Total amount
+                                </span>
+
+                                <strong id="summaryTotalAmount">
+                                    ₹0
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- CONFIRM BUTTON -->
+
+                        <button
+                            id="confirmBookingBtn"
+                            class="booking-btn confirm-booking-btn"
+                            type="button"
+                        >
+
+                            <i class="fa-solid fa-circle-check"></i>
+
+                            Confirm Booking
+
+                        </button>
+
+
+                        <!-- BOOKING ERROR -->
+
+                        <div
+                            id="bookingError"
+                            class="booking-error hidden"
+                        >
+
+                        </div>
+
+                    </div>
+
+
+
+
+                </div>
+
+
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+    <script src="js/pages/car-details.js"></script>
+    <script src="js/core/auth-ui.js"></script>
+
+</body>
+
+</html>
