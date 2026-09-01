@@ -297,10 +297,27 @@ function renderBooking(
         "booking-card";
 
 
+    /* =====================================================
+       BOOKING STATUS
+    ===================================================== */
+
     const status =
         booking.status ||
         "pending";
 
+
+    /* =====================================================
+       PAYMENT STATUS
+    ===================================================== */
+
+    const paymentStatus =
+        booking.paymentStatus ||
+        "pending";
+
+
+    /* =====================================================
+       DATES
+    ===================================================== */
 
     const pickupDate =
         formatDate(
@@ -313,6 +330,10 @@ function renderBooking(
             booking.returnDate
         );
 
+
+    /* =====================================================
+       PRICING
+    ===================================================== */
 
     const totalDays =
         Number(
@@ -332,10 +353,18 @@ function renderBooking(
         );
 
 
+    /* =====================================================
+       DRIVER
+    ===================================================== */
+
     const driverRequired =
         booking.driverRequired ===
         true;
 
+
+    /* =====================================================
+       CARD HTML
+    ===================================================== */
 
     card.innerHTML = `
 
@@ -426,6 +455,7 @@ function renderBooking(
                 <strong>
 
                     ${totalDays}
+
                     ${
                         totalDays === 1
                             ? "day"
@@ -473,6 +503,8 @@ function renderBooking(
         </div>
 
 
+        <!-- Driver information -->
+
         <div
             class="booking-driver"
         >
@@ -485,74 +517,120 @@ function renderBooking(
                 }"
             ></i>
 
-            ${
-                [
-                    "pending",
-                    "confirmed"
-                ].includes(status)
-                    ? `
+            <span>
 
-                        <div class="customer-booking-actions">
+                ${
+                    driverRequired
+                        ? "Driver requested"
+                        : "Self-drive booking"
+                }
 
-                            <button
-                                type="button"
-                                class="customer-cancel-btn"
-                            >
-
-                                <i
-                                    class="fa-solid fa-xmark"
-                                ></i>
-
-                                Cancel Booking
-
-                            </button>
-
-                        </div>
-
-                    `
-                    : ""
-            }
-
-            ${
-                status === "confirmed" &&
-                paymentStatus !== "paid"
-                    ? `
-                        <div class="customer-payment-actions">
-
-                            <button
-                                type="button"
-                                class="customer-pay-btn"
-                            >
-
-                                <i
-                                    class="fa-solid fa-credit-card"
-                                ></i>
-
-                                Pay Now
-
-                            </button>
-
-                        </div>
-                    `
-                    : ""
-            }
-
-
-
-            ${
-                driverRequired
-                    ? "Driver requested"
-                    : "Self-drive booking"
-            }
+            </span>
 
         </div>
+
+
+        <!-- Customer actions -->
+
+        ${
+            [
+                "pending",
+                "confirmed"
+            ].includes(status)
+                ? `
+
+                    <div
+                        class="customer-booking-actions"
+                    >
+
+                        <button
+                            type="button"
+                            class="customer-cancel-btn"
+                        >
+
+                            <i
+                                class="fa-solid fa-xmark"
+                            ></i>
+
+                            Cancel Booking
+
+                        </button>
+
+                    </div>
+
+                `
+                : ""
+        }
+
+
+        <!-- Payment action -->
+
+        ${
+            status === "confirmed" &&
+            paymentStatus !== "paid"
+                ? `
+
+                    <div
+                        class="customer-payment-actions"
+                    >
+
+                        <button
+                            type="button"
+                            class="customer-pay-btn"
+                        >
+
+                            <i
+                                class="fa-solid fa-credit-card"
+                            ></i>
+
+                            Pay Now
+
+                        </button>
+
+                    </div>
+
+                `
+                : ""
+        }
+
+
+        <!-- Paid status -->
+
+        ${
+            paymentStatus === "paid"
+                ? `
+
+                    <div
+                        class="customer-payment-status paid"
+                    >
+
+                        <i
+                            class="fa-solid fa-circle-check"
+                        ></i>
+
+                        Payment completed
+
+                    </div>
+
+                `
+                : ""
+        }
 
     `;
 
 
+    /* =====================================================
+       ADD CARD TO PAGE
+    ===================================================== */
+
     bookingsGrid.appendChild(
         card
     );
+
+
+    /* =====================================================
+       PAY NOW BUTTON
+    ===================================================== */
 
     const payButton =
         card.querySelector(
@@ -579,8 +657,9 @@ function renderBooking(
 
     }
 
+
     /* =====================================================
-    CUSTOMER CANCEL BUTTON
+       CANCEL BOOKING BUTTON
     ===================================================== */
 
     const cancelButton =
@@ -1044,7 +1123,7 @@ async function startPayment(
 
 
             handler:
-                function (
+                async function (
                     paymentResponse
                 ) {
 
@@ -1054,17 +1133,144 @@ async function startPayment(
                     );
 
 
-                    alert(
-                        "Payment completed. We are verifying your payment."
-                    );
+                    try {
 
-                },
+                        button.disabled =
+                            true;
 
 
-            modal: {
+                        button.innerHTML = `
 
-                ondismiss:
-                    function () {
+                            <i
+                                class="fa-solid fa-spinner fa-spin"
+                            ></i>
+
+                            Verifying payment...
+
+                        `;
+
+
+                        /* ---------------------------------------------
+                        SEND PAYMENT TO BACKEND
+                        --------------------------------------------- */
+
+                        const verifyResponse =
+                            await fetch(
+                                "/api/payments/verify",
+                                {
+
+                                    method:
+                                        "POST",
+
+                                    headers: {
+
+                                        "Content-Type":
+                                            "application/json",
+
+                                        "Authorization":
+                                            `Bearer ${token}`
+
+                                    },
+
+                                    body:
+                                        JSON.stringify({
+
+                                            bookingId,
+
+                                            razorpay_payment_id:
+                                                paymentResponse
+                                                    .razorpay_payment_id,
+
+                                            razorpay_order_id:
+                                                paymentResponse
+                                                    .razorpay_order_id,
+
+                                            razorpay_signature:
+                                                paymentResponse
+                                                    .razorpay_signature
+
+                                        })
+
+                                }
+                            );
+
+
+                        const verifyResult =
+                            await verifyResponse.json();
+
+
+                        /* ---------------------------------------------
+                        AUTH ERROR
+                        --------------------------------------------- */
+
+                        if (
+                            verifyResponse.status ===
+                            401
+                        ) {
+
+                            localStorage.removeItem(
+                                "saarthiToken"
+                            );
+
+
+                            localStorage.removeItem(
+                                "saarthiUser"
+                            );
+
+
+                            window.location.href =
+                                `auth.html?returnUrl=${encodeURIComponent(
+                                    window.location.href
+                                )}`;
+
+
+                            return;
+
+                        }
+
+
+                        /* ---------------------------------------------
+                        VERIFICATION ERROR
+                        --------------------------------------------- */
+
+                        if (
+                            !verifyResponse.ok ||
+                            !verifyResult.success
+                        ) {
+
+                            throw new Error(
+                                verifyResult.message ||
+                                "Payment verification failed."
+                            );
+
+                        }
+
+
+                        /* ---------------------------------------------
+                        VERIFIED
+                        --------------------------------------------- */
+
+                        alert(
+                            "Payment successful and verified."
+                        );
+
+
+                        window.location.reload();
+
+
+                    } catch (error) {
+
+                        console.error(
+                            "Payment verification error:",
+                            error
+                        );
+
+
+                        alert(
+                            error.message ||
+                            "Payment was completed but verification failed."
+                        );
+
 
                         button.disabled =
                             false;
@@ -1082,7 +1288,7 @@ async function startPayment(
 
                     }
 
-            }
+                },
 
         };
 

@@ -34,6 +34,8 @@ const Razorpay =
    ROUTES
 ========================================================= */
 
+
+
 const carRoutes =
     require("./routes/carRoutes");
 
@@ -44,6 +46,9 @@ const bookingRoutes =
 
 const paymentRoutes =
     require("./routes/paymentRoutes");
+
+const authRoutes =
+    require("./routes/authRoutes");
 
 
 /* =========================================================
@@ -103,6 +108,13 @@ app.use(
    API ROUTES
 ========================================================= */
 
+
+/* ---------- Authentication APIs ---------- */
+
+app.use(
+    "/api/auth",
+    authRoutes
+);
 
 /* ---------- Car APIs ---------- */
 

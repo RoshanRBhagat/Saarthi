@@ -3,19 +3,16 @@ const express =
 
 
 const {
-    createPaymentOrder
+    createPaymentOrder,
+    verifyPayment
 } =
-    require(
-        "../controllers/paymentController"
-    );
+    require("../controllers/paymentController");
 
 
 const {
     authenticateUser
 } =
-    require(
-        "../middleware/authMiddleware"
-    );
+    require("../middleware/authMiddleware");
 
 
 const router =
@@ -30,6 +27,17 @@ router.post(
     "/create-order",
     authenticateUser,
     createPaymentOrder
+);
+
+
+/* =========================================================
+   VERIFY PAYMENT
+========================================================= */
+
+router.post(
+    "/verify",
+    authenticateUser,
+    verifyPayment
 );
 
 

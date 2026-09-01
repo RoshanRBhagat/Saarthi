@@ -193,18 +193,49 @@ const bookingSchema =
                 type: String,
 
                 enum: [
-
                     "pending",
-
                     "paid",
-
                     "failed",
-
                     "refunded"
-
                 ],
 
                 default: "pending"
+
+            },
+
+
+            paymentId: {
+
+                type: String,
+
+                default: ""
+
+            },
+
+
+            paymentOrderId: {
+
+                type: String,
+
+                default: ""
+
+            },
+
+
+            paymentSignature: {
+
+                type: String,
+
+                default: ""
+
+            },
+
+
+            paidAt: {
+
+                type: Date,
+
+                default: null
 
             },
 
