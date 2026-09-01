@@ -1,144 +1,170 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const path = require("path");
+/* =========================================================
+   SAARTHI - BACKEND SERVER
+========================================================= */
+
+
+/* =========================================================
+   ENVIRONMENT VARIABLES
+========================================================= */
 
 require("dotenv").config();
 
 
-// =========================================================
-// IMPORT ROUTES
-// =========================================================
+/* =========================================================
+   DEPENDENCIES
+========================================================= */
+
+const express =
+    require("express");
+
+
+const mongoose =
+    require("mongoose");
+
+
+const path =
+    require("path");
+
+
+const Razorpay =
+    require("razorpay");
+
+
+/* =========================================================
+   ROUTES
+========================================================= */
 
 const carRoutes =
     require("./routes/carRoutes");
 
-const recommendationRoutes =
-    require("./routes/recommendationRoutes");
 
 const bookingRoutes =
     require("./routes/bookingRoutes");
 
-const authRoutes =
-    require("./routes/authRoutes");
+
+const paymentRoutes =
+    require("./routes/paymentRoutes");
 
 
-// =========================================================
-// CREATE EXPRESS APP
-// =========================================================
+/* =========================================================
+   EXPRESS APP
+========================================================= */
 
 const app =
     express();
 
 
-// =========================================================
-// ENVIRONMENT VARIABLES
-// =========================================================
+/* =========================================================
+   CONFIGURATION
+========================================================= */
 
 const PORT =
     process.env.PORT || 5000;
 
+
 const MONGODB_URI =
-    process.env.MONGODB_URI;
-
-const JWT_SECRET =
-    process.env.JWT_SECRET;
+    process.env.MONGODB_URI ||
+    "mongodb://127.0.0.1:27017/saarthi";
 
 
-// =========================================================
-// CHECK REQUIRED ENVIRONMENT VARIABLES
-// =========================================================
+/* =========================================================
+   RAZORPAY
+========================================================= */
 
-if (!MONGODB_URI) {
+const razorpay =
+    new Razorpay({
 
-    console.error(
-        "MONGODB_URI is missing from .env"
-    );
+        key_id:
+            process.env.RAZORPAY_KEY_ID,
 
-    process.exit(1);
+        key_secret:
+            process.env.RAZORPAY_KEY_SECRET
 
-}
-
-
-if (!JWT_SECRET) {
-
-    console.error(
-        "JWT_SECRET is missing from .env"
-    );
-
-    process.exit(1);
-
-}
+    });
 
 
-// =========================================================
-// PROJECT PATHS
-// =========================================================
-
-const PROJECT_ROOT =
-    path.join(
-        __dirname,
-        ".."
-    );
-
-
-const FRONTEND_ROOT =
-    path.join(
-        PROJECT_ROOT,
-        "frontend"
-    );
-
-
-const UPLOADS_ROOT =
-    path.join(
-        __dirname,
-        "uploads"
-    );
-
-
-// =========================================================
-// MIDDLEWARE
-// =========================================================
+/* =========================================================
+   MIDDLEWARE
+========================================================= */
 
 app.use(
     express.json()
 );
 
 
-// =========================================================
-// SERVE FRONTEND
-// =========================================================
-
 app.use(
-    express.static(
-        FRONTEND_ROOT
-    )
+    express.urlencoded({
+        extended: true
+    })
 );
 
 
-// =========================================================
-// SERVE UPLOADED CAR IMAGES
-// =========================================================
-//
-// MongoDB stores paths such as:
-//
-// /uploads/cars/example.jpg
-//
-// Express serves those files from:
-//
-// backend/uploads/cars/
-// =========================================================
+/* =========================================================
+   API ROUTES
+========================================================= */
+
+
+/* ---------- Car APIs ---------- */
+
+app.use(
+    "/api/cars",
+    carRoutes
+);
+
+
+/* ---------- Booking APIs ---------- */
+
+app.use(
+    "/api/bookings",
+    bookingRoutes
+);
+
+
+/* ---------- Payment APIs ---------- */
+
+app.use(
+    "/api/payments",
+    paymentRoutes
+);
+
+
+/* =========================================================
+   UPLOADS
+========================================================= */
 
 app.use(
     "/uploads",
     express.static(
-        UPLOADS_ROOT
+        path.join(
+            __dirname,
+            "uploads"
+        )
     )
 );
 
 
-// =========================================================
-// HOME PAGE
-// =========================================================
+/* =========================================================
+   FRONTEND
+========================================================= */
+
+const frontendPath =
+    path.join(
+        __dirname,
+        "..",
+        "frontend"
+    );
+
+
+app.use(
+    express.static(
+        frontendPath
+    )
+);
+
+
+/* =========================================================
+   HOME PAGE
+========================================================= */
 
 app.get(
     "/",
@@ -146,7 +172,7 @@ app.get(
 
         res.sendFile(
             path.join(
-                FRONTEND_ROOT,
+                frontendPath,
                 "index.html"
             )
         );
@@ -155,86 +181,178 @@ app.get(
 );
 
 
-// =========================================================
-// CAR API
-// =========================================================
+/* =========================================================
+   RAZORPAY CONFIG TEST
+========================================================= */
 
-app.use(
-    "/api/cars",
-    carRoutes
+app.get(
+    "/api/payment/config",
+    (req, res) => {
+
+        const configured =
+            Boolean(
+                process.env.RAZORPAY_KEY_ID &&
+                process.env.RAZORPAY_KEY_SECRET
+            );
+
+
+        return res.json({
+
+            success:
+                true,
+
+            configured,
+
+            keyId:
+                process.env.RAZORPAY_KEY_ID ||
+                null
+
+        });
+
+    }
 );
 
 
-// =========================================================
-// AI RECOMMENDATION API
-// =========================================================
+/* =========================================================
+   API 404 HANDLER
+========================================================= */
 
 app.use(
-    "/api/recommendations",
-    recommendationRoutes
+    (req, res, next) => {
+
+        if (
+            req.path.startsWith(
+                "/api/"
+            )
+        ) {
+
+            return res.status(404).json({
+
+                success:
+                    false,
+
+                message:
+                    "API route not found."
+
+            });
+
+        }
+
+
+        next();
+
+    }
 );
 
 
-// =========================================================
-// BOOKING API
-// =========================================================
+/* =========================================================
+   GENERAL ERROR HANDLER
+========================================================= */
 
 app.use(
-    "/api/bookings",
-    bookingRoutes
+    (
+        error,
+        req,
+        res,
+        next
+    ) => {
+
+        console.error(
+            "Unhandled server error:",
+            error
+        );
+
+
+        return res.status(500).json({
+
+            success:
+                false,
+
+            message:
+                "Internal server error."
+
+        });
+
+    }
 );
 
 
-// =========================================================
-// AUTHENTICATION API
-// =========================================================
+/* =========================================================
+   START SERVER
+========================================================= */
 
-app.use(
-    "/api/auth",
-    authRoutes
-);
+async function startServer() {
+
+    try {
+
+        /* -------------------------------------------------
+           CONNECT MONGODB
+        ------------------------------------------------- */
+
+        await mongoose.connect(
+            MONGODB_URI
+        );
 
 
-// =========================================================
-// START SERVER AFTER MONGODB CONNECTION
-// =========================================================
+        console.log(
+            "MongoDB connected."
+        );
 
-mongoose
-    .connect(
-        MONGODB_URI
-    )
 
-    .then(
-        () => {
+        /* -------------------------------------------------
+           RAZORPAY CHECK
+        ------------------------------------------------- */
+
+        if (
+            process.env.RAZORPAY_KEY_ID &&
+            process.env.RAZORPAY_KEY_SECRET
+        ) {
 
             console.log(
-                "MongoDB connected successfully."
+                "Razorpay configuration loaded."
             );
 
+        } else {
 
-            app.listen(
-                PORT,
-                () => {
-
-                    console.log(
-                        `Saarthi server running at http://localhost:${PORT}`
-                    );
-
-                }
+            console.warn(
+                "Warning: Razorpay keys are not configured."
             );
 
         }
-    )
 
-    .catch(
-        (error) => {
 
-            console.error(
-                "MongoDB connection failed:",
-                error.message
-            );
+        /* -------------------------------------------------
+           START EXPRESS SERVER
+        ------------------------------------------------- */
 
-            process.exit(1);
+        app.listen(
+            PORT,
+            () => {
 
-        }
-    );
+                console.log(
+                    `Saarthi server running at http://localhost:${PORT}`
+                );
+
+            }
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Server startup failed:",
+            error.message
+        );
+
+
+        process.exit(1);
+
+    }
+
+}
+
+
+/* =========================================================
+   START APPLICATION
+========================================================= */
+
+startServer();

@@ -693,3 +693,127 @@
     }
 
 }
+
+/* =========================================================
+   CUSTOMER BOOKING ACTIONS
+========================================================= */
+
+.customer-booking-actions {
+
+    margin-top: 15px;
+
+    padding-top: 14px;
+
+    border-top:
+        1px solid #edf0f3;
+
+}
+
+
+.customer-cancel-btn {
+
+    width: 100%;
+
+    min-height: 40px;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 7px;
+
+    border:
+        1px solid #dc2626;
+
+    border-radius: 9px;
+
+    background: #ffffff;
+
+    color: #b91c1c;
+
+    font: inherit;
+
+    font-size: 0.78rem;
+
+    font-weight: 800;
+
+    cursor: pointer;
+
+}
+
+
+.customer-cancel-btn:hover {
+
+    background: #fef2f2;
+
+}
+
+
+.customer-cancel-btn:disabled {
+
+    opacity: 0.65;
+
+    cursor: not-allowed;
+
+}
+
+/* =========================================================
+   CUSTOMER PAYMENT ACTION
+========================================================= */
+
+.customer-payment-actions {
+
+    margin-top: 9px;
+
+}
+
+
+.customer-pay-btn {
+
+    width: 100%;
+
+    min-height: 42px;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    border: none;
+
+    border-radius: 9px;
+
+    background: #2563eb;
+
+    color: #ffffff;
+
+    font: inherit;
+
+    font-size: 0.78rem;
+
+    font-weight: 800;
+
+    cursor: pointer;
+
+}
+
+
+.customer-pay-btn:hover {
+
+    background: #1d4ed8;
+
+}
+
+
+.customer-pay-btn:disabled {
+
+    opacity: 0.65;
+
+    cursor: not-allowed;
+
+}

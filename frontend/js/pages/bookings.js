@@ -485,6 +485,59 @@ function renderBooking(
                 }"
             ></i>
 
+            ${
+                [
+                    "pending",
+                    "confirmed"
+                ].includes(status)
+                    ? `
+
+                        <div class="customer-booking-actions">
+
+                            <button
+                                type="button"
+                                class="customer-cancel-btn"
+                            >
+
+                                <i
+                                    class="fa-solid fa-xmark"
+                                ></i>
+
+                                Cancel Booking
+
+                            </button>
+
+                        </div>
+
+                    `
+                    : ""
+            }
+
+            ${
+                status === "confirmed" &&
+                paymentStatus !== "paid"
+                    ? `
+                        <div class="customer-payment-actions">
+
+                            <button
+                                type="button"
+                                class="customer-pay-btn"
+                            >
+
+                                <i
+                                    class="fa-solid fa-credit-card"
+                                ></i>
+
+                                Pay Now
+
+                            </button>
+
+                        </div>
+                    `
+                    : ""
+            }
+
+
 
             ${
                 driverRequired
@@ -500,6 +553,59 @@ function renderBooking(
     bookingsGrid.appendChild(
         card
     );
+
+    const payButton =
+        card.querySelector(
+            ".customer-pay-btn"
+        );
+
+
+    if (
+        payButton
+    ) {
+
+        payButton.addEventListener(
+            "click",
+            async () => {
+
+                await startPayment(
+                    booking.bookingId,
+                    booking.totalAmount,
+                    payButton
+                );
+
+            }
+        );
+
+    }
+
+    /* =====================================================
+    CUSTOMER CANCEL BUTTON
+    ===================================================== */
+
+    const cancelButton =
+        card.querySelector(
+            ".customer-cancel-btn"
+        );
+
+
+    if (
+        cancelButton
+    ) {
+
+        cancelButton.addEventListener(
+            "click",
+            async () => {
+
+                await cancelCustomerBooking(
+                    booking.bookingId,
+                    cancelButton
+                );
+
+            }
+        );
+
+    }
 
 }
 
@@ -593,5 +699,466 @@ function escapeHTML(
             "'",
             "&#039;"
         );
+
+}
+
+/* =========================================================
+   CANCEL CUSTOMER BOOKING
+========================================================= */
+
+async function cancelCustomerBooking(
+    bookingId,
+    button
+) {
+
+    const confirmed =
+        window.confirm(
+            "Are you sure you want to cancel this booking?"
+        );
+
+
+    if (
+        !confirmed
+    ) {
+
+        return;
+
+    }
+
+
+    try {
+
+        /* -------------------------------------------------
+           LOADING STATE
+        ------------------------------------------------- */
+
+        button.disabled =
+            true;
+
+
+        button.innerHTML = `
+
+            <i
+                class="fa-solid fa-spinner fa-spin"
+            ></i>
+
+            Cancelling...
+
+        `;
+
+
+        /* -------------------------------------------------
+           REQUEST
+        ------------------------------------------------- */
+
+        const response =
+            await fetch(
+                `/api/bookings/my/${encodeURIComponent(
+                    bookingId
+                )}/cancel`,
+                {
+
+                    method:
+                        "PATCH",
+
+                    headers: {
+
+                        "Authorization":
+                            `Bearer ${token}`
+
+                    }
+
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        /* -------------------------------------------------
+           AUTH ERROR
+        ------------------------------------------------- */
+
+        if (
+            response.status === 401
+        ) {
+
+            localStorage.removeItem(
+                "saarthiToken"
+            );
+
+
+            localStorage.removeItem(
+                "saarthiUser"
+            );
+
+
+            window.location.href =
+                `auth.html?returnUrl=${encodeURIComponent(
+                    window.location.href
+                )}`;
+
+
+            return;
+
+        }
+
+
+        /* -------------------------------------------------
+           API ERROR
+        ------------------------------------------------- */
+
+        if (
+            !response.ok ||
+            !result.success
+        ) {
+
+            throw new Error(
+                result.message ||
+                "Unable to cancel booking."
+            );
+
+        }
+
+
+        /* -------------------------------------------------
+           SUCCESS
+        ------------------------------------------------- */
+
+        alert(
+            "Booking cancelled successfully."
+        );
+
+
+        /* -------------------------------------------------
+           RELOAD BOOKINGS
+        ------------------------------------------------- */
+
+        window.location.reload();
+
+
+    } catch (error) {
+
+        console.error(
+            "Cancel booking error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Unable to cancel booking."
+        );
+
+
+        /* -------------------------------------------------
+           RESTORE BUTTON
+        ------------------------------------------------- */
+
+        button.disabled =
+            false;
+
+
+        button.innerHTML = `
+
+            <i
+                class="fa-solid fa-xmark"
+            ></i>
+
+            Cancel Booking
+
+        `;
+
+    }
+
+}
+
+/* =========================================================
+   START RAZORPAY PAYMENT
+========================================================= */
+
+async function startPayment(
+    bookingId,
+    totalAmount,
+    button
+) {
+
+    try {
+
+        button.disabled =
+            true;
+
+
+        button.innerHTML = `
+
+            <i
+                class="fa-solid fa-spinner fa-spin"
+            ></i>
+
+            Preparing payment...
+
+        `;
+
+
+        /* -------------------------------------------------
+           CREATE RAZORPAY ORDER
+        ------------------------------------------------- */
+
+        const response =
+            await fetch(
+                "/api/payments/create-order",
+                {
+
+                    method:
+                        "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json",
+
+                        "Authorization":
+                            `Bearer ${token}`
+
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            bookingId
+
+                        })
+
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (
+            response.status === 401
+        ) {
+
+            localStorage.removeItem(
+                "saarthiToken"
+            );
+
+
+            localStorage.removeItem(
+                "saarthiUser"
+            );
+
+
+            window.location.href =
+                `auth.html?returnUrl=${encodeURIComponent(
+                    window.location.href
+                )}`;
+
+
+            return;
+
+        }
+
+
+        if (
+            !response.ok ||
+            !result.success
+        ) {
+
+            throw new Error(
+                result.message ||
+                "Unable to start payment."
+            );
+
+        }
+
+
+        const {
+            orderId,
+            amount,
+            currency,
+            keyId
+        } =
+            result.data;
+
+
+        /* -------------------------------------------------
+           RAZORPAY CHECKOUT
+        ------------------------------------------------- */
+
+        if (
+            typeof Razorpay ===
+            "undefined"
+        ) {
+
+            throw new Error(
+                "Razorpay Checkout failed to load."
+            );
+
+        }
+
+
+        const options = {
+
+            key:
+                keyId,
+
+            amount:
+                amount,
+
+            currency:
+                currency,
+
+            name:
+                "Saarthi",
+
+            description:
+                `Car booking ${bookingId}`,
+
+            order_id:
+                orderId,
+
+
+            prefill: {
+
+                name:
+                    saarthiUser?.name ||
+                    "",
+
+                email:
+                    saarthiUser?.email ||
+                    ""
+
+            },
+
+
+            theme: {
+
+                color:
+                    "#2563eb"
+
+            },
+
+
+            handler:
+                function (
+                    paymentResponse
+                ) {
+
+                    console.log(
+                        "Razorpay payment response:",
+                        paymentResponse
+                    );
+
+
+                    alert(
+                        "Payment completed. We are verifying your payment."
+                    );
+
+                },
+
+
+            modal: {
+
+                ondismiss:
+                    function () {
+
+                        button.disabled =
+                            false;
+
+
+                        button.innerHTML = `
+
+                            <i
+                                class="fa-solid fa-credit-card"
+                            ></i>
+
+                            Pay Now
+
+                        `;
+
+                    }
+
+            }
+
+        };
+
+
+        const razorpay =
+            new Razorpay(
+                options
+            );
+
+
+        razorpay.on(
+            "payment.failed",
+            function (
+                response
+            ) {
+
+                console.error(
+                    "Razorpay payment failed:",
+                    response
+                );
+
+
+                alert(
+                    "Payment failed. Please try again."
+                );
+
+
+                button.disabled =
+                    false;
+
+
+                button.innerHTML = `
+
+                    <i
+                        class="fa-solid fa-credit-card"
+                    ></i>
+
+                    Pay Now
+
+                `;
+
+            }
+        );
+
+
+        razorpay.open();
+
+
+    } catch (error) {
+
+        console.error(
+            "Payment initialization error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Unable to start payment."
+        );
+
+
+        button.disabled =
+            false;
+
+
+        button.innerHTML = `
+
+            <i
+                class="fa-solid fa-credit-card"
+            ></i>
+
+            Pay Now
+
+        `;
+
+    }
 
 }

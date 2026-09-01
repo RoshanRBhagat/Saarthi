@@ -1252,6 +1252,223 @@ async function updateHostBookingStatus(
 
 }
 
+/* =========================================================
+   CANCEL CUSTOMER BOOKING
+========================================================= */
+
+async function cancelCustomerBooking(
+    req,
+    res
+) {
+
+    try {
+
+        const bookingId =
+            req.params.bookingId;
+
+
+        /* -------------------------------------------------
+           FIND BOOKING BELONGING TO LOGGED-IN USER
+        ------------------------------------------------- */
+
+        const booking =
+            await Booking.findOne({
+
+                bookingId,
+
+                userId:
+                    req.user._id
+
+            });
+
+
+        /* -------------------------------------------------
+           NOT FOUND
+        ------------------------------------------------- */
+
+        if (
+            !booking
+        ) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message:
+                    "Booking not found in your account."
+
+            });
+
+        }
+
+
+        /* -------------------------------------------------
+           ALREADY CANCELLED
+        ------------------------------------------------- */
+
+        if (
+            booking.status ===
+            "cancelled"
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "This booking is already cancelled."
+
+            });
+
+        }
+
+
+        /* -------------------------------------------------
+           COMPLETED
+        ------------------------------------------------- */
+
+        if (
+            booking.status ===
+            "completed"
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Completed bookings cannot be cancelled."
+
+            });
+
+        }
+
+
+        /* -------------------------------------------------
+           ONLY PENDING / CONFIRMED BOOKINGS
+        ------------------------------------------------- */
+
+        if (
+            ![
+                "pending",
+                "confirmed"
+            ].includes(
+                booking.status
+            )
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "This booking cannot be cancelled."
+
+            });
+
+        }
+
+
+        /* -------------------------------------------------
+           RENTAL ALREADY STARTED
+        ------------------------------------------------- */
+
+        const now =
+            new Date();
+
+
+        const pickupDate =
+            new Date(
+                booking.pickupDate
+            );
+
+
+        pickupDate.setHours(
+            0,
+            0,
+            0,
+            0
+        );
+
+
+        const today =
+            new Date();
+
+
+        today.setHours(
+            0,
+            0,
+            0,
+            0
+        );
+
+
+        if (
+            pickupDate <=
+            today
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Bookings cannot be cancelled once the pickup date has arrived."
+
+            });
+
+        }
+
+
+        /* -------------------------------------------------
+           CANCEL
+        ------------------------------------------------- */
+
+        booking.status =
+            "cancelled";
+
+
+        await booking.save();
+
+
+        /* -------------------------------------------------
+           RESPONSE
+        ------------------------------------------------- */
+
+        return res.json({
+
+            success: true,
+
+            message:
+                "Booking cancelled successfully.",
+
+            data:
+                booking
+
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            "Customer booking cancellation error:",
+            error.message
+        );
+
+
+        return res.status(500).json({
+
+            success: false,
+
+            message:
+                "Unable to cancel booking."
+
+        });
+
+    }
+
+}
+
 
 // =========================================================
 // EXPORTS
@@ -1264,6 +1481,8 @@ module.exports = {
     createBooking,
 
     getCustomerBookings,
+
+    cancelCustomerBooking,
 
     getHostBookings,
 

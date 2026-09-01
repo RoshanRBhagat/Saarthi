@@ -6,6 +6,7 @@ const {
     checkAvailability,
     createBooking,
     getCustomerBookings,
+    cancelCustomerBooking,
     getHostBookings,
     updateHostBookingStatus
 } =
@@ -37,6 +38,15 @@ router.get(
     getCustomerBookings
 );
 
+/* =========================================================
+   CANCEL MY BOOKING
+========================================================= */
+
+router.patch(
+    "/my/:bookingId/cancel",
+    authenticateUser,
+    cancelCustomerBooking
+);
 
 /* =========================================================
    HOST BOOKINGS
