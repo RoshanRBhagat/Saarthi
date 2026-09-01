@@ -817,3 +817,25 @@
     cursor: not-allowed;
 
 }
+
+.booking-rental-status {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    margin-left: 6px;
+
+    padding: 5px 9px;
+
+    border-radius: 999px;
+
+    font-size: 0.72rem;
+
+    font-weight: 700;
+
+    text-transform: capitalize;
+
+}

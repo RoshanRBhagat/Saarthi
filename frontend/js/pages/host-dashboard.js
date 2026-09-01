@@ -1558,9 +1558,15 @@ function renderBooking(
         "pending";
 
 
+        
     const paymentStatus =
         booking.paymentStatus ||
         "pending";
+
+
+    const rentalStatus =
+        booking.rentalStatus ||
+        booking.status;
 
 
     const driverRequired =
@@ -1606,19 +1612,45 @@ function renderBooking(
 
             <!-- STATUS -->
 
-            <span
-                class="host-booking-status ${
-                    status === "cancelled"
-                        ? "cancelled"
-                        : ""
-                }"
+
+            <div
+                class="host-booking-status-group"
             >
 
-                ${escapeHTML(
-                    status
-                )}
+                <span
+                    class="host-booking-status ${
+                        status === "cancelled"
+                            ? "cancelled"
+                            : ""
+                    }"
+                >
 
-            </span>
+                    ${escapeHTML(
+                        status
+                    )}
+
+                </span>
+
+
+                <span
+                    class="host-rental-status ${escapeHTML(
+                        rentalStatus
+                    )}"
+                >
+
+                    ${
+                        rentalStatus === "upcoming"
+                            ? "Upcoming"
+                            : rentalStatus === "active"
+                                ? "Active"
+                                : rentalStatus === "completed"
+                                    ? "Completed"
+                                    : rentalStatus
+                    }
+
+                </span>
+
+            </div>
 
         </div>
 

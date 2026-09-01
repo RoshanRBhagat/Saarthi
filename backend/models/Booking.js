@@ -44,9 +44,7 @@ const bookingSchema =
 
             /* ---------------------------------------------
                USER
-               
-               Authentication is not connected yet,
-               so this remains optional for now.
+
             --------------------------------------------- */
 
             userId: {

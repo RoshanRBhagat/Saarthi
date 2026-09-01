@@ -315,6 +315,10 @@ function renderBooking(
         "pending";
 
 
+    const rentalStatus =
+        booking.rentalStatus ||
+        status;
+
     /* =====================================================
        DATES
     ===================================================== */
@@ -400,11 +404,25 @@ function renderBooking(
                     status
                 )}"
             >
-
                 ${escapeHTML(
                     status
                 )}
+            </span>
 
+            <span
+                class="booking-rental-status ${escapeHTML(
+                    rentalStatus
+                )}"
+            >
+                ${
+                    rentalStatus === "upcoming"
+                        ? "Upcoming"
+                        : rentalStatus === "active"
+                            ? "Active"
+                            : rentalStatus === "completed"
+                                ? "Completed"
+                                : rentalStatus
+                }
             </span>
 
         </div>

@@ -742,6 +742,199 @@ function calculateRentalDays(
 
 }
 
+/* =========================================================
+   DERIVE RENTAL LIFECYCLE STATUS
+========================================================= */
+
+function getRentalStatus(
+    booking
+) {
+
+    /*
+        Pending and cancelled bookings are not active
+        rentals, so keep their lifecycle status aligned
+        with the booking state.
+    */
+
+    if (
+        booking.status ===
+        "pending"
+    ) {
+
+        return "pending";
+
+    }
+
+
+    if (
+        booking.status ===
+        "cancelled"
+    ) {
+
+        return "cancelled";
+
+    }
+
+
+    if (
+        booking.status ===
+        "completed"
+    ) {
+
+        return "completed";
+
+    }
+
+
+    /*
+        Only confirmed bookings participate in the
+        upcoming / active / completed rental lifecycle.
+    */
+
+    if (
+        booking.status !==
+        "confirmed"
+    ) {
+
+        return booking.status;
+
+    }
+
+
+    const pickupDate =
+        new Date(
+            booking.pickupDate
+        );
+
+
+    const returnDate =
+        new Date(
+            booking.returnDate
+        );
+
+
+    /*
+        Normalize everything to date-only comparison.
+    */
+
+    pickupDate.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+
+    returnDate.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+
+    const today =
+        new Date();
+
+
+    today.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+
+    /* -------------------------------------------------
+       UPCOMING
+    ------------------------------------------------- */
+
+    if (
+        today <
+        pickupDate
+    ) {
+
+        return "upcoming";
+
+    }
+
+
+    /* -------------------------------------------------
+       ACTIVE
+    ------------------------------------------------- */
+
+    if (
+        today >= pickupDate &&
+        today <= returnDate
+    ) {
+
+        return "active";
+
+    }
+
+
+    /* -------------------------------------------------
+       COMPLETED
+    ------------------------------------------------- */
+
+    if (
+        today >
+        returnDate
+    ) {
+
+        return "completed";
+
+    }
+
+
+    return "upcoming";
+
+}
+
+
+/* =========================================================
+   AUTO-COMPLETE FINISHED BOOKINGS
+========================================================= */
+
+async function autoCompleteFinishedBookings() {
+
+    const today =
+        new Date();
+
+
+    today.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+
+    await Booking.updateMany(
+
+        {
+            status:
+                "confirmed",
+
+            returnDate:
+                {
+                    $lt:
+                        today
+                }
+
+        },
+
+        {
+            $set:
+                {
+                    status:
+                        "completed"
+                }
+        }
+
+    );
+
+}
 
 /* =========================================================
    GET CUSTOMER BOOKINGS
@@ -757,6 +950,8 @@ async function getCustomerBookings(
 ) {
 
     try {
+
+        await autoCompleteFinishedBookings();
 
         /* -------------------------------------------------
            AUTHENTICATED USER
@@ -790,15 +985,35 @@ async function getCustomerBookings(
            RESPONSE
         ------------------------------------------------- */
 
+        const bookingData =
+            bookings.map(
+                booking => {
+
+                    const data =
+                        booking.toObject();
+
+
+                    data.rentalStatus =
+                        getRentalStatus(
+                            booking
+                        );
+
+
+                    return data;
+
+                }
+            );
+
+
         return res.json({
 
             success: true,
 
             count:
-                bookings.length,
+                bookingData.length,
 
             data:
-                bookings
+                bookingData
 
         });
 
@@ -833,6 +1048,8 @@ async function getHostBookings(
 ) {
 
     try {
+
+        await autoCompleteFinishedBookings();
 
         /* -------------------------------------------------
            AUTHENTICATED HOST
@@ -976,6 +1193,11 @@ async function getHostBookings(
 
                         status:
                             booking.status,
+
+                        rentalStatus:
+                            getRentalStatus(
+                                booking
+                            ),                        
 
                         paymentStatus:
                             booking.paymentStatus,
