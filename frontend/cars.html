@@ -2,67 +2,31 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Available Cars | Saarthi</title>
 
-
-    <!-- =====================================================
-         GOOGLE FONTS
-    ====================================================== -->
-
-    <link
-        rel="preconnect"
-        href="https://fonts.googleapis.com"
-    >
-
-    <link
-        rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin
-    >
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
         rel="stylesheet"
     >
 
-
-    <!-- =====================================================
-         FONT AWESOME
-    ====================================================== -->
-
+    <!-- Font Awesome -->
     <link
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
         rel="stylesheet"
     >
 
-
-    <!-- =====================================================
-         SAARTHI CSS
-    ====================================================== -->
-
-    <link
-        rel="stylesheet"
-        href="css/style.css"
-    >
-
-    <link
-        rel="stylesheet"
-        href="css/cars.css"
-    >
-
+    <!-- Cars Page CSS -->
+    <link rel="stylesheet" href="css/cars.css">
 </head>
 
-
 <body>
-
 
     <!-- =====================================================
          NAVIGATION
@@ -72,26 +36,19 @@
 
         <div class="nav-container">
 
-
-            <!-- Logo -->
-
             <a
                 href="index.html"
                 class="logo"
+                aria-label="Saarthi Home"
             >
-
                 <i
                     class="fa-solid fa-car-side"
+                    aria-hidden="true"
                 ></i>
 
-                <span>
-                    Saarthi
-                </span>
-
+                <span>Saarthi</span>
             </a>
 
-
-            <!-- Navigation links -->
 
             <div class="nav-links">
 
@@ -107,13 +64,18 @@
                     Host Your Car
                 </a>
 
-                
+                <a
+                    href="auth.html"
+                    class="btn-primary"
+                >
+                    Log In
+                </a>
+
             </div>
 
         </div>
 
     </nav>
-
 
 
     <!-- =====================================================
@@ -122,15 +84,11 @@
 
     <main class="page">
 
-
         <!-- =================================================
-             PAGE INTRO
+             HEADER + FILTERS
         ================================================== -->
 
         <section class="page-header">
-
-
-            <!-- Left side -->
 
             <div>
 
@@ -138,6 +96,7 @@
 
                     <i
                         class="fa-solid fa-car"
+                        aria-hidden="true"
                     ></i>
 
                     Saarthi inventory
@@ -151,107 +110,20 @@
 
 
                 <p id="resultSummary">
-                    Select your preferences and search for cars.
+                    Cars available on Saarthi
                 </p>
 
             </div>
 
 
-        </section>
+            <!-- =============================================
+                 FILTER BOX
+            ============================================== -->
+
+            <div class="filter-box">
 
 
-
-        <!-- =================================================
-             UNIFIED SEARCH PANEL
-        ================================================== -->
-
-        <section class="car-search-panel">
-
-
-            <!-- =================================================
-                 SEARCH HEADER
-            ================================================== -->
-
-            <div class="car-search-header">
-
-                <div>
-
-                    <span class="search-eyebrow">
-
-                        <i
-                            class="fa-solid fa-wand-magic-sparkles"
-                        ></i>
-
-                        Saarthi Smart Search
-
-                    </span>
-
-
-                    <h2>
-                        Find the right car for your trip
-                    </h2>
-
-
-                    <p>
-
-                        Choose your location, group size,
-                        budget and trip style. Saarthi will
-                        find and recommend the best available cars.
-
-                    </p>
-
-                </div>
-
-
-                <span class="search-ai-badge">
-
-                    <i
-                        class="fa-solid fa-sparkles"
-                    ></i>
-
-                    AI Included
-
-                </span>
-
-            </div>
-
-
-
-            <!-- =================================================
-                 BASIC SEARCH FIELDS
-            ================================================== -->
-
-            <div class="car-search-fields">
-
-
-                <!-- STATE -->
-
-                <div class="filter-group">
-
-                    <label for="stateInput">
-                        State
-                    </label>
-
-
-                    <select
-                        id="stateInput"
-                    >
-
-                        <option
-                            value=""
-                            selected
-                            disabled
-                        >
-                            Select State
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-
-                <!-- CITY -->
+                <!-- City -->
 
                 <div class="filter-group">
 
@@ -259,26 +131,49 @@
                         City
                     </label>
 
-
-                    <select
+                    <input
                         id="cityInput"
-                        disabled
+                        type="text"
+                        placeholder="e.g. Nagpur"
+                        autocomplete="off"
                     >
-
-                        <option
-                            value=""
-                            selected
-                        >
-                            Select state first
-                        </option>
-
-                    </select>
 
                 </div>
 
 
+                <!-- Pickup Date -->
 
-                <!-- TRAVELERS -->
+                <div class="filter-group">
+
+                    <label for="startDateInput">
+                        Pickup Date
+                    </label>
+
+                    <input
+                        id="startDateInput"
+                        type="date"
+                    >
+
+                </div>
+
+
+                <!-- Return Date -->
+
+                <div class="filter-group">
+
+                    <label for="endDateInput">
+                        Return Date
+                    </label>
+
+                    <input
+                        id="endDateInput"
+                        type="date"
+                    >
+
+                </div>
+
+
+                <!-- Travelers -->
 
                 <div class="filter-group">
 
@@ -286,23 +181,25 @@
                         Travelers
                     </label>
 
-
-                    <select
-                        id="travelersInput"
-                    >
+                    <select id="travelersInput">
 
                         <option value="">
                             Any
+                        </option>
+
+                        <option value="1">
+                            1+
                         </option>
 
                         <option value="2">
                             2+
                         </option>
 
-                        <option
-                            value="4"
-                            selected
-                        >
+                        <option value="3">
+                            3+
+                        </option>
+
+                        <option value="4">
                             4+
                         </option>
 
@@ -310,8 +207,16 @@
                             5+
                         </option>
 
+                        <option value="6">
+                            6+
+                        </option>
+
                         <option value="7">
                             7+
+                        </option>
+
+                        <option value="8">
+                            8+
                         </option>
 
                     </select>
@@ -319,8 +224,7 @@
                 </div>
 
 
-
-                <!-- MAX DAILY PRICE -->
+                <!-- Maximum Price -->
 
                 <div class="filter-group">
 
@@ -328,271 +232,45 @@
                         Max daily price
                     </label>
 
-
-                    <div class="price-input">
-
-                        <span>
-                            ₹
-                        </span>
-
-
-                        <input
-                            id="maxPriceInput"
-                            type="number"
-                            min="0"
-                            placeholder="3000"
-                        >
-
-                    </div>
+                    <input
+                        id="maxPriceInput"
+                        type="number"
+                        min="0"
+                        placeholder="3000"
+                    >
 
                 </div>
 
 
-            </div>
-
-
-
-            <!-- =================================================
-                 TRIP PREFERENCES
-            ================================================== -->
-
-            <div class="search-preferences">
-
-
-                <div class="preferences-heading">
-
-
-                    <div>
-
-                        <span>
-                            Trip preference
-                        </span>
-
-                        <small>
-                            Choose one or more
-                        </small>
-
-                    </div>
-
-
-                    <span
-                        id="aiPreferenceSummary"
-                        class="preference-summary"
-                    >
-                        No preference selected
-                    </span>
-
-
-                </div>
-
-
-
-                <!-- Preference buttons -->
-
-                <div class="ai-preferences">
-
-
-                    <!-- Adventure -->
-
-                    <button
-                        type="button"
-                        class="ai-preference"
-                        data-preference="Adventure"
-                    >
-
-                        <i
-                            class="fa-solid fa-mountain"
-                        ></i>
-
-                        Adventure
-
-                    </button>
-
-
-
-                    <!-- Nature -->
-
-                    <button
-                        type="button"
-                        class="ai-preference"
-                        data-preference="Nature"
-                    >
-
-                        <i
-                            class="fa-solid fa-leaf"
-                        ></i>
-
-                        Nature
-
-                    </button>
-
-
-
-                    <!-- Relaxation -->
-
-                    <button
-                        type="button"
-                        class="ai-preference"
-                        data-preference="Relaxation"
-                    >
-
-                        <i
-                            class="fa-solid fa-mug-hot"
-                        ></i>
-
-                        Relaxation
-
-                    </button>
-
-
-
-                    <!-- Family -->
-
-                    <button
-                        type="button"
-                        class="ai-preference"
-                        data-preference="Family"
-                    >
-
-                        <i
-                            class="fa-solid fa-people-group"
-                        ></i>
-
-                        Family
-
-                    </button>
-
-
-
-                    <!-- Romantic -->
-
-                    <button
-                        type="button"
-                        class="ai-preference"
-                        data-preference="Romantic"
-                    >
-
-                        <i
-                            class="fa-solid fa-heart"
-                        ></i>
-
-                        Romantic
-
-                    </button>
-
-
-                </div>
-
-            </div>
-
-
-
-            <!-- =================================================
-                 SEARCH ACTION
-            ================================================== -->
-
-            <div class="search-action-row">
-
-
-                <div class="search-helper">
-
-                    <i
-                        class="fa-solid fa-circle-info"
-                    ></i>
-
-                    <span>
-
-                        Saarthi AI will rank the best cars
-                        from the matching inventory.
-
-                    </span>
-
-                </div>
-
+                <!-- Search -->
 
                 <button
                     id="searchCarsBtn"
-                    class="main-search-btn"
+                    class="search-btn"
                     type="button"
                 >
 
                     <i
-                        class="fa-solid fa-wand-magic-sparkles"
+                        class="fa-solid fa-magnifying-glass"
+                        aria-hidden="true"
                     ></i>
 
-                    Find My Car
+                    Search
 
                 </button>
 
-
             </div>
-
 
         </section>
 
 
-
         <!-- =================================================
-             AI RECOMMENDED RESULTS
-        ================================================== -->
-
-        <section
-            id="aiResultsSection"
-            class="ai-results-section hidden"
-        >
-
-
-            <div class="ai-results-header">
-
-
-                <div>
-
-                    <span class="ai-eyebrow">
-
-                        <i
-                            class="fa-solid fa-sparkles"
-                        ></i>
-
-                        Saarthi AI
-
-                    </span>
-
-
-                    <h2>
-                        Recommended for you
-                    </h2>
-
-
-                    <p id="aiResultsSummary">
-
-                        Best matches based on your preferences.
-
-                    </p>
-
-                </div>
-
-
-            </div>
-
-
-            <div
-                id="aiRecommendationsGrid"
-                class="ai-recommendations-grid"
-            >
-
-            </div>
-
-
-        </section>
-
-
-
-        <!-- =================================================
-             LOADING
+             CARS SECTION
         ================================================== -->
 
         <section class="cars-section">
 
+            <!-- Loading -->
 
             <div
                 id="loading"
@@ -601,6 +279,7 @@
 
                 <i
                     class="fa-solid fa-spinner fa-spin"
+                    aria-hidden="true"
                 ></i>
 
                 <p>
@@ -610,10 +289,7 @@
             </div>
 
 
-
-            <!-- =================================================
-                 ERROR
-            ================================================== -->
+            <!-- Error -->
 
             <div
                 id="error"
@@ -621,10 +297,7 @@
             ></div>
 
 
-
-            <!-- =================================================
-                 NO RESULTS
-            ================================================== -->
+            <!-- Empty -->
 
             <div
                 id="empty"
@@ -633,13 +306,12 @@
 
                 <i
                     class="fa-solid fa-car-side"
+                    aria-hidden="true"
                 ></i>
-
 
                 <h3>
                     No cars found
                 </h3>
-
 
                 <p>
                     Try changing your filters.
@@ -648,46 +320,23 @@
             </div>
 
 
-
-            <!-- =================================================
-                 NORMAL CAR RESULTS
-            ================================================== -->
+            <!-- Car Grid -->
 
             <div
                 id="carGrid"
                 class="car-grid"
-            >
-
-            </div>
-
+            ></div>
 
         </section>
 
-
     </main>
-
 
 
     <!-- =====================================================
          JAVASCRIPT
     ====================================================== -->
 
-
-    <!-- Location database -->
-
-    <script src="js/data/cities.js"></script>
-
-
-    <!-- State → City dropdown -->
-
-    <script src="js/pages/cars-location.js"></script>
-
-
-    <!-- Car search + AI recommendations -->
-
     <script src="js/pages/cars.js"></script>
-    <script src="js/core/auth-ui.js"></script>
-
 
 </body>
 
