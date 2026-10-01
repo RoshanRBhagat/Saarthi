@@ -44,7 +44,6 @@ const bookingSchema =
 
             /* ---------------------------------------------
                USER
-
             --------------------------------------------- */
 
             userId: {
@@ -183,6 +182,88 @@ const bookingSchema =
 
 
             /* ---------------------------------------------
+               PICKUP / VEHICLE HANDOVER
+            --------------------------------------------- */
+
+            pickupStatus: {
+
+                type: String,
+
+                enum: [
+
+                    "pending",
+
+                    "confirmed"
+
+                ],
+
+                default: "pending"
+
+            },
+
+
+            pickupConfirmedAt: {
+
+                type: Date,
+
+                default: null
+
+            },
+
+
+            pickupNotes: {
+
+                type: String,
+
+                default: "",
+
+                trim: true
+
+            },
+
+
+            /* ---------------------------------------------
+               RETURN / VEHICLE HANDOVER
+            --------------------------------------------- */
+
+            returnStatus: {
+
+                type: String,
+
+                enum: [
+
+                    "pending",
+
+                    "confirmed"
+
+                ],
+
+                default: "pending"
+
+            },
+
+
+            returnConfirmedAt: {
+
+                type: Date,
+
+                default: null
+
+            },
+
+
+            returnNotes: {
+
+                type: String,
+
+                default: "",
+
+                trim: true
+
+            },
+
+
+            /* ---------------------------------------------
                PAYMENT STATUS
             --------------------------------------------- */
 
@@ -191,10 +272,15 @@ const bookingSchema =
                 type: String,
 
                 enum: [
+
                     "pending",
+
                     "paid",
+
                     "failed",
+
                     "refunded"
+
                 ],
 
                 default: "pending"

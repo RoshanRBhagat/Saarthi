@@ -8,7 +8,9 @@ const {
     getCustomerBookings,
     cancelCustomerBooking,
     getHostBookings,
-    updateHostBookingStatus
+    updateHostBookingStatus,
+    confirmPickup,
+    confirmReturn
 } =
     require(
         "../controllers/bookingController"
@@ -38,6 +40,7 @@ router.get(
     getCustomerBookings
 );
 
+
 /* =========================================================
    CANCEL MY BOOKING
 ========================================================= */
@@ -47,6 +50,7 @@ router.patch(
     authenticateUser,
     cancelCustomerBooking
 );
+
 
 /* =========================================================
    HOST BOOKINGS
@@ -69,6 +73,30 @@ router.patch(
     authenticateUser,
     requireHost,
     updateHostBookingStatus
+);
+
+
+/* =========================================================
+   CONFIRM VEHICLE PICKUP
+========================================================= */
+
+router.patch(
+    "/host/:bookingId/pickup",
+    authenticateUser,
+    requireHost,
+    confirmPickup
+);
+
+
+/* =========================================================
+   CONFIRM VEHICLE RETURN
+========================================================= */
+
+router.patch(
+    "/host/:bookingId/return",
+    authenticateUser,
+    requireHost,
+    confirmReturn
 );
 
 

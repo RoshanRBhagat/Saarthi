@@ -1,21 +1,19 @@
-const Car = require("../models/Car");
-const Booking = require("../models/Booking");
+const Car =
+    require("../models/Car");
+
+const Booking =
+    require("../models/Booking");
 
 
-// =========================================================
-// CHECK CAR AVAILABILITY
-// =========================================================
-//
-// GET /api/bookings/availability/:carId
-//
-// Query:
-//
-// ?pickupDate=2026-09-10&returnDate=2026-09-12
-//
-// Returns whether the requested car is available.
-// =========================================================
 
-async function checkAvailability(req, res) {
+/* =========================================================
+   CHECK CAR AVAILABILITY
+========================================================= */
+
+async function checkAvailability(
+    req,
+    res
+) {
 
     try {
 
@@ -28,9 +26,9 @@ async function checkAvailability(req, res) {
         } = req.query;
 
 
-        // =================================================
-        // VALIDATE INPUT
-        // =================================================
+        /* -------------------------------------------------
+           VALIDATE INPUT
+        ------------------------------------------------- */
 
         if (
             !pickupDate ||
@@ -49,15 +47,14 @@ async function checkAvailability(req, res) {
         }
 
 
-        // =================================================
-        // PARSE DATES
-        // =================================================
+        /* -------------------------------------------------
+           PARSE DATES
+        ------------------------------------------------- */
 
         const requestedPickup =
             parseDateOnly(
                 pickupDate
             );
-
 
         const requestedReturn =
             parseDateOnly(
@@ -82,9 +79,9 @@ async function checkAvailability(req, res) {
         }
 
 
-        // =================================================
-        // DATE ORDER
-        // =================================================
+        /* -------------------------------------------------
+           DATE ORDER
+        ------------------------------------------------- */
 
         if (
             requestedReturn <
@@ -103,9 +100,9 @@ async function checkAvailability(req, res) {
         }
 
 
-        // =================================================
-        // CHECK CAR
-        // =================================================
+        /* -------------------------------------------------
+           FIND CAR
+        ------------------------------------------------- */
 
         const car =
             await Car.findOne({
@@ -132,21 +129,9 @@ async function checkAvailability(req, res) {
         }
 
 
-        // =================================================
-        // CHECK OVERLAPPING BOOKINGS
-        // =================================================
-        //
-        // Two date ranges overlap when:
-        //
-        // existingPickup <= requestedReturn
-        //
-        // AND
-        //
-        // existingReturn >= requestedPickup
-        //
-        // We only consider bookings that are actually
-        // blocking availability.
-        // =================================================
+        /* -------------------------------------------------
+           CHECK OVERLAPPING BOOKINGS
+        ------------------------------------------------- */
 
         const overlappingBooking =
             await Booking.findOne({
@@ -173,10 +158,6 @@ async function checkAvailability(req, res) {
             });
 
 
-        // =================================================
-        // NOT AVAILABLE
-        // =================================================
-
         if (
             overlappingBooking
         ) {
@@ -195,9 +176,9 @@ async function checkAvailability(req, res) {
         }
 
 
-        // =================================================
-        // AVAILABLE
-        // =================================================
+        /* -------------------------------------------------
+           AVAILABLE
+        ------------------------------------------------- */
 
         return res.json({
 
@@ -249,14 +230,6 @@ async function checkAvailability(req, res) {
 }
 
 
-// =========================================================
-// CREATE BOOKING
-// =========================================================
-//
-// POST /api/bookings
-//
-// This will be used after we build the booking form.
-// =========================================================
 
 /* =========================================================
    CREATE BOOKING
@@ -288,9 +261,7 @@ async function createBooking(
             req.user;
 
 
-        if (
-            !user
-        ) {
+        if (!user) {
 
             return res.status(401).json({
 
@@ -361,7 +332,6 @@ async function createBooking(
                 `${pickupDate}T00:00:00`
             );
 
-
         const requestedReturn =
             new Date(
                 `${returnDate}T00:00:00`
@@ -421,9 +391,7 @@ async function createBooking(
             });
 
 
-        if (
-            !car
-        ) {
+        if (!car) {
 
             return res.status(404).json({
 
@@ -437,13 +405,9 @@ async function createBooking(
         }
 
 
-        /* =================================================
-           IMPORTANT:
-           RE-CHECK AVAILABILITY DURING BOOKING CREATION
-           
-           Never trust only the frontend or the separate
-           availability endpoint.
-        ================================================== */
+        /* -------------------------------------------------
+           RE-CHECK AVAILABILITY
+        ------------------------------------------------- */
 
         const overlappingBooking =
             await Booking.findOne({
@@ -469,10 +433,6 @@ async function createBooking(
 
             });
 
-
-        /* -------------------------------------------------
-           BOOKING CONFLICT
-        ------------------------------------------------- */
 
         if (
             overlappingBooking
@@ -576,10 +536,6 @@ async function createBooking(
 
                 totalAmount,
 
-                /* -----------------------------------------
-                   New bookings require host approval
-                ------------------------------------------ */
-
                 status:
                     "pending",
 
@@ -633,14 +589,10 @@ async function createBooking(
 }
 
 
-// =========================================================
-// DATE HELPER
-// =========================================================
-//
-// Converts YYYY-MM-DD into a Date at UTC midnight.
-// Using date-only values avoids common timezone problems
-// when customers select rental dates.
-// =========================================================
+
+/* =========================================================
+   DATE HELPER
+========================================================= */
 
 function parseDateOnly(
     dateString
@@ -675,12 +627,10 @@ function parseDateOnly(
             match[1]
         );
 
-
     const month =
         Number(
             match[2]
         );
-
 
     const day =
         Number(
@@ -690,11 +640,13 @@ function parseDateOnly(
 
     const date =
         new Date(
+
             Date.UTC(
                 year,
                 month - 1,
                 day
             )
+
         );
 
 
@@ -714,9 +666,10 @@ function parseDateOnly(
 }
 
 
-// =========================================================
-// RENTAL DAYS
-// =========================================================
+
+/* =========================================================
+   RENTAL DAYS
+========================================================= */
 
 function calculateRentalDays(
     pickupDate,
@@ -729,7 +682,9 @@ function calculateRentalDays(
 
 
     return (
+
         Math.floor(
+
             milliseconds /
             (
                 1000 *
@@ -737,24 +692,22 @@ function calculateRentalDays(
                 60 *
                 24
             )
+
         ) + 1
+
     );
 
 }
 
+
+
 /* =========================================================
-   DERIVE RENTAL LIFECYCLE STATUS
+   RENTAL STATUS
 ========================================================= */
 
 function getRentalStatus(
     booking
 ) {
-
-    /*
-        Pending and cancelled bookings are not active
-        rentals, so keep their lifecycle status aligned
-        with the booking state.
-    */
 
     if (
         booking.status ===
@@ -786,11 +739,6 @@ function getRentalStatus(
     }
 
 
-    /*
-        Only confirmed bookings participate in the
-        upcoming / active / completed rental lifecycle.
-    */
-
     if (
         booking.status !==
         "confirmed"
@@ -806,16 +754,11 @@ function getRentalStatus(
             booking.pickupDate
         );
 
-
     const returnDate =
         new Date(
             booking.returnDate
         );
 
-
-    /*
-        Normalize everything to date-only comparison.
-    */
 
     pickupDate.setHours(
         0,
@@ -823,7 +766,6 @@ function getRentalStatus(
         0,
         0
     );
-
 
     returnDate.setHours(
         0,
@@ -836,7 +778,6 @@ function getRentalStatus(
     const today =
         new Date();
 
-
     today.setHours(
         0,
         0,
@@ -844,10 +785,6 @@ function getRentalStatus(
         0
     );
 
-
-    /* -------------------------------------------------
-       UPCOMING
-    ------------------------------------------------- */
 
     if (
         today <
@@ -859,10 +796,6 @@ function getRentalStatus(
     }
 
 
-    /* -------------------------------------------------
-       ACTIVE
-    ------------------------------------------------- */
-
     if (
         today >= pickupDate &&
         today <= returnDate
@@ -872,10 +805,6 @@ function getRentalStatus(
 
     }
 
-
-    /* -------------------------------------------------
-       COMPLETED
-    ------------------------------------------------- */
 
     if (
         today >
@@ -892,56 +821,47 @@ function getRentalStatus(
 }
 
 
+
 /* =========================================================
-   AUTO-COMPLETE FINISHED BOOKINGS
+   AUTO COMPLETE FINISHED BOOKINGS
 ========================================================= */
 
 async function autoCompleteFinishedBookings() {
 
-    const today =
-        new Date();
+    /*
+        Do NOT automatically change a confirmed booking to
+        completed merely because its return date has passed.
 
+        The host must explicitly confirm the vehicle return.
 
-    today.setHours(
-        0,
-        0,
-        0,
-        0
-    );
+        Once returnStatus becomes "confirmed", confirmReturn()
+        already changes booking.status to "completed".
 
+        This prevents a late return confirmation from becoming
+        impossible after the scheduled return date.
+    */
 
     await Booking.updateMany(
 
         {
-            status:
-                "confirmed",
+            status: "confirmed",
 
-            returnDate:
-                {
-                    $lt:
-                        today
-                }
-
+            returnStatus: "confirmed"
         },
 
         {
-            $set:
-                {
-                    status:
-                        "completed"
-                }
+            $set: {
+                status: "completed"
+            }
         }
 
     );
 
 }
 
-/* =========================================================
-   GET CUSTOMER BOOKINGS
-========================================================= */
 
 /* =========================================================
-   GET MY BOOKINGS
+   GET CUSTOMER BOOKINGS
 ========================================================= */
 
 async function getCustomerBookings(
@@ -953,27 +873,17 @@ async function getCustomerBookings(
 
         await autoCompleteFinishedBookings();
 
-        /* -------------------------------------------------
-           AUTHENTICATED USER
-        ------------------------------------------------- */
 
         const userId =
             req.user._id;
 
 
-        /* -------------------------------------------------
-           FIND ONLY THIS USER'S BOOKINGS
-        ------------------------------------------------- */
-
         const bookings =
             await Booking.find({
 
-                userId:
+                userId
 
-                    userId
-
-            })
-            .sort({
+            }).sort({
 
                 createdAt:
                     -1
@@ -981,12 +891,9 @@ async function getCustomerBookings(
             });
 
 
-        /* -------------------------------------------------
-           RESPONSE
-        ------------------------------------------------- */
-
         const bookingData =
             bookings.map(
+
                 booking => {
 
                     const data =
@@ -1002,6 +909,7 @@ async function getCustomerBookings(
                     return data;
 
                 }
+
             );
 
 
@@ -1016,6 +924,7 @@ async function getCustomerBookings(
                 bookingData
 
         });
+
 
     } catch (error) {
 
@@ -1038,6 +947,8 @@ async function getCustomerBookings(
 
 }
 
+
+
 /* =========================================================
    GET HOST BOOKINGS
 ========================================================= */
@@ -1051,9 +962,6 @@ async function getHostBookings(
 
         await autoCompleteFinishedBookings();
 
-        /* -------------------------------------------------
-           AUTHENTICATED HOST
-        ------------------------------------------------- */
 
         const ownerId =
             req.user._id;
@@ -1069,13 +977,11 @@ async function getHostBookings(
                 ownerId
 
             }).select(
+
                 "carId make model mainImage city state dailyPrice"
+
             );
 
-
-        /* -------------------------------------------------
-           NO VEHICLES
-        ------------------------------------------------- */
 
         if (
             hostCars.length === 0
@@ -1095,26 +1001,30 @@ async function getHostBookings(
 
 
         /* -------------------------------------------------
-           GET CAR IDS
+           CAR IDS
         ------------------------------------------------- */
 
         const hostCarIds =
             hostCars.map(
+
                 car =>
                     car.carId
+
             );
 
 
         /* -------------------------------------------------
-           FIND BOOKINGS
+           BOOKINGS
         ------------------------------------------------- */
 
         const bookings =
             await Booking.find({
 
                 carId: {
+
                     $in:
                         hostCarIds
+
                 }
 
             }).sort({
@@ -1126,7 +1036,7 @@ async function getHostBookings(
 
 
         /* -------------------------------------------------
-           CREATE QUICK CAR LOOKUP
+           CAR LOOKUP
         ------------------------------------------------- */
 
         const carMap =
@@ -1134,23 +1044,29 @@ async function getHostBookings(
 
 
         hostCars.forEach(
+
             car => {
 
                 carMap.set(
+
                     car.carId,
+
                     car
+
                 );
 
             }
+
         );
 
 
         /* -------------------------------------------------
-           ATTACH CAR DETAILS
+           RESPONSE DATA
         ------------------------------------------------- */
 
         const bookingData =
             bookings.map(
+
                 booking => {
 
                     const car =
@@ -1197,10 +1113,34 @@ async function getHostBookings(
                         rentalStatus:
                             getRentalStatus(
                                 booking
-                            ),                        
+                            ),
 
                         paymentStatus:
                             booking.paymentStatus,
+
+                        paymentId:
+                            booking.paymentId,
+
+                        paidAt:
+                            booking.paidAt,
+
+                        pickupStatus:
+                            booking.pickupStatus,
+
+                        pickupConfirmedAt:
+                            booking.pickupConfirmedAt,
+
+                        pickupNotes:
+                            booking.pickupNotes,
+
+                        returnStatus:
+                            booking.returnStatus,
+
+                        returnConfirmedAt:
+                            booking.returnConfirmedAt,
+
+                        returnNotes:
+                            booking.returnNotes,
 
                         driverRequired:
                             booking.driverRequired,
@@ -1208,39 +1148,37 @@ async function getHostBookings(
                         createdAt:
                             booking.createdAt,
 
-                        car: car
-                            ? {
+                        car:
+                            car
+                                ? {
 
-                                make:
-                                    car.make,
+                                    make:
+                                        car.make,
 
-                                model:
-                                    car.model,
+                                    model:
+                                        car.model,
 
-                                mainImage:
-                                    car.mainImage,
+                                    mainImage:
+                                        car.mainImage,
 
-                                city:
-                                    car.city,
+                                    city:
+                                        car.city,
 
-                                state:
-                                    car.state,
+                                    state:
+                                        car.state,
 
-                                dailyPrice:
-                                    car.dailyPrice
+                                    dailyPrice:
+                                        car.dailyPrice
 
-                            }
-                            : null
+                                }
+                                : null
 
                     };
 
                 }
+
             );
 
-
-        /* -------------------------------------------------
-           RESPONSE
-        ------------------------------------------------- */
 
         return res.json({
 
@@ -1276,6 +1214,8 @@ async function getHostBookings(
 
 }
 
+
+
 /* =========================================================
    UPDATE HOST BOOKING STATUS
 ========================================================= */
@@ -1293,16 +1233,16 @@ async function updateHostBookingStatus(
 
         const {
             status
-        } = req.body;
+        } =
+            req.body;
 
-
-        /* -------------------------------------------------
-           VALID STATUS
-        ------------------------------------------------- */
 
         const allowedStatuses = [
+
             "confirmed",
+
             "cancelled"
+
         ];
 
 
@@ -1341,8 +1281,10 @@ async function updateHostBookingStatus(
 
         const hostCarIds =
             hostCars.map(
+
                 car =>
                     car.carId
+
             );
 
 
@@ -1364,15 +1306,6 @@ async function updateHostBookingStatus(
 
         /* -------------------------------------------------
            FIND BOOKING
-           
-           Notice that we verify BOTH:
-           
-           bookingId
-           +
-           carId belongs to host
-           
-           This prevents one host from modifying
-           another host's booking.
         ------------------------------------------------- */
 
         const booking =
@@ -1436,10 +1369,6 @@ async function updateHostBookingStatus(
         await booking.save();
 
 
-        /* -------------------------------------------------
-           RESPONSE
-        ------------------------------------------------- */
-
         return res.json({
 
             success: true,
@@ -1474,6 +1403,8 @@ async function updateHostBookingStatus(
 
 }
 
+
+
 /* =========================================================
    CANCEL CUSTOMER BOOKING
 ========================================================= */
@@ -1490,7 +1421,7 @@ async function cancelCustomerBooking(
 
 
         /* -------------------------------------------------
-           FIND BOOKING BELONGING TO LOGGED-IN USER
+           FIND BOOKING
         ------------------------------------------------- */
 
         const booking =
@@ -1503,10 +1434,6 @@ async function cancelCustomerBooking(
 
             });
 
-
-        /* -------------------------------------------------
-           NOT FOUND
-        ------------------------------------------------- */
 
         if (
             !booking
@@ -1567,7 +1494,7 @@ async function cancelCustomerBooking(
 
 
         /* -------------------------------------------------
-           ONLY PENDING / CONFIRMED BOOKINGS
+           ONLY PENDING / CONFIRMED
         ------------------------------------------------- */
 
         if (
@@ -1594,10 +1521,6 @@ async function cancelCustomerBooking(
         /* -------------------------------------------------
            RENTAL ALREADY STARTED
         ------------------------------------------------- */
-
-        const now =
-            new Date();
-
 
         const pickupDate =
             new Date(
@@ -1653,10 +1576,6 @@ async function cancelCustomerBooking(
         await booking.save();
 
 
-        /* -------------------------------------------------
-           RESPONSE
-        ------------------------------------------------- */
-
         return res.json({
 
             success: true,
@@ -1692,9 +1611,562 @@ async function cancelCustomerBooking(
 }
 
 
-// =========================================================
-// EXPORTS
-// =========================================================
+
+/* =========================================================
+   CONFIRM PICKUP
+========================================================= */
+
+async function confirmPickup(
+    req,
+    res
+) {
+
+    try {
+
+        const bookingId =
+            req.params.bookingId;
+
+
+        /* -------------------------------------------------
+           FIND HOST'S VEHICLES
+        ------------------------------------------------- */
+
+        const hostCars =
+            await Car.find({
+
+                ownerId:
+                    req.user._id
+
+            }).select(
+                "carId"
+            );
+
+
+        const hostCarIds =
+            hostCars.map(
+
+                car =>
+                    car.carId
+
+            );
+
+
+        if (
+            hostCarIds.length === 0
+        ) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message:
+                    "You do not have any vehicles."
+
+            });
+
+        }
+
+
+        /* -------------------------------------------------
+           FIND BOOKING
+        ------------------------------------------------- */
+
+        const booking =
+            await Booking.findOne({
+
+                bookingId,
+
+                carId: {
+                    $in:
+                        hostCarIds
+                }
+
+            });
+
+
+        if (
+            !booking
+        ) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message:
+                    "Booking not found for your vehicles."
+
+            });
+
+        }
+
+
+        /* -------------------------------------------------
+           BOOKING MUST BE CONFIRMED
+        ------------------------------------------------- */
+
+        if (
+            booking.status !==
+            "confirmed"
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Only confirmed bookings can be picked up."
+
+            });
+
+        }
+
+
+        /* -------------------------------------------------
+           PAYMENT MUST BE COMPLETED
+        ------------------------------------------------- */
+
+        if (
+            booking.paymentStatus !==
+            "paid"
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Pickup cannot be confirmed until payment is completed."
+
+            });
+
+        }
+
+
+        /* -------------------------------------------------
+           PREVENT DUPLICATE PICKUP
+        ------------------------------------------------- */
+
+        if (
+            booking.pickupStatus ===
+            "confirmed"
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Pickup has already been confirmed."
+
+            });
+
+        }
+
+
+        /* -------------------------------------------------
+           CHECK PICKUP DATE
+        ------------------------------------------------- */
+
+        const today =
+            new Date();
+
+
+        today.setHours(
+            0,
+            0,
+            0,
+            0
+        );
+
+
+        const pickupDate =
+            new Date(
+                booking.pickupDate
+            );
+
+
+        pickupDate.setHours(
+            0,
+            0,
+            0,
+            0
+        );
+
+
+        if (
+            today <
+            pickupDate
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Pickup cannot be confirmed before the pickup date."
+
+            });
+
+        }
+
+
+        /* -------------------------------------------------
+           OPTIONAL NOTES
+        ------------------------------------------------- */
+
+        const notes =
+            typeof req.body.notes ===
+            "string"
+
+                ? req.body.notes.trim()
+
+                : "";
+
+
+        /* -------------------------------------------------
+           CONFIRM PICKUP
+        ------------------------------------------------- */
+
+        booking.pickupStatus =
+            "confirmed";
+
+        booking.pickupConfirmedAt =
+            new Date();
+
+        booking.pickupNotes =
+            notes;
+
+
+        await booking.save();
+
+
+        return res.json({
+
+            success: true,
+
+            message:
+                "Vehicle pickup confirmed successfully.",
+
+            data:
+                booking
+
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            "Pickup confirmation error:",
+            error.message
+        );
+
+
+        return res.status(500).json({
+
+            success: false,
+
+            message:
+                "Unable to confirm vehicle pickup."
+
+        });
+
+    }
+
+}
+
+
+
+/* =========================================================
+   CONFIRM RETURN
+========================================================= */
+
+async function confirmReturn(
+    req,
+    res
+) {
+
+    try {
+
+        const bookingId =
+            req.params.bookingId;
+
+
+        /* -------------------------------------------------
+           FIND HOST'S VEHICLES
+        ------------------------------------------------- */
+
+        const hostCars =
+            await Car.find({
+
+                ownerId:
+                    req.user._id
+
+            }).select(
+                "carId"
+            );
+
+
+        const hostCarIds =
+            hostCars.map(
+
+                car =>
+                    car.carId
+
+            );
+
+
+        if (
+            hostCarIds.length === 0
+        ) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message:
+                    "You do not have any vehicles."
+
+            });
+
+        }
+
+
+        /* -------------------------------------------------
+           FIND BOOKING
+        ------------------------------------------------- */
+
+        const booking =
+            await Booking.findOne({
+
+                bookingId,
+
+                carId: {
+                    $in:
+                        hostCarIds
+                }
+
+            });
+
+
+        if (
+            !booking
+        ) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message:
+                    "Booking not found for your vehicles."
+
+            });
+
+        }
+
+
+        /* -------------------------------------------------
+           BOOKING MUST BE CONFIRMED
+        ------------------------------------------------- */
+
+        if (
+            booking.status !==
+            "confirmed"
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Only confirmed bookings can be returned."
+
+            });
+
+        }
+
+
+        /* -------------------------------------------------
+           PAYMENT MUST BE COMPLETED
+        ------------------------------------------------- */
+
+        if (
+            booking.paymentStatus !==
+            "paid"
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Return cannot be confirmed until payment is completed."
+
+            });
+
+        }
+
+
+        /* -------------------------------------------------
+           PICKUP MUST BE CONFIRMED
+        ------------------------------------------------- */
+
+        if (
+            booking.pickupStatus !==
+            "confirmed"
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Vehicle pickup must be confirmed before return."
+
+            });
+
+        }
+
+
+        /* -------------------------------------------------
+           PREVENT DUPLICATE RETURN
+        ------------------------------------------------- */
+
+        if (
+            booking.returnStatus ===
+            "confirmed"
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Return has already been confirmed."
+
+            });
+
+        }
+
+
+        /* -------------------------------------------------
+           VEHICLE RENTAL MUST HAVE STARTED
+        ------------------------------------------------- */
+
+        const today =
+            new Date();
+
+
+        today.setHours(
+            0,
+            0,
+            0,
+            0
+        );
+
+
+        const pickupDate =
+            new Date(
+                booking.pickupDate
+            );
+
+
+        pickupDate.setHours(
+            0,
+            0,
+            0,
+            0
+        );
+
+
+        if (
+            today <
+            pickupDate
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Vehicle cannot be returned before the rental starts."
+
+            });
+
+        }
+
+
+        /* -------------------------------------------------
+           OPTIONAL NOTES
+        ------------------------------------------------- */
+
+        const notes =
+            typeof req.body.notes ===
+            "string"
+
+                ? req.body.notes.trim()
+
+                : "";
+
+
+        /* -------------------------------------------------
+           CONFIRM RETURN
+        ------------------------------------------------- */
+
+        booking.returnStatus =
+            "confirmed";
+
+        booking.returnConfirmedAt =
+            new Date();
+
+        booking.returnNotes =
+            notes;
+
+        booking.status =
+            "completed";
+
+
+        await booking.save();
+
+
+        return res.json({
+
+            success: true,
+
+            message:
+                "Vehicle return confirmed successfully.",
+
+            data:
+                booking
+
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            "Return confirmation error:",
+            error.message
+        );
+
+
+        return res.status(500).json({
+
+            success: false,
+
+            message:
+                "Unable to confirm vehicle return."
+
+        });
+
+    }
+
+}
+
+
+
+/* =========================================================
+   EXPORTS
+========================================================= */
 
 module.exports = {
 
@@ -1708,6 +2180,10 @@ module.exports = {
 
     getHostBookings,
 
-    updateHostBookingStatus
+    updateHostBookingStatus,
+
+    confirmPickup,
+
+    confirmReturn
 
 };

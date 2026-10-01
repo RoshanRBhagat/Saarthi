@@ -2,145 +2,88 @@
    SAARTHI - HOST DASHBOARD
 ========================================================= */
 
-
-/* =========================================================
-   DOM ELEMENTS
-========================================================= */
-
-/* ---------- Dashboard ---------- */
-
 const dashboardLoading =
-    document.getElementById(
-        "dashboardLoading"
-    );
-
+    document.getElementById("dashboardLoading");
 
 const dashboardError =
-    document.getElementById(
-        "dashboardError"
-    );
-
+    document.getElementById("dashboardError");
 
 const dashboardContent =
-    document.getElementById(
-        "dashboardContent"
-    );
-
+    document.getElementById("dashboardContent");
 
 const welcomeMessage =
-    document.getElementById(
-        "welcomeMessage"
-    );
+    document.getElementById("welcomeMessage");
 
 
-/* ---------- Stats ---------- */
+/* =========================================================
+   STATS
+========================================================= */
 
 const vehicleCount =
-    document.getElementById(
-        "vehicleCount"
-    );
-
+    document.getElementById("vehicleCount");
 
 const activeVehicleCount =
-    document.getElementById(
-        "activeVehicleCount"
-    );
-
+    document.getElementById("activeVehicleCount");
 
 const pendingBookingCount =
-    document.getElementById(
-        "pendingBookingCount"
-    );
-
+    document.getElementById("pendingBookingCount");
 
 const confirmedBookingCount =
-    document.getElementById(
-        "confirmedBookingCount"
-    );
-
+    document.getElementById("confirmedBookingCount");
 
 const earningsAmount =
-    document.getElementById(
-        "earningsAmount"
-    );
+    document.getElementById("earningsAmount");
 
 
-/* ---------- Vehicles ---------- */
+/* =========================================================
+   VEHICLES
+========================================================= */
 
 const vehicleSummary =
-    document.getElementById(
-        "vehicleSummary"
-    );
-
+    document.getElementById("vehicleSummary");
 
 const vehiclesGrid =
-    document.getElementById(
-        "vehiclesGrid"
-    );
-
+    document.getElementById("vehiclesGrid");
 
 const noVehicles =
-    document.getElementById(
-        "noVehicles"
-    );
+    document.getElementById("noVehicles");
 
 
-/* ---------- Bookings ---------- */
+/* =========================================================
+   BOOKINGS
+========================================================= */
 
 const bookingSummary =
-    document.getElementById(
-        "bookingSummary"
-    );
-
+    document.getElementById("bookingSummary");
 
 const bookingsGrid =
-    document.getElementById(
-        "bookingsGrid"
-    );
-
+    document.getElementById("bookingsGrid");
 
 const noBookings =
-    document.getElementById(
-        "noBookings"
-    );
-
+    document.getElementById("noBookings");
 
 const noFilteredBookings =
-    document.getElementById(
-        "noFilteredBookings"
-    );
+    document.getElementById("noFilteredBookings");
 
 
-/* ---------- Booking Filters ---------- */
+/* =========================================================
+   BOOKING FILTERS
+========================================================= */
 
 const bookingFilterButtons =
-    document.querySelectorAll(
-        ".booking-filter"
-    );
-
+    document.querySelectorAll(".booking-filter");
 
 const allFilterCount =
-    document.getElementById(
-        "allFilterCount"
-    );
-
+    document.getElementById("allFilterCount");
 
 const pendingFilterCount =
-    document.getElementById(
-        "pendingFilterCount"
-    );
-
+    document.getElementById("pendingFilterCount");
 
 const confirmedFilterCount =
-    document.getElementById(
-        "confirmedFilterCount"
-    );
-
+    document.getElementById("confirmedFilterCount");
 
 const cancelledFilterCount =
-    document.getElementById(
-        "cancelledFilterCount"
-    );
+    document.getElementById("cancelledFilterCount");
 
 
 /* =========================================================
@@ -149,8 +92,9 @@ const cancelledFilterCount =
 
 let allBookings = [];
 
-let currentBookingFilter =
-    "all";
+let allCars = [];
+
+let currentBookingFilter = "all";
 
 
 /* =========================================================
@@ -158,24 +102,17 @@ let currentBookingFilter =
 ========================================================= */
 
 const token =
-    localStorage.getItem(
-        "saarthiToken"
-    );
-
+    localStorage.getItem("saarthiToken");
 
 const storedUser =
-    localStorage.getItem(
-        "saarthiUser"
-    );
+    localStorage.getItem("saarthiUser");
 
 
 /* =========================================================
    REQUIRE LOGGED-IN HOST
 ========================================================= */
 
-if (
-    !token
-) {
+if (!token) {
 
     window.location.href =
         `auth.html?returnUrl=${encodeURIComponent(
@@ -212,10 +149,6 @@ if (
 
         } else {
 
-            /* ---------------------------------------------
-               HOST NAME
-            --------------------------------------------- */
-
             if (
                 user.name
             ) {
@@ -225,10 +158,6 @@ if (
 
             }
 
-
-            /* ---------------------------------------------
-               LOAD DASHBOARD
-            --------------------------------------------- */
 
             loadDashboard();
 
@@ -245,7 +174,6 @@ if (
         localStorage.removeItem(
             "saarthiToken"
         );
-
 
         localStorage.removeItem(
             "saarthiUser"
@@ -311,10 +239,6 @@ async function loadDashboard() {
 
     try {
 
-        /* -------------------------------------------------
-           Fetch vehicles and bookings together
-        ------------------------------------------------- */
-
         const [
             carsResponse,
             bookingsResponse
@@ -323,40 +247,33 @@ async function loadDashboard() {
             fetch(
                 "/api/cars/host/my-cars",
                 {
-
                     method:
                         "GET",
 
                     headers: {
-
                         "Authorization":
                             `Bearer ${token}`
-
                     },
 
                     cache:
                         "no-store"
-
                 }
             ),
+
 
             fetch(
                 "/api/bookings/host",
                 {
-
                     method:
                         "GET",
 
                     headers: {
-
                         "Authorization":
                             `Bearer ${token}`
-
                     },
 
                     cache:
                         "no-store"
-
                 }
             )
 
@@ -364,7 +281,7 @@ async function loadDashboard() {
 
 
         /* -------------------------------------------------
-           Authentication failure
+           AUTHENTICATION FAILURE
         ------------------------------------------------- */
 
         if (
@@ -374,20 +291,7 @@ async function loadDashboard() {
             bookingsResponse.status === 403
         ) {
 
-            localStorage.removeItem(
-                "saarthiToken"
-            );
-
-            localStorage.removeItem(
-                "saarthiUser"
-            );
-
-
-            window.location.href =
-                `auth.html?returnUrl=${encodeURIComponent(
-                    window.location.href
-                )}`;
-
+            handleAuthFailure();
 
             return;
 
@@ -395,7 +299,7 @@ async function loadDashboard() {
 
 
         /* -------------------------------------------------
-           Parse responses
+           PARSE RESPONSES
         ------------------------------------------------- */
 
         const carsResult =
@@ -407,7 +311,7 @@ async function loadDashboard() {
 
 
         /* -------------------------------------------------
-           Validate vehicle response
+           VALIDATE VEHICLE RESPONSE
         ------------------------------------------------- */
 
         if (
@@ -424,7 +328,7 @@ async function loadDashboard() {
 
 
         /* -------------------------------------------------
-           Validate booking response
+           VALIDATE BOOKING RESPONSE
         ------------------------------------------------- */
 
         if (
@@ -441,7 +345,7 @@ async function loadDashboard() {
 
 
         /* -------------------------------------------------
-           Normalize data
+           NORMALIZE DATA
         ------------------------------------------------- */
 
         const cars =
@@ -450,6 +354,16 @@ async function loadDashboard() {
             )
                 ? carsResult.data
                 : [];
+
+
+        /*
+            IMPORTANT:
+            Keep all cars available so booking cards can
+            resolve their vehicle name using booking.carId.
+        */
+
+        allCars =
+            cars;
 
 
         allBookings =
@@ -461,7 +375,7 @@ async function loadDashboard() {
 
 
         /* -------------------------------------------------
-           Render dashboard
+           RENDER
         ------------------------------------------------- */
 
         renderStats(
@@ -482,7 +396,7 @@ async function loadDashboard() {
 
 
         /* -------------------------------------------------
-           Show dashboard
+           SHOW DASHBOARD
         ------------------------------------------------- */
 
         dashboardLoading.classList.add(
@@ -491,6 +405,11 @@ async function loadDashboard() {
 
 
         dashboardContent.classList.remove(
+            "hidden"
+        );
+
+
+        dashboardError.classList.add(
             "hidden"
         );
 
@@ -531,13 +450,14 @@ function renderStats(
     bookings
 ) {
 
-    /* -----------------------------------------------------
-       Vehicles
-    ----------------------------------------------------- */
-
     const totalVehicles =
         cars.length;
 
+
+    /*
+        Your Car model uses "available" as the active
+        marketplace status.
+    */
 
     const activeVehicles =
         cars.filter(
@@ -546,10 +466,6 @@ function renderStats(
                 "available"
         ).length;
 
-
-    /* -----------------------------------------------------
-       Bookings
-    ----------------------------------------------------- */
 
     const pendingBookings =
         bookings.filter(
@@ -567,11 +483,9 @@ function renderStats(
         ).length;
 
 
-    /* -----------------------------------------------------
-       Booking value
-       
-       Cancelled bookings are not included.
-    ----------------------------------------------------- */
+    /*
+        Booking value excludes cancelled bookings.
+    */
 
     const totalValue =
         bookings
@@ -598,10 +512,6 @@ function renderStats(
                 0
             );
 
-
-    /* -----------------------------------------------------
-       Update DOM
-    ----------------------------------------------------- */
 
     vehicleCount.textContent =
         totalVehicles;
@@ -712,17 +622,17 @@ function renderFilteredBookings() {
 
 
     /* -----------------------------------------------------
-       No bookings at all
+       NO BOOKINGS
     ----------------------------------------------------- */
 
     if (
-        allBookings.length === 0
+        allBookings.length ===
+        0
     ) {
 
         noBookings.classList.remove(
             "hidden"
         );
-
 
         return;
 
@@ -730,7 +640,7 @@ function renderFilteredBookings() {
 
 
     /* -----------------------------------------------------
-       Apply selected filter
+       APPLY FILTER
     ----------------------------------------------------- */
 
     let filteredBookings =
@@ -753,17 +663,17 @@ function renderFilteredBookings() {
 
 
     /* -----------------------------------------------------
-       No bookings for selected filter
+       NO BOOKINGS FOR FILTER
     ----------------------------------------------------- */
 
     if (
-        filteredBookings.length === 0
+        filteredBookings.length ===
+        0
     ) {
 
         noFilteredBookings.classList.remove(
             "hidden"
         );
-
 
         return;
 
@@ -771,7 +681,7 @@ function renderFilteredBookings() {
 
 
     /* -----------------------------------------------------
-       Render
+       RENDER
     ----------------------------------------------------- */
 
     filteredBookings.forEach(
@@ -794,13 +704,13 @@ function renderVehicles(
 
 
     if (
-        cars.length === 0
+        cars.length ===
+        0
     ) {
 
         noVehicles.classList.remove(
             "hidden"
         );
-
 
         return;
 
@@ -836,10 +746,6 @@ function renderVehicle(
     card.className =
         "host-vehicle-card";
 
-
-    /* -----------------------------------------------------
-       STATUS
-    ----------------------------------------------------- */
 
     const vehicleStatus =
         car.status ||
@@ -884,7 +790,7 @@ function renderVehicle(
 
                 </div>
 
-            `
+              `
 
             : `
 
@@ -904,7 +810,7 @@ function renderVehicle(
 
                 </div>
 
-            `;
+              `;
 
 
     /* -----------------------------------------------------
@@ -912,32 +818,53 @@ function renderVehicle(
     ----------------------------------------------------- */
 
     const nextStatus =
-        vehicleStatus === "available"
+        vehicleStatus ===
+        "available"
+
             ? "unavailable"
+
             : "available";
 
 
     const statusButtonText =
-        vehicleStatus === "archived"
+        vehicleStatus ===
+        "archived"
+
             ? "Restore Vehicle"
-            : vehicleStatus === "available"
+
+            : vehicleStatus ===
+              "available"
+
                 ? "Make Unavailable"
+
                 : "Make Available";
 
 
     const statusButtonIcon =
-        vehicleStatus === "archived"
+        vehicleStatus ===
+        "archived"
+
             ? "fa-rotate-left"
-            : vehicleStatus === "available"
+
+            : vehicleStatus ===
+              "available"
+
                 ? "fa-pause"
+
                 : "fa-play";
 
 
     const statusButtonClass =
-        vehicleStatus === "archived"
+        vehicleStatus ===
+        "archived"
+
             ? "make-available"
-            : vehicleStatus === "available"
+
+            : vehicleStatus ===
+              "available"
+
                 ? "make-unavailable"
+
                 : "make-available";
 
 
@@ -998,10 +925,16 @@ function renderVehicle(
 
                 <span
                     class="vehicle-status ${
-                        vehicleStatus === "archived"
+                        vehicleStatus ===
+                        "archived"
+
                             ? "archived"
-                            : vehicleStatus !== "available"
+
+                            : vehicleStatus !==
+                              "available"
+
                                 ? "unavailable"
+
                                 : ""
                     }"
                 >
@@ -1025,10 +958,12 @@ function renderVehicle(
                     class="fa-solid fa-location-dot"
                 ></i>
 
+
                 ${escapeHTML(
                     car.city ||
                     ""
                 )},
+
 
                 ${escapeHTML(
                     car.state ||
@@ -1115,7 +1050,9 @@ function renderVehicle(
 
 
                 <span>
+
                     / day
+
                 </span>
 
             </div>
@@ -1145,7 +1082,7 @@ function renderVehicle(
                 </a>
 
 
-                <!-- AVAILABLE / UNAVAILABLE / RESTORE -->
+                <!-- STATUS -->
 
                 <button
                     type="button"
@@ -1168,7 +1105,8 @@ function renderVehicle(
                 <!-- ARCHIVE -->
 
                 ${
-                    vehicleStatus !== "archived"
+                    vehicleStatus !==
+                    "archived"
 
                         ? `
 
@@ -1188,7 +1126,7 @@ function renderVehicle(
 
                             </button>
 
-                        `
+                          `
 
                         : ""
                 }
@@ -1291,7 +1229,9 @@ async function updateVehicleStatus(
 
     const action =
         status === "available"
+
             ? "make this vehicle available"
+
             : "make this vehicle unavailable";
 
 
@@ -1334,9 +1274,7 @@ async function updateVehicleStatus(
 
                     body:
                         JSON.stringify({
-
                             status
-
                         })
 
                 }
@@ -1346,10 +1284,6 @@ async function updateVehicleStatus(
         const result =
             await response.json();
 
-
-        /* -------------------------------------------------
-           AUTH ERROR
-        ------------------------------------------------- */
 
         if (
             response.status === 401 ||
@@ -1363,10 +1297,6 @@ async function updateVehicleStatus(
         }
 
 
-        /* -------------------------------------------------
-           API ERROR
-        ------------------------------------------------- */
-
         if (
             !response.ok ||
             !result.success
@@ -1379,10 +1309,6 @@ async function updateVehicleStatus(
 
         }
 
-
-        /* -------------------------------------------------
-           REFRESH DASHBOARD
-        ------------------------------------------------- */
 
         await loadDashboard();
 
@@ -1466,10 +1392,6 @@ async function archiveVehicle(
             await response.json();
 
 
-        /* -------------------------------------------------
-           AUTH ERROR
-        ------------------------------------------------- */
-
         if (
             response.status === 401 ||
             response.status === 403
@@ -1481,10 +1403,6 @@ async function archiveVehicle(
 
         }
 
-
-        /* -------------------------------------------------
-           API ERROR
-        ------------------------------------------------- */
 
         if (
             !response.ok ||
@@ -1498,10 +1416,6 @@ async function archiveVehicle(
 
         }
 
-
-        /* -------------------------------------------------
-           REFRESH
-        ------------------------------------------------- */
 
         await loadDashboard();
 
@@ -1525,7 +1439,7 @@ async function archiveVehicle(
 
 
 /* =========================================================
-   RENDER BOOKINGS
+   RENDER BOOKING
 ========================================================= */
 
 function renderBooking(
@@ -1542,8 +1456,24 @@ function renderBooking(
         "host-booking-card";
 
 
+    /*
+        First try booking.car.
+
+        If that is missing, use allCars and match
+        booking.carId with car.carId.
+
+        This fixes the "Vehicle" title problem.
+    */
+
     const car =
         booking.car ||
+
+        allCars.find(
+            vehicle =>
+                vehicle.carId ===
+                booking.carId
+        ) ||
+
         {};
 
 
@@ -1553,26 +1483,91 @@ function renderBooking(
         }`.trim();
 
 
+    /* -----------------------------------------------------
+       BOOKING STATUS
+    ----------------------------------------------------- */
+
     const status =
         booking.status ||
         "pending";
 
 
-        
+    /* -----------------------------------------------------
+       PAYMENT STATUS
+    ----------------------------------------------------- */
+
     const paymentStatus =
         booking.paymentStatus ||
         "pending";
 
+
+    /* -----------------------------------------------------
+       RENTAL STATUS
+    ----------------------------------------------------- */
 
     const rentalStatus =
         booking.rentalStatus ||
         booking.status;
 
 
+    /* -----------------------------------------------------
+       DRIVER
+    ----------------------------------------------------- */
+
     const driverRequired =
         booking.driverRequired ===
         true;
 
+
+    /* -----------------------------------------------------
+       PICKUP / RETURN STATUS
+    ----------------------------------------------------- */
+
+    const pickupStatus =
+        booking.pickupStatus ||
+        "pending";
+
+
+    const returnStatus =
+        booking.returnStatus ||
+        "pending";
+
+
+    const pickupConfirmed =
+        pickupStatus ===
+        "confirmed";
+
+
+    const returnConfirmed =
+        returnStatus ===
+        "confirmed";
+
+
+    /* -----------------------------------------------------
+       PICKUP ACTION CONDITION
+    ----------------------------------------------------- */
+
+    const canConfirmPickup =
+        status === "confirmed" &&
+        paymentStatus === "paid" &&
+        rentalStatus === "active" &&
+        !pickupConfirmed;
+
+
+    /* -----------------------------------------------------
+       RETURN ACTION CONDITION
+    ----------------------------------------------------- */
+
+    const canConfirmReturn =
+        status === "confirmed" &&
+        paymentStatus === "paid" &&
+        pickupConfirmed &&
+        !returnConfirmed;
+
+
+    /* -----------------------------------------------------
+       CARD HTML
+    ----------------------------------------------------- */
 
     card.innerHTML = `
 
@@ -1600,6 +1595,7 @@ function renderBooking(
                 >
 
                     Booking ID:
+
                     ${escapeHTML(
                         booking.bookingId ||
                         ""
@@ -1612,14 +1608,14 @@ function renderBooking(
 
             <!-- STATUS -->
 
-
             <div
                 class="host-booking-status-group"
             >
 
                 <span
                     class="host-booking-status ${
-                        status === "cancelled"
+                        status ===
+                        "cancelled"
                             ? "cancelled"
                             : ""
                     }"
@@ -1639,13 +1635,27 @@ function renderBooking(
                 >
 
                     ${
-                        rentalStatus === "upcoming"
+                        rentalStatus ===
+                        "upcoming"
+
                             ? "Upcoming"
-                            : rentalStatus === "active"
+
+                            : rentalStatus ===
+                              "active"
+
                                 ? "Active"
-                                : rentalStatus === "completed"
+
+                                : rentalStatus ===
+                                  "completed"
+
                                     ? "Completed"
-                                    : rentalStatus
+
+                                    : rentalStatus ===
+                                      "cancelled"
+
+                                        ? "Cancelled"
+
+                                        : rentalStatus
                     }
 
                 </span>
@@ -1661,6 +1671,8 @@ function renderBooking(
             class="host-booking-info"
         >
 
+            <!-- CUSTOMER -->
+
             <div
                 class="host-booking-row"
             >
@@ -1670,14 +1682,18 @@ function renderBooking(
                 </span>
 
                 <strong>
+
                     ${escapeHTML(
                         booking.customerName ||
                         "—"
                     )}
+
                 </strong>
 
             </div>
 
+
+            <!-- PHONE -->
 
             <div
                 class="host-booking-row"
@@ -1688,14 +1704,40 @@ function renderBooking(
                 </span>
 
                 <strong>
+
                     ${escapeHTML(
                         booking.customerPhone ||
                         "—"
                     )}
+
                 </strong>
 
             </div>
 
+
+            <!-- EMAIL -->
+
+            <div
+                class="host-booking-row"
+            >
+
+                <span>
+                    Email
+                </span>
+
+                <strong>
+
+                    ${escapeHTML(
+                        booking.customerEmail ||
+                        "—"
+                    )}
+
+                </strong>
+
+            </div>
+
+
+            <!-- PICKUP -->
 
             <div
                 class="host-booking-row"
@@ -1706,13 +1748,17 @@ function renderBooking(
                 </span>
 
                 <strong>
+
                     ${formatDate(
                         booking.pickupDate
                     )}
+
                 </strong>
 
             </div>
 
+
+            <!-- RETURN -->
 
             <div
                 class="host-booking-row"
@@ -1723,13 +1769,17 @@ function renderBooking(
                 </span>
 
                 <strong>
+
                     ${formatDate(
                         booking.returnDate
                     )}
+
                 </strong>
 
             </div>
 
+
+            <!-- DURATION -->
 
             <div
                 class="host-booking-row"
@@ -1747,18 +1797,24 @@ function renderBooking(
                     )}
 
                     ${
+
                         Number(
                             booking.totalDays ||
                             0
                         ) === 1
+
                             ? "day"
+
                             : "days"
+
                     }
 
                 </strong>
 
             </div>
 
+
+            <!-- PAYMENT -->
 
             <div
                 class="host-booking-row"
@@ -1769,13 +1825,156 @@ function renderBooking(
                 </span>
 
                 <strong>
+
                     ${escapeHTML(
                         paymentStatus
                     )}
+
                 </strong>
 
             </div>
 
+
+            <!-- PAYMENT ID -->
+
+            ${
+                booking.paymentId
+
+                    ? `
+
+                        <div
+                            class="host-booking-row"
+                        >
+
+                            <span>
+                                Payment ID
+                            </span>
+
+                            <strong>
+
+                                ${escapeHTML(
+                                    booking.paymentId
+                                )}
+
+                            </strong>
+
+                        </div>
+
+                      `
+
+                    : ""
+            }
+
+
+            <!-- PICKUP STATUS -->
+
+            <div
+                class="host-booking-row"
+            >
+
+                <span>
+                    Pickup status
+                </span>
+
+                <strong>
+
+                    ${
+                        pickupConfirmed
+                            ? "Confirmed"
+                            : "Pending"
+                    }
+
+                </strong>
+
+            </div>
+
+
+            <!-- RETURN STATUS -->
+
+            <div
+                class="host-booking-row"
+            >
+
+                <span>
+                    Return status
+                </span>
+
+                <strong>
+
+                    ${
+                        returnConfirmed
+                            ? "Confirmed"
+                            : "Pending"
+                    }
+
+                </strong>
+
+            </div>
+
+
+            <!-- PICKUP CONFIRMED DATE -->
+
+            ${
+                booking.pickupConfirmedAt
+
+                    ? `
+
+                        <div
+                            class="host-booking-row"
+                        >
+
+                            <span>
+                                Pickup confirmed
+                            </span>
+
+                            <strong>
+
+                                ${formatDate(
+                                    booking.pickupConfirmedAt
+                                )}
+
+                            </strong>
+
+                        </div>
+
+                      `
+
+                    : ""
+            }
+
+
+            <!-- RETURN CONFIRMED DATE -->
+
+            ${
+                booking.returnConfirmedAt
+
+                    ? `
+
+                        <div
+                            class="host-booking-row"
+                        >
+
+                            <span>
+                                Return confirmed
+                            </span>
+
+                            <strong>
+
+                                ${formatDate(
+                                    booking.returnConfirmedAt
+                                )}
+
+                            </strong>
+
+                        </div>
+
+                      `
+
+                    : ""
+            }
+
+
+            <!-- BOOKING VALUE -->
 
             <div
                 class="host-booking-row total"
@@ -1815,19 +2014,23 @@ function renderBooking(
                 }"
             ></i>
 
+
             ${
                 driverRequired
+
                     ? "Customer requested a driver."
+
                     : "Self-drive booking."
             }
 
         </div>
 
 
-        <!-- PENDING ACTIONS -->
+        <!-- BOOKING ACTIONS -->
 
         ${
-            status === "pending"
+            status ===
+            "pending"
 
                 ? `
 
@@ -1866,21 +2069,81 @@ function renderBooking(
 
                     </div>
 
-                `
+                  `
 
-                : ""
+
+                : status ===
+                  "confirmed" &&
+                  canConfirmPickup
+
+                    ? `
+
+                        <div
+                            class="host-booking-actions"
+                        >
+
+                            <button
+                                type="button"
+                                class="booking-action-btn confirm booking-pickup-btn"
+                                data-handover-action="pickup"
+                            >
+
+                                <i
+                                    class="fa-solid fa-key"
+                                ></i>
+
+                                Confirm Pickup
+
+                            </button>
+
+                        </div>
+
+                      `
+
+
+                    : status ===
+                      "confirmed" &&
+                      canConfirmReturn
+
+                        ? `
+
+                            <div
+                                class="host-booking-actions"
+                            >
+
+                                <button
+                                    type="button"
+                                    class="booking-action-btn confirm booking-return-btn"
+                                    data-handover-action="return"
+                                >
+
+                                    <i
+                                        class="fa-solid fa-arrow-rotate-left"
+                                    ></i>
+
+                                    Confirm Return
+
+                                </button>
+
+                            </div>
+
+                          `
+
+
+                        : ""
+
         }
 
     `;
 
 
     /* =====================================================
-       BOOKING ACTION BUTTONS
+       NORMAL BOOKING ACTIONS
     ===================================================== */
 
     const actionButtons =
         card.querySelectorAll(
-            ".booking-action-btn"
+            ".booking-action-btn[data-action]"
         );
 
 
@@ -1907,6 +2170,66 @@ function renderBooking(
     );
 
 
+    /* =====================================================
+       PICKUP BUTTON
+    ===================================================== */
+
+    const pickupButton =
+        card.querySelector(
+            '[data-handover-action="pickup"]'
+        );
+
+
+    if (
+        pickupButton
+    ) {
+
+        pickupButton.addEventListener(
+            "click",
+            async () => {
+
+                await confirmPickup(
+                    booking.bookingId
+                );
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       RETURN BUTTON
+    ===================================================== */
+
+    const returnButton =
+        card.querySelector(
+            '[data-handover-action="return"]'
+        );
+
+
+    if (
+        returnButton
+    ) {
+
+        returnButton.addEventListener(
+            "click",
+            async () => {
+
+                await confirmReturn(
+                    booking.bookingId
+                );
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       ADD CARD
+    ===================================================== */
+
     bookingsGrid.appendChild(
         card
     );
@@ -1924,8 +2247,11 @@ async function updateBookingStatus(
 ) {
 
     const actionText =
-        status === "confirmed"
+        status ===
+        "confirmed"
+
             ? "confirm"
+
             : "cancel";
 
 
@@ -1981,10 +2307,6 @@ async function updateBookingStatus(
             await response.json();
 
 
-        /* -------------------------------------------------
-           AUTH ERROR
-        ------------------------------------------------- */
-
         if (
             response.status === 401 ||
             response.status === 403
@@ -1996,10 +2318,6 @@ async function updateBookingStatus(
 
         }
 
-
-        /* -------------------------------------------------
-           API ERROR
-        ------------------------------------------------- */
 
         if (
             !response.ok ||
@@ -2013,10 +2331,6 @@ async function updateBookingStatus(
 
         }
 
-
-        /* -------------------------------------------------
-           REFRESH
-        ------------------------------------------------- */
 
         await loadDashboard();
 
@@ -2032,6 +2346,250 @@ async function updateBookingStatus(
         alert(
             error.message ||
             "Unable to update booking."
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   CONFIRM PICKUP
+========================================================= */
+
+async function confirmPickup(
+    bookingId
+) {
+
+    const notes =
+        window.prompt(
+            "Pickup notes (optional):",
+            ""
+        );
+
+
+    if (
+        notes === null
+    ) {
+
+        return;
+
+    }
+
+
+    const confirmed =
+        window.confirm(
+            "Confirm that the vehicle has been handed over to the customer?"
+        );
+
+
+    if (
+        !confirmed
+    ) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/bookings/host/${encodeURIComponent(
+                    bookingId
+                )}/pickup`,
+                {
+
+                    method:
+                        "PATCH",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json",
+
+                        "Authorization":
+                            `Bearer ${token}`
+
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            notes
+
+                        })
+
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (
+            response.status === 401 ||
+            response.status === 403
+        ) {
+
+            handleAuthFailure();
+
+            return;
+
+        }
+
+
+        if (
+            !response.ok ||
+            !result.success
+        ) {
+
+            throw new Error(
+                result.message ||
+                "Unable to confirm vehicle pickup."
+            );
+
+        }
+
+
+        await loadDashboard();
+
+
+    } catch (error) {
+
+        console.error(
+            "Pickup confirmation error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Unable to confirm vehicle pickup."
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   CONFIRM RETURN
+========================================================= */
+
+async function confirmReturn(
+    bookingId
+) {
+
+    const notes =
+        window.prompt(
+            "Return notes (optional):",
+            ""
+        );
+
+
+    if (
+        notes === null
+    ) {
+
+        return;
+
+    }
+
+
+    const confirmed =
+        window.confirm(
+            "Confirm that the vehicle has been returned by the customer?"
+        );
+
+
+    if (
+        !confirmed
+    ) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/bookings/host/${encodeURIComponent(
+                    bookingId
+                )}/return`,
+                {
+
+                    method:
+                        "PATCH",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json",
+
+                        "Authorization":
+                            `Bearer ${token}`
+
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            notes
+
+                        })
+
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (
+            response.status === 401 ||
+            response.status === 403
+        ) {
+
+            handleAuthFailure();
+
+            return;
+
+        }
+
+
+        if (
+            !response.ok ||
+            !result.success
+        ) {
+
+            throw new Error(
+                result.message ||
+                "Unable to confirm vehicle return."
+            );
+
+        }
+
+
+        await loadDashboard();
+
+
+    } catch (error) {
+
+        console.error(
+            "Return confirmation error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Unable to confirm vehicle return."
         );
 
     }
