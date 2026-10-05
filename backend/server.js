@@ -34,7 +34,8 @@ const Razorpay =
    ROUTES
 ========================================================= */
 
-
+const aiTripRoutes =
+    require("./routes/aiTripRoutes");
 
 const carRoutes =
     require("./routes/carRoutes");
@@ -50,6 +51,8 @@ const paymentRoutes =
 const authRoutes =
     require("./routes/authRoutes");
 
+const damageDetectionRoutes =
+    require("./routes/damageDetectionRoutes");
 
 /* =========================================================
    EXPRESS APP
@@ -93,7 +96,9 @@ const razorpay =
 ========================================================= */
 
 app.use(
-    express.json()
+    express.json({
+        limit: "16mb"
+    })
 );
 
 
@@ -131,6 +136,16 @@ app.use(
     bookingRoutes
 );
 
+app.use(
+    "/api/ai-trip",
+    aiTripRoutes
+);
+
+app.use(
+    "/api/damage-detection",
+    damageDetectionRoutes
+);
+
 
 /* ---------- Payment APIs ---------- */
 
@@ -138,6 +153,8 @@ app.use(
     "/api/payments",
     paymentRoutes
 );
+
+app.use("/api/ai-trip", aiTripRoutes);
 
 
 /* =========================================================

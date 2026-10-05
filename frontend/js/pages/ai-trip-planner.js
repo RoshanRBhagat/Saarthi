@@ -1,20 +1,14 @@
 /* =========================================================
-   Saarthi AI Trip Planner - ai-trip-planner.js
-
-   Phase 1:
-   - Interactive planner form
-   - Mock AI trip generation
-   - Itinerary rendering
-   - Car recommendation
-   - Cost estimate
-   - AI-style trip modification
-
-   Later:
-   Replace mock generation with an API request to the
-   Saarthi backend / AI service.
-   ========================================================= */
+   SAARTHI AI TRIP PLANNER
+   Frontend -> /api/ai-trip/plan
+   Gemini-powered itinerary + live Saarthi vehicle inventory
+========================================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
+
+    /* =========================================================
+       DOM
+    ========================================================= */
 
     const promptInput = document.getElementById("tripPrompt");
     const originInput = document.getElementById("origin");
@@ -24,67 +18,87 @@ document.addEventListener("DOMContentLoaded", () => {
     const travelersInput = document.getElementById("travelers");
     const budgetInput = document.getElementById("budget");
 
-    const generateBtn = document.getElementById("generateTripBtn");
-    const resultsSection = document.getElementById("resultsSection");
-    const selectedCount = document.getElementById("selectedCount");
+    const generateBtn =
+        document.getElementById("generateTripBtn");
 
-    const tripTitle = document.getElementById("tripTitle");
-    const tripSummary = document.getElementById("tripSummary");
-    const durationStat = document.getElementById("durationStat");
-    const travelersStat = document.getElementById("travelersStat");
-    const estimatedStat = document.getElementById("estimatedStat");
-    const itineraryList = document.getElementById("itineraryList");
+    const resultsSection =
+        document.getElementById("resultsSection");
 
-    const recommendedCar = document.getElementById("recommendedCar");
-    const carPrice = document.getElementById("carPrice");
+    const selectedCount =
+        document.getElementById("selectedCount");
 
-    const rentalCost = document.getElementById("rentalCost");
-    const fuelCost = document.getElementById("fuelCost");
-    const tollCost = document.getElementById("tollCost");
-    const activityCost = document.getElementById("activityCost");
-    const totalCost = document.getElementById("totalCost");
-    const budgetStatus = document.getElementById("budgetStatus");
+    const tripTitle =
+        document.getElementById("tripTitle");
 
-    const editPlanBtn = document.getElementById("editPlanBtn");
-    const modifyInput = document.getElementById("modifyInput");
-    const modifyTripBtn = document.getElementById("modifyTripBtn");
+    const tripSummary =
+        document.getElementById("tripSummary");
 
-    const toast = document.getElementById("toast");
-    const toastMessage = document.getElementById("toastMessage");
+    const durationStat =
+        document.getElementById("durationStat");
+
+    const travelersStat =
+        document.getElementById("travelersStat");
+
+    const estimatedStat =
+        document.getElementById("estimatedStat");
+
+    const itineraryList =
+        document.getElementById("itineraryList");
+
+    const recommendedCar =
+        document.getElementById("recommendedCar");
+
+    const carPrice =
+        document.getElementById("carPrice");
+
+    const rentalCost =
+        document.getElementById("rentalCost");
+
+    const fuelCost =
+        document.getElementById("fuelCost");
+
+    const tollCost =
+        document.getElementById("tollCost");
+
+    const activityCost =
+        document.getElementById("activityCost");
+
+    const totalCost =
+        document.getElementById("totalCost");
+
+    const budgetStatus =
+        document.getElementById("budgetStatus");
+
+    const editPlanBtn =
+        document.getElementById("editPlanBtn");
+
+    const modifyInput =
+        document.getElementById("modifyInput");
+
+    const modifyTripBtn =
+        document.getElementById("modifyTripBtn");
+
+    const toast =
+        document.getElementById("toast");
+
+    const toastMessage =
+        document.getElementById("toastMessage");
+
+    const viewCarBtn =
+        document.getElementById("viewRecommendedCarBtn") ||
+        document.querySelector(
+            ".recommendation-card .secondary-btn"
+        );
+
+    const continueCarsBtn =
+        document.getElementById("continueToCarsBtn") ||
+        document.querySelector(".book-car-btn");
+
+    const offerBtn =
+        document.querySelector(".offer-card button");
 
     let selectedPreferences = [];
     let currentPlan = null;
-
-
-    /* =========================================================
-       DATE DEFAULTS
-    ========================================================= */
-
-    function setDefaultDates() {
-
-        const today = new Date();
-
-        const start = new Date(today);
-        start.setDate(today.getDate() + 7);
-
-        const end = new Date(start);
-        end.setDate(start.getDate() + 2);
-
-        startDateInput.value = formatDateForInput(start);
-        endDateInput.value = formatDateForInput(end);
-
-    }
-
-
-    function formatDateForInput(date) {
-
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-
-        return `${year}-${month}-${day}`;
-
-    }
 
 
     /* =========================================================
@@ -92,32 +106,83 @@ document.addEventListener("DOMContentLoaded", () => {
     ========================================================= */
 
     function formatCurrency(amount) {
+        return `₹${Math.round(
+            Number(amount) || 0
+        ).toLocaleString("en-IN")}`;
+    }
 
-        return `₹${Number(amount).toLocaleString("en-IN")}`;
 
+    function formatDateForInput(date) {
+
+        const year = date.getFullYear();
+
+        const month = String(
+            date.getMonth() + 1
+        ).padStart(2, "0");
+
+        const day = String(
+            date.getDate()
+        ).padStart(2, "0");
+
+        return `${year}-${month}-${day}`;
+    }
+
+
+    function getTodayDateString() {
+        return formatDateForInput(new Date());
     }
 
 
     function calculateDuration() {
 
-        if (!startDateInput.value || !endDateInput.value) {
-            return 3;
+        if (
+            !startDateInput.value ||
+            !endDateInput.value
+        ) {
+            return 0;
         }
 
-        const start = new Date(`${startDateInput.value}T00:00:00`);
-        const end = new Date(`${endDateInput.value}T00:00:00`);
+        const start = new Date(
+            `${startDateInput.value}T00:00:00`
+        );
 
-        const milliseconds = end - start;
+        const end = new Date(
+            `${endDateInput.value}T00:00:00`
+        );
+
+        if (
+            Number.isNaN(start.getTime()) ||
+            Number.isNaN(end.getTime())
+        ) {
+            return 0;
+        }
 
         const days =
-            Math.ceil(milliseconds / (1000 * 60 * 60 * 24)) + 1;
+            Math.floor(
+                (
+                    end.getTime() -
+                    start.getTime()
+                ) /
+                (1000 * 60 * 60 * 24)
+            ) + 1;
 
         return Math.max(1, days);
+    }
 
+
+    function getSelectedPreferencesText() {
+
+        return selectedPreferences.length
+            ? selectedPreferences.join(" + ")
+            : "Balanced";
     }
 
 
     function showToast(message) {
+
+        if (!toast || !toastMessage) {
+            return;
+        }
 
         toastMessage.textContent = message;
 
@@ -126,24 +191,183 @@ document.addEventListener("DOMContentLoaded", () => {
         window.clearTimeout(showToast.timer);
 
         showToast.timer = window.setTimeout(() => {
-
             toast.classList.add("hidden");
-
-        }, 2600);
-
+        }, 3500);
     }
 
 
-    function getSelectedPreferencesText() {
+    function setButtonLoading(button, text) {
 
-        if (selectedPreferences.length === 0) {
-
-            return "Balanced";
-
+        if (!button) {
+            return;
         }
 
-        return selectedPreferences.join(" + ");
+        button.dataset.originalHTML =
+            button.innerHTML;
 
+        button.innerHTML = `
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            ${escapeHTML(text)}
+        `;
+
+        button.disabled = true;
+    }
+
+
+    function resetButton(button) {
+
+        if (!button) {
+            return;
+        }
+
+        button.innerHTML =
+            button.dataset.originalHTML ||
+            button.innerHTML;
+
+        button.disabled = false;
+    }
+
+
+    function setDefaultDates() {
+
+        startDateInput.min =
+            getTodayDateString();
+
+        endDateInput.min =
+            getTodayDateString();
+
+        if (
+            startDateInput.value &&
+            endDateInput.value
+        ) {
+            return;
+        }
+
+        const today = new Date();
+
+        const start = new Date(today);
+
+        start.setDate(
+            start.getDate() + 7
+        );
+
+        const end = new Date(start);
+
+        end.setDate(
+            end.getDate() + 2
+        );
+
+        startDateInput.value =
+            formatDateForInput(start);
+
+        endDateInput.value =
+            formatDateForInput(end);
+    }
+
+
+    /* =========================================================
+       FORM VALIDATION
+    ========================================================= */
+
+    function validateForm() {
+
+        const origin =
+            originInput.value.trim();
+
+        const destination =
+            destinationInput.value.trim();
+
+        const startDate =
+            startDateInput.value;
+
+        const endDate =
+            endDateInput.value;
+
+        const travelers =
+            Number(travelersInput.value);
+
+        const budget =
+            Number(budgetInput.value);
+
+        if (!origin) {
+
+            originInput.focus();
+
+            showToast(
+                "Please enter your starting location."
+            );
+
+            return false;
+        }
+
+        if (!destination) {
+
+            destinationInput.focus();
+
+            showToast(
+                "Please enter a destination."
+            );
+
+            return false;
+        }
+
+        if (!startDate || !endDate) {
+
+            showToast(
+                "Please select your trip dates."
+            );
+
+            return false;
+        }
+
+        if (
+            startDate <
+            getTodayDateString()
+        ) {
+
+            startDateInput.focus();
+
+            showToast(
+                "Trip start date cannot be in the past."
+            );
+
+            return false;
+        }
+
+        if (endDate < startDate) {
+
+            endDateInput.focus();
+
+            showToast(
+                "End date must be on or after the start date."
+            );
+
+            return false;
+        }
+
+        if (!travelers || travelers < 1) {
+
+            travelersInput.focus();
+
+            showToast(
+                "Please select the number of travelers."
+            );
+
+            return false;
+        }
+
+        if (!budget || budget < 1000) {
+
+            budgetInput.focus();
+
+            showToast(
+                "Please enter a valid trip budget."
+            );
+
+            return false;
+        }
+
+        return true;
     }
 
 
@@ -151,363 +375,191 @@ document.addEventListener("DOMContentLoaded", () => {
        PREFERENCE PILLS
     ========================================================= */
 
-    document.querySelectorAll(".preference-pill").forEach((pill) => {
+    document
+        .querySelectorAll(".preference-pill")
+        .forEach(pill => {
 
-        pill.addEventListener("click", () => {
+            pill.addEventListener("click", () => {
 
-            const preference =
-                pill.dataset.preference;
+                const preference =
+                    pill.dataset.preference;
 
+                if (!preference) {
+                    return;
+                }
 
-            if (selectedPreferences.includes(preference)) {
+                if (
+                    selectedPreferences.includes(
+                        preference
+                    )
+                ) {
 
-                selectedPreferences =
-                    selectedPreferences.filter(
-                        item => item !== preference
+                    selectedPreferences =
+                        selectedPreferences.filter(
+                            item =>
+                                item !== preference
+                        );
+
+                    pill.classList.remove(
+                        "selected"
                     );
 
-                pill.classList.remove("selected");
+                } else {
 
-            } else {
+                    selectedPreferences.push(
+                        preference
+                    );
 
-                selectedPreferences.push(preference);
+                    pill.classList.add(
+                        "selected"
+                    );
+                }
 
-                pill.classList.add("selected");
+                if (selectedCount) {
 
-            }
-
-
-            selectedCount.textContent =
-                `${selectedPreferences.length} selected`;
-
+                    selectedCount.textContent =
+                        `${selectedPreferences.length} selected`;
+                }
+            });
         });
-
-    });
 
 
     /* =========================================================
-       PROMPT SUGGESTIONS
+       PROMPT CHIPS
     ========================================================= */
 
-    document.querySelectorAll(".prompt-chip").forEach((chip) => {
+    document
+        .querySelectorAll(".prompt-chip")
+        .forEach(chip => {
 
-        chip.addEventListener("click", () => {
+            chip.addEventListener("click", () => {
 
-            promptInput.value =
-                chip.dataset.prompt;
-
-        });
-
-    });
-
-
-    /* =========================================================
-       MOCK AI GENERATION
-    ========================================================= */
-
-    function generateMockPlan() {
-
-        const origin =
-            originInput.value.trim() ||
-            "Nagpur, Maharashtra";
-
-
-        const destination =
-            destinationInput.value.trim() ||
-            "Pench National Park";
-
-
-        const travelers =
-            Number(travelersInput.value) || 4;
-
-
-        const budget =
-            Number(budgetInput.value) || 15000;
-
-
-        const duration =
-            calculateDuration();
-
-
-        let car;
-        let rental;
-
-
-        /*
-            Simple demo recommendation logic.
-
-            Later this will be replaced by the real
-            AI recommendation engine.
-        */
-
-        if (travelers <= 2) {
-
-            car = "Hyundai Creta";
-            rental = 4200;
-
-        } else if (travelers <= 4) {
-
-            car = "Mahindra XUV700";
-            rental = 4800;
-
-        } else {
-
-            car = "Toyota Innova Crysta";
-            rental = 6200;
-
-        }
-
-
-        const fuel =
-            Math.max(
-                2200,
-                Math.round(duration * 1050)
-            );
-
-
-        const tolls =
-            Math.max(
-                900,
-                Math.round(duration * 450)
-            );
-
-
-        const activities =
-            Math.max(
-                2200,
-                Math.round(budget * 0.27)
-            );
-
-
-        const estimatedTotal =
-            rental +
-            fuel +
-            tolls +
-            activities;
-
-
-        /* -----------------------------------------------------
-           Demo itinerary templates
-        ----------------------------------------------------- */
-
-        const itineraryTemplates = [
-
-            {
-                title:
-                    `${origin} → ${destination}`,
-
-                summary:
-                    "Travel, check-in, local exploration and a relaxed evening.",
-
-                items: [
-
-                    [
-                        "08:00 AM",
-                        "Departure",
-                        `Start from ${origin} and begin the road journey.`
-                    ],
-
-                    [
-                        "11:30 AM",
-                        "Arrival & check-in",
-                        `Reach ${destination} and settle in.`
-                    ],
-
-                    [
-                        "01:00 PM",
-                        "Lunch",
-                        "Try a local restaurant or a highly rated regional dish."
-                    ],
-
-                    [
-                        "03:00 PM",
-                        "Main attraction",
-                        "Explore one of the destination's signature experiences."
-                    ],
-
-                    [
-                        "06:00 PM",
-                        "Sunset & free time",
-                        "Relax, take photos and explore at an easy pace."
-                    ],
-
-                    [
-                        "08:00 PM",
-                        "Dinner",
-                        "Enjoy a local dinner and rest for the night."
-                    ]
-
-                ]
-
-            },
-
-
-            {
-
-                title:
-                    "Explore the destination",
-
-                summary:
-                    "A balanced day mixing nature, activities and downtime.",
-
-                items: [
-
-                    [
-                        "07:30 AM",
-                        "Breakfast",
-                        "Start with a light breakfast before heading out."
-                    ],
-
-                    [
-                        "09:00 AM",
-                        "Nature experience",
-                        "Visit a scenic spot, trail, park or viewpoint."
-                    ],
-
-                    [
-                        "12:30 PM",
-                        "Lunch break",
-                        "Refuel and take some downtime."
-                    ],
-
-                    [
-                        "02:30 PM",
-                        "Adventure / sightseeing",
-                        "Choose a hands-on activity based on your preferences."
-                    ],
-
-                    [
-                        "05:30 PM",
-                        "Scenic stop",
-                        "Slow down at a viewpoint or peaceful outdoor location."
-                    ],
-
-                    [
-                        "08:00 PM",
-                        "Dinner",
-                        "Return for dinner and an easy evening."
-                    ]
-
-                ]
-
-            },
-
-
-            {
-
-                title:
-                    "Final exploration → return",
-
-                summary:
-                    "Enjoy one final experience before heading back.",
-
-                items: [
-
-                    [
-                        "08:00 AM",
-                        "Breakfast & checkout",
-                        "Finish breakfast and prepare for departure."
-                    ],
-
-                    [
-                        "09:30 AM",
-                        "Final stop",
-                        "Visit one last nearby attraction or local market."
-                    ],
-
-                    [
-                        "12:00 PM",
-                        "Lunch",
-                        "Have lunch before the return journey."
-                    ],
-
-                    [
-                        "01:30 PM",
-                        "Return journey",
-                        `Depart ${destination} toward ${origin}.`
-                    ],
-
-                    [
-                        "05:00 PM",
-                        "Refresh break",
-                        "Take a short break during the drive."
-                    ],
-
-                    [
-                        "07:30 PM",
-                        "Arrive",
-                        `Reach ${origin} and complete your trip.`
-                    ]
-
-                ]
-
-            }
-
-        ];
-
-
-        const itinerary = [];
-
-
-        for (
-            let index = 0;
-            index < duration;
-            index++
-        ) {
-
-            const template =
-                itineraryTemplates[
-                    index % itineraryTemplates.length
-                ];
-
-
-            itinerary.push({
-
-                day: index + 1,
-
-                title: template.title,
-
-                summary: template.summary,
-
-                items: template.items
+                promptInput.value =
+                    chip.dataset.prompt || "";
 
             });
+        });
 
-        }
 
+    /* =========================================================
+       BACKEND API
+    ========================================================= */
 
-        return {
+    async function requestTripPlan({
+        modification = "",
+        previousPlan = null
+    } = {}) {
 
-            origin,
+        const payload = {
 
-            destination,
+            prompt:
+                promptInput.value.trim(),
 
-            travelers,
+            origin:
+                originInput.value.trim(),
 
-            budget,
+            destination:
+                destinationInput.value.trim(),
 
-            duration,
+            startDate:
+                startDateInput.value,
+
+            endDate:
+                endDateInput.value,
+
+            travelers:
+                Number(
+                    travelersInput.value
+                ) || 0,
+
+            budget:
+                Number(
+                    budgetInput.value
+                ) || 0,
 
             preferences:
-                getSelectedPreferencesText(),
+                selectedPreferences,
 
-            car,
+            modification,
 
-            rental,
-
-            fuel,
-
-            tolls,
-
-            activities,
-
-            total:
-                estimatedTotal,
-
-            itinerary
-
+            previousPlan
         };
 
+        const response =
+            await fetch(
+                "/api/ai-trip/plan",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify(payload)
+                }
+            );
+
+        let result;
+
+        try {
+
+            result =
+                await response.json();
+
+        } catch (error) {
+
+            throw new Error(
+                "The AI planner returned an invalid server response."
+            );
+        }
+
+        if (
+            !response.ok ||
+            !result.success
+        ) {
+
+            throw new Error(
+                result.message ||
+                "Unable to generate the trip plan."
+            );
+        }
+
+        return result;
+    }
+
+
+    /* =========================================================
+       NEEDS MORE INFO
+    ========================================================= */
+
+    function handleNeedsInfo(result) {
+
+        const questions =
+            Array.isArray(
+                result.followUpQuestions
+            )
+                ? result.followUpQuestions
+                : [];
+
+        if (!questions.length) {
+
+            showToast(
+                "A little more trip information is required."
+            );
+
+            return;
+        }
+
+        showToast(
+            questions.join(" ")
+        );
+
+        promptInput.value =
+            questions.join(" ");
+
+        promptInput.focus();
     }
 
 
@@ -515,200 +567,369 @@ document.addEventListener("DOMContentLoaded", () => {
        RENDER PLAN
     ========================================================= */
 
-    function renderPlan(plan) {
+    function renderPlan(result) {
+
+        const plan =
+            result.plan;
+
+        if (!plan) {
+
+            throw new Error(
+                "The AI planner returned no trip plan."
+            );
+        }
 
         currentPlan = plan;
 
+        const trip =
+            plan.trip || {};
+
+        const vehicle =
+            plan.vehicleRecommendation || {};
+
+        const costs =
+            plan.estimatedBudget || {};
+
+        const interests =
+            Array.isArray(trip.interests) &&
+            trip.interests.length
+                ? trip.interests.join(" + ")
+                : getSelectedPreferencesText();
+
+
+        /* -------------------------
+           TITLE
+        ------------------------- */
 
         tripTitle.textContent =
-            `${plan.origin} → ${plan.destination}`;
+            plan.title ||
+            `${trip.origin || ""} → ${trip.destination || ""}`;
 
+
+        /* -------------------------
+           SUMMARY
+        ------------------------- */
 
         tripSummary.textContent =
-            `${plan.duration} days • ` +
-            `${plan.travelers} travelers • ` +
-            `${plan.preferences} • ` +
-            `planned around a ${formatCurrency(plan.budget)} budget`;
+            plan.summary ||
+            `${trip.durationDays || calculateDuration()} days • ` +
+            `${trip.travelers || travelersInput.value} travelers • ` +
+            `${interests}`;
 
+
+        /* -------------------------
+           STATS
+        ------------------------- */
+
+        const duration =
+            Number(
+                trip.durationDays ||
+                calculateDuration()
+            );
+
+        const travelers =
+            Number(
+                trip.travelers ||
+                travelersInput.value
+            );
 
         durationStat.textContent =
-            `${plan.duration} ${
-                plan.duration === 1
+            `${duration} ${
+                duration === 1
                     ? "day"
                     : "days"
             }`;
 
-
         travelersStat.textContent =
-            `${plan.travelers} ${
-                plan.travelers === 1
+            `${travelers} ${
+                travelers === 1
                     ? "traveler"
                     : "travelers"
             }`;
 
-
         estimatedStat.textContent =
-            formatCurrency(plan.total);
+            formatCurrency(
+                costs.estimatedTotal
+            );
 
 
-        recommendedCar.textContent =
-            plan.car;
+        /* -------------------------
+           VEHICLE
+        ------------------------- */
+
+        if (
+            vehicle.carId &&
+            vehicle.name
+        ) {
+
+            recommendedCar.textContent =
+                vehicle.name;
+
+            carPrice.textContent =
+                `${formatCurrency(
+                    vehicle.dailyPrice
+                )}/day`;
+
+        } else {
+
+            recommendedCar.textContent =
+                "No matching car found";
+
+            carPrice.textContent =
+                "No live match";
+        }
 
 
-        carPrice.textContent =
-            formatCurrency(plan.rental);
-
+        /* -------------------------
+           COSTS
+        ------------------------- */
 
         rentalCost.textContent =
-            formatCurrency(plan.rental);
-
+            formatCurrency(
+                costs.carRental
+            );
 
         fuelCost.textContent =
-            formatCurrency(plan.fuel);
-
+            formatCurrency(
+                costs.fuel
+            );
 
         tollCost.textContent =
-            formatCurrency(plan.tolls);
+            formatCurrency(
+                costs.tolls
+            );
 
+
+        const combinedActivities =
+            Number(costs.food || 0) +
+            Number(costs.activities || 0) +
+            Number(costs.misc || 0);
 
         activityCost.textContent =
-            formatCurrency(plan.activities);
-
+            formatCurrency(
+                combinedActivities
+            );
 
         totalCost.textContent =
-            formatCurrency(plan.total);
+            formatCurrency(
+                costs.estimatedTotal
+            );
 
+
+        /* -------------------------
+           ITINERARY
+        ------------------------- */
 
         renderItinerary(
-            plan.itinerary
+            plan.itinerary || []
         );
 
+
+        /* -------------------------
+           BUDGET
+        ------------------------- */
 
         updateBudgetStatus(
-            plan.total,
-            plan.budget
+            costs.estimatedTotal,
+            costs.totalBudget,
+            costs.budgetProvided
         );
 
 
-        resultsSection.classList.remove(
-            "hidden"
-        );
+        /* -------------------------
+           SHOW RESULTS
+        ------------------------- */
+
+        if (resultsSection) {
+
+            resultsSection.classList.remove(
+                "hidden"
+            );
+
+            resultsSection.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }
 
 
-        resultsSection.scrollIntoView({
+        /* -------------------------
+           STATUS MESSAGE
+        ------------------------- */
 
-            behavior: "smooth",
+        if (
+            vehicle.carId &&
+            vehicle.availabilityChecked === true
+        ) {
 
-            block: "start"
+            showToast(
+                "AI plan generated with a live available Saarthi vehicle."
+            );
 
-        });
+        } else if (vehicle.carId) {
 
+            showToast(
+                "AI plan generated with a vehicle recommendation."
+            );
+
+        } else {
+
+            showToast(
+                "AI plan generated. No matching Saarthi vehicle was found."
+            );
+        }
     }
 
 
     /* =========================================================
-       RENDER ITINERARY
+       ITINERARY
     ========================================================= */
 
     function renderItinerary(days) {
 
         itineraryList.innerHTML = "";
 
+        if (!days.length) {
 
-        days.forEach((day) => {
+            itineraryList.innerHTML = `
+                <div class="empty-state">
+                    No itinerary details were returned.
+                </div>
+            `;
+
+            return;
+        }
+
+        days.forEach(day => {
 
             const dayElement =
                 document.createElement("article");
-
 
             dayElement.className =
                 "itinerary-day";
 
 
+            /* DAY LABEL */
+
             const label =
                 document.createElement("div");
-
 
             label.className =
                 "day-label";
 
-
             label.innerHTML = `
                 <div class="day-number">
-                    ${day.day}
+                    ${escapeHTML(day.day)}
                 </div>
                 Day
             `;
 
 
+            /* DAY CONTENT */
+
             const content =
                 document.createElement("div");
-
 
             content.className =
                 "day-content";
 
-
             content.innerHTML = `
-                <h4>${day.title}</h4>
-                <p>${day.summary}</p>
+                <h4>
+                    ${escapeHTML(
+                        day.title ||
+                        `Day ${day.day}`
+                    )}
+                </h4>
+
+                <p>
+                    ${escapeHTML(
+                        [
+                            day.date,
+                            day.area
+                        ]
+                            .filter(Boolean)
+                            .join(" • ")
+                    )}
+                </p>
+
+                <p>
+                    ${escapeHTML(
+                        day.travelNote || ""
+                    )}
+                </p>
             `;
 
 
-            day.items.forEach((item) => {
+            /* ACTIVITIES */
+
+            const activities =
+                Array.isArray(
+                    day.activities
+                )
+                    ? day.activities
+                    : [];
+
+            activities.forEach(activity => {
 
                 const timeline =
                     document.createElement("div");
 
-
                 timeline.className =
                     "timeline-item";
 
+                const estimatedCost =
+                    Number(
+                        activity.estimatedCost
+                    ) || 0;
+
+                const cost =
+                    estimatedCost > 0
+                        ? ` • ${formatCurrency(
+                            estimatedCost
+                        )}`
+                        : "";
 
                 timeline.innerHTML = `
-
                     <div class="timeline-time">
-                        ${item[0]}
+                        ${escapeHTML(
+                            activity.time || ""
+                        )}
                     </div>
 
                     <div class="timeline-text">
 
                         <strong>
-                            ${item[1]}
+                            ${escapeHTML(
+                                activity.name ||
+                                "Activity"
+                            )}
                         </strong>
 
                         <span>
-                            ${item[2]}
+                            ${escapeHTML(
+                                activity.description ||
+                                ""
+                            )}
+                            ${escapeHTML(cost)}
                         </span>
 
                     </div>
-
                 `;
-
 
                 content.appendChild(
                     timeline
                 );
-
             });
 
 
-            dayElement.appendChild(
-                label
-            );
+            dayElement.appendChild(label);
 
-
-            dayElement.appendChild(
-                content
-            );
-
+            dayElement.appendChild(content);
 
             itineraryList.appendChild(
                 dayElement
             );
-
         });
-
     }
 
 
@@ -718,24 +939,48 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function updateBudgetStatus(
         total,
-        budget
+        budget,
+        budgetProvided
     ) {
 
-        if (total <= budget) {
+        if (
+            !budgetProvided ||
+            !Number(budget)
+        ) {
 
             budgetStatus.classList.remove(
                 "over"
             );
 
+            budgetStatus.innerHTML = `
+                <i class="fa-solid fa-circle-info"></i>
+                Budget was not provided.
+                This is an estimated trip cost.
+            `;
+
+            return;
+        }
+
+        const difference =
+            Math.abs(
+                Number(total) -
+                Number(budget)
+            );
+
+        if (
+            Number(total) <=
+            Number(budget)
+        ) {
+
+            budgetStatus.classList.remove(
+                "over"
+            );
 
             budgetStatus.innerHTML = `
-
                 <i class="fa-solid fa-circle-check"></i>
-
-                You are
-                ${formatCurrency(budget - total)}
-                under your budget.
-
+                You are ${formatCurrency(
+                    difference
+                )} under your budget.
             `;
 
         } else {
@@ -744,256 +989,416 @@ document.addEventListener("DOMContentLoaded", () => {
                 "over"
             );
 
-
             budgetStatus.innerHTML = `
-
                 <i class="fa-solid fa-triangle-exclamation"></i>
-
-                This plan is
-                ${formatCurrency(total - budget)}
-                over budget.
-
+                This plan is ${formatCurrency(
+                    difference
+                )} over budget.
             `;
-
         }
-
     }
 
 
     /* =========================================================
-       GENERATE BUTTON
+       GENERATE PLAN
     ========================================================= */
 
-    generateBtn.addEventListener(
-        "click",
-        () => {
+    if (generateBtn) {
 
-            const destination =
-                destinationInput.value.trim();
+        generateBtn.addEventListener(
+            "click",
+            async () => {
 
+                if (!validateForm()) {
+                    return;
+                }
 
-            if (!destination) {
-
-                destinationInput.focus();
-
-                showToast(
-                    "Please enter a destination first."
+                setButtonLoading(
+                    generateBtn,
+                    "Saarthi AI is planning..."
                 );
 
-                return;
+                try {
 
+                    const result =
+                        await requestTripPlan();
+
+                    if (
+                        result.status ===
+                        "needs_info"
+                    ) {
+
+                        handleNeedsInfo(
+                            result
+                        );
+
+                        return;
+                    }
+
+                    renderPlan(
+                        result
+                    );
+
+                } catch (error) {
+
+                    console.error(
+                        "AI trip planner error:",
+                        error
+                    );
+
+                    showToast(
+                        error.message ||
+                        "Unable to generate your trip right now."
+                    );
+
+                } finally {
+
+                    resetButton(
+                        generateBtn
+                    );
+                }
             }
+        );
+    }
 
 
-            generateBtn.innerHTML = `
+    /* =========================================================
+       VIEW RECOMMENDED CAR
+    ========================================================= */
 
-                <i class="fa-solid fa-spinner fa-spin"></i>
+    if (viewCarBtn) {
 
-                Planning your trip...
+        viewCarBtn.addEventListener(
+            "click",
+            () => {
 
-            `;
+                const carId =
+                    currentPlan
+                        ?.vehicleRecommendation
+                        ?.carId;
 
+                if (!carId) {
 
-            generateBtn.disabled = true;
+                    showToast(
+                        "No recommended Saarthi car is available."
+                    );
 
+                    return;
+                }
 
-            window.setTimeout(() => {
-
-                const plan =
-                    generateMockPlan();
-
-
-                renderPlan(plan);
-
-
-                generateBtn.innerHTML = `
-
-                    <i class="fa-solid fa-wand-magic-sparkles"></i>
-
-                    Generate My Trip
-
-                `;
-
-
-                generateBtn.disabled = false;
+                window.location.href =
+                    `car-details.html?carId=${encodeURIComponent(
+                        carId
+                    )}`;
+            }
+        );
+    }
 
 
-                showToast(
-                    "Your personalized trip plan is ready."
+    /* =========================================================
+       CONTINUE TO CARS
+    ========================================================= */
+
+    if (continueCarsBtn) {
+
+        continueCarsBtn.addEventListener(
+            "click",
+            () => {
+
+                const params =
+                    new URLSearchParams();
+
+                const origin =
+                    originInput.value.trim();
+
+                if (origin) {
+
+                    params.set(
+                        "city",
+                        origin
+                            .split(",")[0]
+                            .trim()
+                    );
+                }
+
+                if (startDateInput.value) {
+
+                    params.set(
+                        "startDate",
+                        startDateInput.value
+                    );
+                }
+
+                if (endDateInput.value) {
+
+                    params.set(
+                        "endDate",
+                        endDateInput.value
+                    );
+                }
+
+                if (travelersInput.value) {
+
+                    params.set(
+                        "travelers",
+                        travelersInput.value
+                    );
+                }
+
+                if (
+                    promptInput.value.trim()
+                ) {
+
+                    params.set(
+                        "tripVibe",
+                        promptInput.value.trim()
+                    );
+                }
+
+                window.location.href =
+                    `cars.html?${params.toString()}`;
+            }
+        );
+    }
+
+
+    /* =========================================================
+       WEEKEND10 OFFER
+    ========================================================= */
+
+    if (offerBtn) {
+
+        offerBtn.addEventListener(
+            "click",
+            () => {
+
+                if (!currentPlan) {
+
+                    showToast(
+                        "Generate a trip before applying the offer."
+                    );
+
+                    return;
+                }
+
+                if (
+                    currentPlan.couponApplied
+                ) {
+
+                    showToast(
+                        "WEEKEND10 is already applied."
+                    );
+
+                    return;
+                }
+
+                const rental =
+                    Number(
+                        currentPlan
+                            ?.estimatedBudget
+                            ?.carRental
+                    ) || 0;
+
+                const discount =
+                    Math.round(
+                        rental * 0.10
+                    );
+
+                if (!discount) {
+
+                    showToast(
+                        "No eligible rental amount is available for this offer."
+                    );
+
+                    return;
+                }
+
+                currentPlan.couponApplied =
+                    true;
+
+                const discountedRental =
+                    rental - discount;
+
+                const originalTotal =
+                    Number(
+                        currentPlan
+                            ?.estimatedBudget
+                            ?.estimatedTotal
+                    ) || 0;
+
+                const discountedTotal =
+                    originalTotal - discount;
+
+                rentalCost.textContent =
+                    formatCurrency(
+                        discountedRental
+                    );
+
+                totalCost.textContent =
+                    formatCurrency(
+                        discountedTotal
+                    );
+
+                estimatedStat.textContent =
+                    formatCurrency(
+                        discountedTotal
+                    );
+
+                updateBudgetStatus(
+                    discountedTotal,
+                    currentPlan
+                        ?.estimatedBudget
+                        ?.totalBudget,
+                    currentPlan
+                        ?.estimatedBudget
+                        ?.budgetProvided
                 );
 
-            }, 900);
-
-        }
-    );
+                showToast(
+                    `WEEKEND10 applied. You saved ${formatCurrency(
+                        discount
+                    )}.`
+                );
+            }
+        );
+    }
 
 
     /* =========================================================
        EDIT PLAN
     ========================================================= */
 
-    editPlanBtn.addEventListener(
-        "click",
-        () => {
+    if (editPlanBtn) {
 
-            window.scrollTo({
+        editPlanBtn.addEventListener(
+            "click",
+            () => {
 
-                top: 0,
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth"
+                });
 
-                behavior: "smooth"
-
-            });
-
-
-            promptInput.focus();
-
-        }
-    );
+                promptInput.focus();
+            }
+        );
+    }
 
 
     /* =========================================================
-       MODIFY TRIP
+       MODIFY PLAN
+       Calls Gemini again with previous plan.
     ========================================================= */
 
-    modifyTripBtn.addEventListener(
-        "click",
+    if (modifyTripBtn) {
+
+        modifyTripBtn.addEventListener(
+            "click",
+            async () => {
+
+                const request =
+                    modifyInput.value.trim();
+
+                if (!request) {
+
+                    modifyInput.focus();
+
+                    showToast(
+                        "Tell Saarthi what you want to change."
+                    );
+
+                    return;
+                }
+
+                if (!currentPlan) {
+
+                    showToast(
+                        "Generate a trip plan first."
+                    );
+
+                    return;
+                }
+
+                setButtonLoading(
+                    modifyTripBtn,
+                    "Updating plan..."
+                );
+
+                try {
+
+                    const result =
+                        await requestTripPlan({
+                            modification:
+                                request,
+                            previousPlan:
+                                currentPlan
+                        });
+
+                    if (
+                        result.status ===
+                        "needs_info"
+                    ) {
+
+                        handleNeedsInfo(
+                            result
+                        );
+
+                        return;
+                    }
+
+                    renderPlan(
+                        result
+                    );
+
+                    modifyInput.value =
+                        "";
+
+                    showToast(
+                        "Saarthi AI updated your trip plan."
+                    );
+
+                } catch (error) {
+
+                    console.error(
+                        "Trip modification error:",
+                        error
+                    );
+
+                    showToast(
+                        error.message ||
+                        "Unable to modify the trip plan."
+                    );
+
+                } finally {
+
+                    resetButton(
+                        modifyTripBtn
+                    );
+                }
+            }
+        );
+    }
+
+
+    /* =========================================================
+       DATE INTERACTION
+    ========================================================= */
+
+    startDateInput.addEventListener(
+        "change",
         () => {
 
-            const request =
-                modifyInput.value.trim();
-
-
-            if (!request) {
-
-                modifyInput.focus();
-
-                showToast(
-                    "Tell Saarthi what you want to change."
-                );
-
-                return;
-
-            }
-
-
-            if (!currentPlan) {
-
-                return;
-
-            }
-
-
-            const lowerRequest =
-                request.toLowerCase();
-
-
-            /*
-                Demo modification logic.
-
-                This will later be replaced with
-                a real AI backend request.
-            */
+            endDateInput.min =
+                startDateInput.value;
 
             if (
-                lowerRequest.includes("relax") ||
-                lowerRequest.includes("slow")
+                endDateInput.value <
+                startDateInput.value
             ) {
 
-                currentPlan.itinerary.forEach(
-                    (day) => {
-
-                        day.summary =
-                            "A slower day with fewer activities and more downtime.";
-
-                    }
-                );
-
-
-                renderItinerary(
-                    currentPlan.itinerary
-                );
-
-
-                showToast(
-                    "The itinerary has been made more relaxed."
-                );
-
+                endDateInput.value =
+                    startDateInput.value;
             }
-
-
-            else if (
-                lowerRequest.includes("budget") ||
-                lowerRequest.includes("cheap") ||
-                lowerRequest.includes("save")
-            ) {
-
-                currentPlan.activities =
-                    Math.max(
-                        1200,
-                        Math.round(
-                            currentPlan.activities * 0.75
-                        )
-                    );
-
-
-                currentPlan.total =
-                    currentPlan.rental +
-                    currentPlan.fuel +
-                    currentPlan.tolls +
-                    currentPlan.activities;
-
-
-                activityCost.textContent =
-                    formatCurrency(
-                        currentPlan.activities
-                    );
-
-
-                totalCost.textContent =
-                    formatCurrency(
-                        currentPlan.total
-                    );
-
-
-                estimatedStat.textContent =
-                    formatCurrency(
-                        currentPlan.total
-                    );
-
-
-                updateBudgetStatus(
-                    currentPlan.total,
-                    currentPlan.budget
-                );
-
-
-                showToast(
-                    "Trip costs have been optimized."
-                );
-
-            }
-
-
-            else {
-
-                currentPlan.itinerary[0].summary =
-                    `Updated based on your request: ${request}`;
-
-
-                renderItinerary(
-                    currentPlan.itinerary
-                );
-
-
-                showToast(
-                    "Your trip plan has been updated."
-                );
-
-            }
-
-
-            modifyInput.value = "";
-
         }
     );
 
@@ -1004,19 +1409,55 @@ document.addEventListener("DOMContentLoaded", () => {
 
     setDefaultDates();
 
+    const defaultPreferences = [
+        "Nature",
+        "Adventure"
+    ];
 
-    /*
-        Demo defaults:
-        Nature + Adventure
-    */
+    document
+        .querySelectorAll(".preference-pill")
+        .forEach(pill => {
 
-    document.querySelectorAll(
-        '.preference-pill[data-preference="Nature"], ' +
-        '.preference-pill[data-preference="Adventure"]'
-    ).forEach((pill) => {
+            if (
+                defaultPreferences.includes(
+                    pill.dataset.preference
+                )
+            ) {
 
-        pill.click();
-
-    });
+                pill.click();
+            }
+        });
 
 });
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHTML(value) {
+
+    return String(
+        value ?? ""
+    )
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
+}
