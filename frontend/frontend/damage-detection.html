@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>AI Damage Detection | Saarthi</title>
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/damage-detection.css"
+    >
+
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         NAVBAR
+    ====================================================== -->
+
+    <nav class="navbar">
+
+        <div class="nav-container">
+
+            <a
+                href="index.html"
+                class="logo"
+            >
+
+                <i class="fa-solid fa-car-side"></i>
+
+                <span>Saarthi</span>
+
+            </a>
+
+
+            <div class="nav-links">
+
+                <a href="index.html">
+                    Home
+                </a>
+
+                <a href="cars.html">
+                    Browse Cars
+                </a>
+
+                <a href="ai-trip-planner.html">
+                    AI Trip Planner
+                </a>
+
+                <a href="host.html">
+                    Host Your Car
+                </a>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+
+    <!-- =====================================================
+         PAGE HERO
+    ====================================================== -->
+
+    <main class="damage-page">
+
+        <section class="damage-hero">
+
+            <div class="hero-content">
+
+                <span class="eyebrow">
+
+                    <i class="fa-solid fa-shield-halved"></i>
+
+                    Saarthi AI Protection
+
+                </span>
+
+
+                <h1>
+                    AI Vehicle Damage Detection
+                </h1>
+
+
+                <p>
+                    Compare before and after rental photos
+                    and let Saarthi AI identify visible
+                    changes to the vehicle.
+                </p>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             UPLOAD SECTION
+        ================================================== -->
+
+        <section class="inspection-section">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <span class="section-label">
+                        Vehicle Inspection
+                    </span>
+
+                    <h2>
+                        Upload before &amp; after photos
+                    </h2>
+
+                    <p>
+                        Use clear photos of the same vehicle
+                        from similar angles.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="upload-grid">
+
+
+                <!-- BEFORE -->
+
+                <div class="upload-card">
+
+                    <div class="upload-card-header">
+
+                        <div class="upload-icon before-icon">
+
+                            <i class="fa-solid fa-camera"></i>
+
+                        </div>
+
+                        <div>
+
+                            <h3>
+                                Before Rental
+                            </h3>
+
+                            <p>
+                                Vehicle condition before pickup
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <label
+                        for="beforeImage"
+                        class="upload-zone"
+                        id="beforeUploadZone"
+                    >
+
+                        <input
+                            type="file"
+                            id="beforeImage"
+                            accept="image/jpeg,image/png,image/webp"
+                            hidden
+                        >
+
+                        <div
+                            class="upload-placeholder"
+                            id="beforePlaceholder"
+                        >
+
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+
+                            <strong>
+                                Choose before photo
+                            </strong>
+
+                            <span>
+                                JPG, PNG or WebP · Max 5 MB
+                            </span>
+
+                        </div>
+
+
+                        <img
+                            id="beforePreview"
+                            class="image-preview hidden"
+                            alt="Before rental vehicle preview"
+                        >
+
+                    </label>
+
+
+                    <button
+                        type="button"
+                        class="remove-image-btn hidden"
+                        id="removeBeforeBtn"
+                    >
+
+                        <i class="fa-solid fa-xmark"></i>
+
+                        Remove photo
+
+                    </button>
+
+                </div>
+
+
+
+                <!-- AFTER -->
+
+                <div class="upload-card">
+
+                    <div class="upload-card-header">
+
+                        <div class="upload-icon after-icon">
+
+                            <i class="fa-solid fa-camera-retro"></i>
+
+                        </div>
+
+                        <div>
+
+                            <h3>
+                                After Rental
+                            </h3>
+
+                            <p>
+                                Vehicle condition after return
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <label
+                        for="afterImage"
+                        class="upload-zone"
+                        id="afterUploadZone"
+                    >
+
+                        <input
+                            type="file"
+                            id="afterImage"
+                            accept="image/jpeg,image/png,image/webp"
+                            hidden
+                        >
+
+                        <div
+                            class="upload-placeholder"
+                            id="afterPlaceholder"
+                        >
+
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+
+                            <strong>
+                                Choose after photo
+                            </strong>
+
+                            <span>
+                                JPG, PNG or WebP · Max 5 MB
+                            </span>
+
+                        </div>
+
+
+                        <img
+                            id="afterPreview"
+                            class="image-preview hidden"
+                            alt="After rental vehicle preview"
+                        >
+
+                    </label>
+
+
+                    <button
+                        type="button"
+                        class="remove-image-btn hidden"
+                        id="removeAfterBtn"
+                    >
+
+                        <i class="fa-solid fa-xmark"></i>
+
+                        Remove photo
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 ANALYZE
+            ================================================== -->
+
+            <div class="analyze-area">
+
+                <button
+                    type="button"
+                    id="analyzeDamageBtn"
+                    class="analyze-btn"
+                >
+
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+
+                    Analyze Vehicle Damage
+
+                </button>
+
+
+                <p class="security-note">
+
+                    <i class="fa-solid fa-lock"></i>
+
+                    Images are analyzed only for this inspection.
+
+                </p>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 ERROR
+            ================================================== -->
+
+            <div
+                id="damageError"
+                class="damage-message error hidden"
+            >
+            </div>
+
+
+
+            <!-- =================================================
+                 RESULTS
+            ================================================== -->
+
+            <section
+                id="damageResults"
+                class="results-section hidden"
+            >
+
+                <div class="results-header">
+
+                    <div>
+
+                        <span class="section-label">
+                            AI Inspection Report
+                        </span>
+
+                        <h2>
+                            Vehicle condition analysis
+                        </h2>
+
+                    </div>
+
+                    <span
+                        id="inspectionTime"
+                        class="inspection-time"
+                    >
+                    </span>
+
+                </div>
+
+
+
+                <!-- OVERALL -->
+
+                <div class="overall-card">
+
+                    <div
+                        id="overallIcon"
+                        class="overall-icon"
+                    >
+
+                        <i class="fa-solid fa-shield"></i>
+
+                    </div>
+
+
+                    <div class="overall-content">
+
+                        <div class="overall-top">
+
+                            <div>
+
+                                <span class="result-label">
+                                    Overall Assessment
+                                </span>
+
+                                <h3 id="overallSeverity">
+                                    Analyzing...
+                                </h3>
+
+                            </div>
+
+
+                            <div class="confidence-box">
+
+                                <span>
+                                    Confidence
+                                </span>
+
+                                <strong
+                                    id="overallConfidence"
+                                >
+                                    0%
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <p id="overallSummary">
+                            -
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- VEHICLE MATCH -->
+
+                <div class="result-grid">
+
+                    <div class="result-card">
+
+                        <div class="result-card-heading">
+
+                            <i class="fa-solid fa-car"></i>
+
+                            <h3>
+                                Vehicle Match
+                            </h3>
+
+                        </div>
+
+
+                        <div class="match-result">
+
+                            <span
+                                id="vehicleMatchStatus"
+                            >
+                                -
+                            </span>
+
+                            <strong
+                                id="vehicleMatchConfidence"
+                            >
+                                0%
+                            </strong>
+
+                        </div>
+
+
+                        <p
+                            id="vehicleMatchReason"
+                        >
+                            -
+                        </p>
+
+                    </div>
+
+
+
+                    <div class="result-card">
+
+                        <div class="result-card-heading">
+
+                            <i class="fa-solid fa-lightbulb"></i>
+
+                            <h3>
+                                Recommended Action
+                            </h3>
+
+                        </div>
+
+
+                        <p
+                            id="recommendedAction"
+                            class="action-text"
+                        >
+                            -
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- BEFORE / AFTER SUMMARY -->
+
+                <div class="condition-grid">
+
+                    <div class="condition-card">
+
+                        <span class="condition-label">
+                            BEFORE RENTAL
+                        </span>
+
+                        <h3>
+                            Vehicle condition
+                        </h3>
+
+                        <p id="beforeCondition">
+                            -
+                        </p>
+
+
+                        <div
+                            id="existingIssuesWrap"
+                            class="existing-issues hidden"
+                        >
+
+                            <strong>
+                                Visible existing issues
+                            </strong>
+
+                            <ul
+                                id="existingIssues"
+                            >
+                            </ul>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="condition-card">
+
+                        <span class="condition-label">
+                            AFTER RENTAL
+                        </span>
+
+                        <h3>
+                            Vehicle condition
+                        </h3>
+
+                        <p id="afterCondition">
+                            -
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- CHANGES -->
+
+                <div class="changes-card">
+
+                    <div class="changes-heading">
+
+                        <div>
+
+                            <span class="section-label">
+                                Detected Changes
+                            </span>
+
+                            <h2>
+                                Damage findings
+                            </h2>
+
+                        </div>
+
+                        <span
+                            id="damageCount"
+                            class="damage-count"
+                        >
+                            0 changes
+                        </span>
+
+                    </div>
+
+
+                    <div
+                        id="changesList"
+                        class="changes-list"
+                    >
+                    </div>
+
+                </div>
+
+
+
+                <!-- LIMITATIONS -->
+
+                <div
+                    id="limitationsCard"
+                    class="limitations-card hidden"
+                >
+
+                    <div class="limitations-heading">
+
+                        <i class="fa-solid fa-circle-info"></i>
+
+                        <h3>
+                            Inspection limitations
+                        </h3>
+
+                    </div>
+
+
+                    <ul
+                        id="limitationsList"
+                    >
+                    </ul>
+
+                </div>
+
+
+            </section>
+
+        </section>
+
+    </main>
+
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer class="footer">
+
+        <p>
+            © 2026 Saarthi Smart Car Rental.
+            AI damage detection is an inspection aid,
+            not a legal or insurance assessment.
+        </p>
+
+    </footer>
+
+
+
+    <script
+        src="js/pages/damage-detection.js"
+    ></script>
+
+</body>
+
+</html>

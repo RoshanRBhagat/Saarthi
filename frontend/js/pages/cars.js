@@ -42,6 +42,9 @@ const errorBox =
 const emptyBox =
     document.getElementById("empty");
 
+const initialState =
+    document.getElementById("initialState");
+
 const resultSummary =
     document.getElementById("resultSummary");
 
@@ -451,10 +454,48 @@ function buildQueryParameters() {
 
 
 /* =========================================================
+   SEARCH CRITERIA
+========================================================= */
+
+function hasSearchCriteria() {
+
+    return Boolean(
+        cityInput.value.trim() ||
+        startDateInput.value ||
+        endDateInput.value ||
+        travelersInput.value ||
+        maxPriceInput.value.trim()
+    );
+
+}
+
+
+/* =========================================================
    FETCH CARS
 ========================================================= */
 
 async function fetchCars() {
+
+    // Once a visitor starts a search, replace the initial prompt with results/errors.
+    if (initialState) {
+        initialState.classList.add("hidden");
+    }
+
+    errorBox.classList.add("hidden");
+
+    // An empty query previously fetched the entire cars collection.
+    // Require at least one filter so the page never loads all cars by default.
+    if (!hasSearchCriteria()) {
+
+        carGrid.innerHTML = "";
+        emptyBox.classList.add("hidden");
+        showError(
+            "Enter a city, select pickup and return dates, or choose a filter before searching."
+        );
+        cityInput.focus();
+        return;
+
+    }
 
     /* ---------------------------------------------
        Validate dates
@@ -1113,4 +1154,19 @@ setupDateInputs();
 
 loadSearchParameters();
 
-fetchCars();
+if (hasSearchCriteria()) {
+
+    // Preserve homepage / AI Trip Planner links that provide search parameters.
+    fetchCars();
+
+} else {
+
+    // Direct visits should not fetch the whole inventory.
+    if (initialState) {
+        initialState.classList.remove("hidden");
+    }
+
+    resultSummary.textContent =
+        "Search to find cars matching your trip.";
+
+}

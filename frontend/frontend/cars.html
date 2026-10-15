@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Available Cars | Saarthi</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Font Awesome -->
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Cars Page CSS -->
+    <link rel="stylesheet" href="css/cars.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+
+<body>
+
+    <!-- =====================================================
+         NAVIGATION
+    ====================================================== -->
+
+    <nav class="navbar">
+
+        <div class="nav-container">
+
+            <a
+                href="index.html"
+                class="logo"
+                aria-label="Saarthi Home"
+            >
+                <i
+                    class="fa-solid fa-car-side"
+                    aria-hidden="true"
+                ></i>
+
+                <span>Saarthi</span>
+            </a>
+
+
+            <div class="nav-links">
+
+                <a href="index.html">
+                    Home
+                </a>
+
+                <a href="ai-trip-planner.html">
+                    AI Trip Planner
+                </a>
+
+                <a href="host.html">
+                    Host Your Car
+                </a>
+
+                <a
+                    href="auth.html"
+                    class="btn-primary"
+                >
+                    Log In
+                </a>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+    <!-- =====================================================
+         MAIN PAGE
+    ====================================================== -->
+
+    <main class="page">
+
+        <!-- =================================================
+             HEADER + FILTERS
+        ================================================== -->
+
+        <section class="page-header">
+
+            <div>
+
+                <span class="eyebrow">
+
+                    <i
+                        class="fa-solid fa-car"
+                        aria-hidden="true"
+                    ></i>
+
+                    Saarthi inventory
+
+                </span>
+
+
+                <h1>
+                    Available cars
+                </h1>
+
+
+                <p id="resultSummary">
+                    Cars available on Saarthi
+                </p>
+
+            </div>
+
+
+            <!-- =============================================
+                 FILTER BOX
+            ============================================== -->
+
+            <div class="filter-box">
+
+
+                <!-- City -->
+
+                <div class="filter-group">
+
+                    <label for="cityInput">
+                        City
+                    </label>
+
+                    <input
+                        id="cityInput"
+                        type="text"
+                        placeholder="e.g. Nagpur"
+                        autocomplete="off"
+                    >
+
+                </div>
+
+
+                <!-- Pickup Date -->
+
+                <div class="filter-group">
+
+                    <label for="startDateInput">
+                        Pickup Date
+                    </label>
+
+                    <input
+                        id="startDateInput"
+                        type="date"
+                    >
+
+                </div>
+
+
+                <!-- Return Date -->
+
+                <div class="filter-group">
+
+                    <label for="endDateInput">
+                        Return Date
+                    </label>
+
+                    <input
+                        id="endDateInput"
+                        type="date"
+                    >
+
+                </div>
+
+
+                <!-- Travelers -->
+
+                <div class="filter-group">
+
+                    <label for="travelersInput">
+                        Travelers
+                    </label>
+
+                    <select id="travelersInput">
+
+                        <option value="">
+                            Any
+                        </option>
+
+                        <option value="1">
+                            1+
+                        </option>
+
+                        <option value="2">
+                            2+
+                        </option>
+
+                        <option value="3">
+                            3+
+                        </option>
+
+                        <option value="4">
+                            4+
+                        </option>
+
+                        <option value="5">
+                            5+
+                        </option>
+
+                        <option value="6">
+                            6+
+                        </option>
+
+                        <option value="7">
+                            7+
+                        </option>
+
+                        <option value="8">
+                            8+
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Maximum Price -->
+
+                <div class="filter-group">
+
+                    <label for="maxPriceInput">
+                        Max daily price
+                    </label>
+
+                    <input
+                        id="maxPriceInput"
+                        type="number"
+                        min="0"
+                        placeholder="3000"
+                    >
+
+                </div>
+
+
+                <!-- Search -->
+
+                <button
+                    id="searchCarsBtn"
+                    class="search-btn"
+                    type="button"
+                >
+
+                    <i
+                        class="fa-solid fa-magnifying-glass"
+                        aria-hidden="true"
+                    ></i>
+
+                    Search
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             CARS SECTION
+        ================================================== -->
+
+        <section class="cars-section">
+
+            <!-- Loading -->
+
+            <div
+                id="loading"
+                class="message hidden"
+            >
+
+                <i
+                    class="fa-solid fa-spinner fa-spin"
+                    aria-hidden="true"
+                ></i>
+
+                <p>
+                    Loading available cars...
+                </p>
+
+            </div>
+
+
+            <!-- Error -->
+
+            <div
+                id="error"
+                class="message error hidden"
+            ></div>
+
+
+            <!-- Empty -->
+
+            <div
+                id="empty"
+                class="message hidden"
+            >
+
+                <i
+                    class="fa-solid fa-car-side"
+                    aria-hidden="true"
+                ></i>
+
+                <h3>
+                    No cars found
+                </h3>
+
+                <p>
+                    Try changing your filters.
+                </p>
+
+            </div>
+
+
+            <!-- Car Grid -->
+
+            <div
+                id="carGrid"
+                class="car-grid"
+            ></div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+    <script src="js/pages/cars.js"></script>
+
+</body>
+
+</html>

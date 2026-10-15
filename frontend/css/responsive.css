@@ -1,0 +1,1416 @@
+/*
+ * Saarthi Responsive Layer
+ * Loaded after page stylesheets. This file only adjusts layout at common
+ * viewport sizes; it does not change API calls, IDs, or page behaviour.
+ */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    width: 100%;
+    min-width: 320px;
+    max-width: 100%;
+    overflow-x: clip;
+}
+
+img,
+picture,
+video,
+canvas,
+iframe {
+    max-width: 100%;
+}
+
+main,
+section,
+article,
+header,
+footer,
+nav,
+form,
+.grid,
+[class*="grid"] {
+    min-width: 0;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+strong,
+small,
+label,
+button,
+a {
+    overflow-wrap: anywhere;
+}
+
+input,
+select,
+textarea,
+button {
+    max-width: 100%;
+}
+
+/* Navigation shared by the main pages. */
+.navbar {
+    width: 100%;
+    max-width: 100%;
+}
+
+.navbar .nav-container {
+    width: calc(100% - 40px);
+    max-width: 1280px;
+    min-width: 0;
+    height: auto;
+    min-height: 68px;
+    margin-inline: auto;
+    gap: 14px;
+}
+
+.navbar .nav-links {
+    min-width: 0;
+    max-width: 100%;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+}
+
+.navbar .nav-links > a {
+    max-width: 100%;
+}
+
+/* General page containers never exceed their viewport. */
+.page,
+.bookings-page,
+.car-details-page,
+.edit-page,
+.dashboard-page,
+.damage-page,
+.planner-container,
+.results-container,
+.host-page .host-container {
+    min-width: 0;
+    max-width: calc(100% - 32px);
+}
+
+/* Homepage */
+.hero {
+    min-width: 0;
+    background-position: center;
+}
+
+.hero-content,
+.hero-content h1,
+.hero-content p {
+    min-width: 0;
+}
+
+.search-box {
+    min-width: 0;
+}
+
+.search-field {
+    min-width: 0;
+}
+
+.search-field input,
+.location-input-wrap input {
+    min-width: 0;
+}
+
+.location-dropdown,
+.location-suggestions {
+    max-width: calc(100vw - 32px);
+}
+
+.feature-container {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.footer-content {
+    width: 100%;
+    max-width: 850px;
+}
+
+/* Car browsing cards: predictable columns and equal image proportions. */
+.car-grid,
+.ai-recommendations-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+    width: 100%;
+    min-width: 0;
+}
+
+.car-card,
+.ai-car-card {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.car-main-image,
+.ai-car-image,
+.details-main-image {
+    aspect-ratio: 16 / 10;
+}
+
+.car-main-image > img,
+.ai-car-image img,
+.details-main-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.car-content,
+.ai-car-content,
+.details-info {
+    min-width: 0;
+}
+
+/* Planner/results layout */
+.planner-hero {
+    min-width: 0;
+}
+
+.planner-card,
+.panel-card,
+.modify-card,
+.booking-card,
+.edit-card,
+.host-form-card,
+.auth-card,
+.success-card {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.field-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.results-layout {
+    grid-template-columns: minmax(0, 1.55fr) minmax(0, 0.8fr);
+}
+
+.trip-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+/* Car details + booking forms */
+.car-details {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: clamp(20px, 3vw, 45px);
+}
+
+.details-gallery {
+    min-width: 0;
+}
+
+.details-specs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.booking-dates {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.booking-date-field,
+.booking-form-group,
+.edit-group,
+.filter-group {
+    min-width: 0;
+}
+
+.booking-date-field input,
+.booking-form-group input,
+.edit-group input,
+.edit-group select,
+.edit-group textarea,
+.filter-group input,
+.filter-group select {
+    width: 100%;
+    min-width: 0;
+}
+
+/* Booking listings, host dashboards and their cards */
+.bookings-grid,
+.vehicles-grid,
+.host-bookings-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+}
+
+.booking-details,
+.booking-card-header,
+.booking-detail-row,
+.car-top,
+.car-actions,
+.dashboard-header,
+.section-header,
+.booking-section-heading,
+.results-heading {
+    min-width: 0;
+}
+
+.dashboard-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.booking-filters {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.booking-filter {
+    min-width: 0;
+}
+
+/* Host vehicle form and image uploads */
+.host-page .host-container {
+    min-width: 0;
+}
+
+.host-page .host-form-card,
+.host-page .host-form,
+.host-page .vehicle-section,
+.host-page .image-upload-box {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.host-page .image-preview {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.host-page .preview-card,
+.host-page .preview-image-wrap {
+    min-width: 0;
+}
+
+/* Inspection and damage tools */
+.angle-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.upload-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.result-grid,
+.condition-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.angle-card,
+.upload-card,
+.result-card,
+.condition-card {
+    min-width: 0;
+}
+
+.photo-button,
+.analyze-btn,
+.primary-button,
+.secondary-link,
+.save-vehicle-btn,
+.cancel-edit-btn,
+.confirm-booking-btn,
+.booking-btn {
+    min-height: 42px;
+}
+
+/* General form grids and status areas */
+.edit-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.form-row {
+    min-width: 0;
+}
+
+/* Smaller laptops and tablets */
+@media (max-width: 1100px) {
+    .navbar .nav-container {
+        width: calc(100% - 32px);
+    }
+
+    .navbar .nav-links {
+        gap: 4px 8px;
+    }
+
+    .navbar .nav-links > a {
+        font-size: 0.9rem;
+        padding-inline: 10px;
+    }
+
+    .car-grid,
+    .ai-recommendations-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+    }
+
+    .car-details {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 24px;
+    }
+
+    .details-gallery {
+        position: static;
+    }
+
+    .host-page .host-container {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        width: min(100% - 32px, 760px);
+        gap: 30px;
+    }
+
+    .host-page .host-value-prop {
+        max-width: none;
+        position: static;
+    }
+
+    .host-page .host-form-card {
+        width: 100%;
+        padding: clamp(18px, 3vw, 32px);
+    }
+
+    .dashboard-stats {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .booking-filters {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 900px) {
+    .navbar .nav-container {
+        height: auto;
+        min-height: 0;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        padding-block: 12px;
+        row-gap: 10px;
+    }
+
+    .navbar .nav-links {
+        display: flex !important;
+        width: 100%;
+        justify-content: flex-start;
+        align-items: center;
+        flex-wrap: wrap;
+        padding: 2px 0 0;
+        margin: 0;
+    }
+
+    .navbar .nav-links > a {
+        min-height: 36px;
+        font-size: 0.83rem;
+        padding: 6px 9px;
+    }
+
+    .navbar .logo {
+        font-size: 1.3rem;
+    }
+
+    .navbar .logo i {
+        flex-shrink: 0;
+    }
+
+    .hero {
+        height: auto;
+        min-height: 0;
+        padding: 76px 0 88px;
+    }
+
+    .hero-content h1 {
+        font-size: clamp(2.1rem, 6vw, 3.3rem);
+        line-height: 1.12;
+        margin-bottom: 24px;
+    }
+
+    .hero-content p {
+        font-size: 1rem;
+        margin-bottom: 28px;
+    }
+
+    .search-box {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        padding: 12px;
+    }
+
+    .search-field {
+        padding: 10px 12px;
+    }
+
+    .search-box .divider {
+        border: 0;
+        padding: 10px 12px;
+    }
+
+    .btn-search {
+        width: 100%;
+        grid-column: 1 / -1;
+    }
+
+    .feature-container {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+    }
+
+    .results-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .trip-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .car-details {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .details-gallery {
+        position: static;
+    }
+
+    .details-info {
+        width: 100%;
+    }
+
+    .bookings-grid,
+    .vehicles-grid,
+    .host-bookings-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .angle-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .dashboard-header,
+    .booking-section-heading,
+    .results-heading {
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+}
+
+/* Phones */
+@media (max-width: 640px) {
+    .navbar .nav-container {
+        width: calc(100% - 24px);
+        padding: 10px 0;
+    }
+
+    .navbar .nav-links {
+        column-gap: 5px;
+        row-gap: 4px;
+    }
+
+    .navbar .nav-links > a {
+        min-height: 34px;
+        padding: 5px 7px;
+        font-size: 0.77rem;
+    }
+
+    .navbar .nav-links > a.btn-primary {
+        margin-left: 0;
+        padding-inline: 11px;
+    }
+
+    .navbar .logo {
+        font-size: 1.18rem;
+    }
+
+    .page,
+    .bookings-page,
+    .car-details-page,
+    .edit-page,
+    .dashboard-page,
+    .damage-page,
+    .planner-container,
+    .results-container {
+        width: calc(100% - 28px);
+        max-width: none;
+    }
+
+    .page {
+        padding: 28px 0 44px;
+    }
+
+    .page-header h1,
+    .bookings-header h1,
+    .edit-header h1,
+    .dashboard-header h1 {
+        font-size: clamp(1.9rem, 8vw, 2.6rem);
+        line-height: 1.12;
+    }
+
+    .hero {
+        padding: 56px 0 64px;
+    }
+
+    .hero-content {
+        padding-inline: 14px;
+    }
+
+    .hero-content h1 {
+        font-size: clamp(1.9rem, 8vw, 2.65rem);
+        letter-spacing: -0.7px;
+    }
+
+    .hero-content p {
+        font-size: 0.96rem;
+    }
+
+    .search-box {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 4px;
+        padding: 10px;
+        border-radius: 14px;
+    }
+
+    .search-field,
+    .search-box .divider {
+        padding: 9px 10px;
+    }
+
+    .search-box .divider {
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .location-dropdown,
+    .location-suggestions {
+        left: 0;
+        right: 0;
+        max-width: 100%;
+    }
+
+    .features {
+        padding: 48px 14px;
+    }
+
+    .feature-container {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 14px;
+    }
+
+    .card {
+        padding: 24px 20px;
+    }
+
+    .footer-content {
+        padding-inline: 14px;
+    }
+
+    .footer-buttons,
+    .success-actions,
+    .edit-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .footer-buttons > *,
+    .success-actions > *,
+    .edit-actions > * {
+        width: 100%;
+    }
+
+    .planner-hero {
+        padding: 34px 0 45px;
+    }
+
+    .hero-copy {
+        margin-bottom: 22px;
+    }
+
+    .hero-copy h1 {
+        font-size: clamp(2rem, 9vw, 2.8rem);
+        line-height: 1.08;
+    }
+
+    .hero-copy p {
+        font-size: 0.95rem;
+    }
+
+    .planner-card,
+    .panel-card,
+    .modify-card {
+        padding: 17px;
+        border-radius: 16px;
+    }
+
+    .card-header,
+    .preferences-header,
+    .panel-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .field-grid,
+    .edit-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 14px;
+    }
+
+    .trip-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .results-heading,
+    .ai-results-header {
+        align-items: flex-start;
+    }
+
+    .itinerary-day {
+        grid-template-columns: 60px minmax(0, 1fr);
+        gap: 10px;
+    }
+
+    .itinerary-day::before {
+        left: 29px;
+    }
+
+    .day-number {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+    }
+
+    .timeline-item {
+        flex-wrap: wrap;
+        gap: 6px 10px;
+    }
+
+    .timeline-time {
+        flex: 0 0 100%;
+    }
+
+    .car-grid,
+    .ai-recommendations-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 16px;
+    }
+
+    .car-top {
+        flex-direction: row;
+        gap: 10px;
+    }
+
+    .car-content,
+    .ai-car-content {
+        padding: 16px;
+    }
+
+    .car-actions {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .view-btn,
+    .ai-car-details-btn {
+        width: 100%;
+    }
+
+    .details-main-image {
+        border-radius: 14px;
+    }
+
+    .details-thumbnails {
+        display: flex;
+        overflow-x: auto;
+        max-width: 100%;
+        padding-bottom: 6px;
+    }
+
+    .details-thumbnail {
+        flex: 0 0 64px;
+    }
+
+    .details-specs,
+    .booking-dates,
+    .booking-form-summary {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .booking-box,
+    .booking-form-section {
+        padding: 17px;
+    }
+
+    .booking-btn,
+    .confirm-booking-btn,
+    .booking-btn-secondary {
+        width: 100%;
+    }
+
+    .bookings-grid,
+    .vehicles-grid,
+    .host-bookings-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 14px;
+    }
+
+    .booking-card {
+        padding: 17px;
+    }
+
+    .booking-card-header {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .booking-detail-row {
+        gap: 10px;
+    }
+
+    .dashboard-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .stat-card {
+        padding: 15px;
+        min-width: 0;
+    }
+
+    .booking-filters {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .booking-filter {
+        padding: 12px;
+    }
+
+    .booking-filter strong {
+        font-size: 1rem;
+    }
+
+    .host-page .host-hero {
+        padding: 35px 14px;
+    }
+
+    .host-page .host-container {
+        width: 100%;
+        max-width: 100%;
+        gap: 22px;
+    }
+
+    .host-page .host-value-prop h1 {
+        font-size: clamp(2rem, 8vw, 2.6rem);
+    }
+
+    .host-page .host-value-prop .description {
+        font-size: 1rem;
+        margin-bottom: 24px;
+    }
+
+    .host-page .host-form-card {
+        padding: 17px;
+        border-radius: 16px;
+    }
+
+    .host-page .host-form .form-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .host-page .image-preview {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .host-page .upload-label {
+        padding: 20px 12px;
+    }
+
+    .angle-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .angle-card {
+        padding: 14px 12px;
+        border-radius: 13px;
+    }
+
+    .angle-card h2 {
+        font-size: 0.9rem;
+    }
+
+    .angle-card > p {
+        min-height: 0;
+        font-size: 0.75rem;
+    }
+
+    .upload-grid,
+    .result-grid,
+    .condition-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .damage-hero {
+        padding-inline: 14px;
+    }
+
+    .upload-card {
+        padding: 16px;
+    }
+
+    .analyze-btn,
+    .primary-button {
+        width: 100%;
+    }
+
+    .instructions {
+        align-items: flex-start;
+        padding: 16px;
+    }
+
+    .progress-heading,
+    .submit-area,
+    .edit-header,
+    .dashboard-header {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .auth-page {
+        padding: 24px 14px;
+    }
+
+    .auth-card {
+        width: 100%;
+        padding: 23px 18px;
+        border-radius: 17px;
+    }
+
+    .success-page {
+        min-height: calc(100vh - 20px);
+        padding: 24px 14px;
+    }
+
+    .success-card {
+        width: 100%;
+        padding: 26px 18px;
+        border-radius: 17px;
+    }
+
+    .success-primary,
+    .success-secondary {
+        width: 100%;
+        text-align: center;
+    }
+
+    .modal-card {
+        width: calc(100% - 24px);
+        max-width: 420px;
+        padding: 22px 16px;
+    }
+}
+
+@media (max-width: 380px) {
+    .navbar .nav-links > a {
+        font-size: 0.72rem;
+        padding-inline: 6px;
+    }
+
+    .trip-stats,
+    .dashboard-stats,
+    .booking-filters {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .car-top {
+        flex-direction: column;
+    }
+
+    .car-price {
+        text-align: left;
+    }
+
+    .angle-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .angle-card {
+        padding: 16px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Standalone inspection page uses a compact navbar without .nav-container. */
+.navbar > .logo {
+    flex-shrink: 0;
+}
+
+.navbar > .back-link {
+    min-width: 0;
+    max-width: 100%;
+}
+
+@media (max-width: 640px) {
+    .booking-inspection .navbar,
+    body:has(.angle-grid) .navbar {
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px 16px;
+        padding: 12px 14px;
+    }
+
+    .navbar > .back-link {
+        font-size: 0.84rem;
+    }
+
+    .otp-inputs {
+        display: flex;
+        justify-content: center;
+        gap: clamp(4px, 1.5vw, 9px);
+        max-width: 100%;
+    }
+
+    .otp-box {
+        width: clamp(35px, 11vw, 48px);
+        height: clamp(42px, 13vw, 50px);
+        flex: 0 1 clamp(35px, 11vw, 48px);
+        min-width: 0;
+        padding: 0;
+    }
+}
+
+
+/* Homepage mobile navigation: compact header with an accessible toggle. */
+.homepage-navbar .nav-menu-toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid #dbe3ef;
+    border-radius: 11px;
+    background: #ffffff;
+    color: #1d4ed8;
+    font-size: 1.1rem;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.homepage-navbar .nav-menu-toggle:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, 0.35);
+    outline-offset: 2px;
+}
+
+@media (max-width: 768px) {
+    .homepage-navbar {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+
+    .homepage-navbar .nav-container {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        width: calc(100% - 24px);
+        min-height: 62px;
+        padding: 9px 0;
+        gap: 0 12px;
+    }
+
+    .homepage-navbar .logo {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        margin-right: auto;
+    }
+
+    .homepage-navbar .nav-menu-toggle {
+        display: inline-flex;
+    }
+
+    .homepage-navbar .nav-links {
+        display: none !important;
+        flex: 0 0 100%;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        width: 100%;
+        max-width: 100%;
+        gap: 4px;
+        margin: 9px 0 0;
+        padding: 9px;
+        border: 1px solid #e5eaf2;
+        border-radius: 14px;
+        background: #ffffff;
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.10);
+    }
+
+    .homepage-navbar .nav-links.is-open {
+        display: flex !important;
+    }
+
+    .homepage-navbar .nav-links > a,
+    .homepage-navbar .nav-links > a.btn-primary {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        width: 100%;
+        min-height: 44px;
+        margin: 0;
+        padding: 10px 12px;
+        border-radius: 9px;
+        font-size: 0.92rem;
+        line-height: 1.3;
+        text-align: left;
+    }
+
+    .homepage-navbar .nav-links > a:not(.btn-primary)::after {
+        display: none;
+    }
+
+    .homepage-navbar .nav-links > a:hover {
+        background: #f1f5ff;
+    }
+
+    .homepage-navbar .nav-links > a.btn-primary {
+        justify-content: center;
+        margin-top: 3px;
+    }
+}
+
+/* =========================================================
+   HOMEPAGE SEARCH PANEL — layout and control polish
+   This overrides only the homepage search form; form IDs and
+   JavaScript behavior remain unchanged.
+========================================================= */
+.search-box {
+    box-sizing: border-box;
+    width: 100%;
+    align-items: stretch;
+    border: 1px solid rgba(226, 232, 240, 0.96);
+    background: rgba(255, 255, 255, 0.985);
+    box-shadow: 0 22px 55px rgba(2, 6, 23, 0.24);
+}
+
+.search-field {
+    box-sizing: border-box;
+    min-width: 0;
+}
+
+.search-field label {
+    margin: 0 0 8px;
+    color: #64748b;
+    font-size: 0.7rem;
+    font-weight: 800;
+    line-height: 1.25;
+    letter-spacing: 0.065em;
+}
+
+.search-field > input,
+.search-field > select {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    height: 42px;
+    min-height: 42px;
+    margin: 0;
+    padding: 0 11px;
+    border: 1px solid #dce4ef;
+    border-radius: 9px;
+    outline: none;
+    background-color: #f8fafc;
+    color: #172033;
+    font: 500 0.9rem/1.2 Inter, sans-serif;
+    transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.search-field > input::placeholder {
+    color: #94a3b8;
+    opacity: 1;
+}
+
+.search-field > input:focus,
+.search-field > select:focus,
+.location-input-wrap:focus-within {
+    border-color: #2563eb;
+    outline: none;
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.search-field > select {
+    cursor: pointer;
+}
+
+.search-field > input[type="date"] {
+    padding-inline: 9px;
+    font-variant-numeric: tabular-nums;
+    color-scheme: light;
+}
+
+.location-field {
+    min-width: 0;
+}
+
+.location-input-wrap {
+    box-sizing: border-box;
+    width: 100%;
+    height: 42px;
+    min-height: 42px;
+    gap: 8px;
+    padding: 0 10px;
+    border: 1px solid #dce4ef;
+    border-radius: 9px;
+    background: #f8fafc;
+    transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.location-input-wrap input,
+.location-input-wrap input:focus {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    height: 40px;
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    box-shadow: none;
+    color: #172033;
+    font: 500 0.9rem/1.2 Inter, sans-serif;
+}
+
+.location-input-wrap input::placeholder {
+    color: #94a3b8;
+    opacity: 1;
+}
+
+.location-icon {
+    margin-right: 0;
+    font-size: 0.9rem;
+}
+
+.search-box .divider {
+    border-left: 1px solid #e5eaf2;
+}
+
+.btn-search {
+    align-self: center;
+    justify-self: stretch;
+    min-width: 0;
+    min-height: 52px;
+    padding: 0 20px;
+    border-radius: 10px;
+    font-size: 0.92rem;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2);
+}
+
+.btn-search:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, 0.35);
+    outline-offset: 3px;
+}
+
+@media (min-width: 1200px) {
+    .hero-content {
+        max-width: 1320px;
+    }
+
+    .search-box {
+        display: grid;
+        grid-template-columns:
+            minmax(230px, 1.45fr)
+            minmax(164px, 1fr)
+            minmax(164px, 1fr)
+            minmax(130px, 0.72fr)
+            minmax(195px, 1.2fr)
+            minmax(148px, auto);
+        gap: 0;
+        padding: 12px;
+        min-height: 116px;
+    }
+
+    .search-field {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 9px 14px;
+    }
+
+    .search-field > input,
+    .search-field > select {
+        font-size: 0.88rem;
+    }
+
+    .location-input-wrap input {
+        font-size: 0.88rem;
+    }
+
+    .btn-search {
+        width: 100%;
+        min-height: 54px;
+        padding-inline: 15px;
+    }
+}
+
+@media (min-width: 901px) and (max-width: 1199px) {
+    .hero-content {
+        max-width: 1000px;
+    }
+
+    .search-box {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 9px;
+        padding: 14px;
+    }
+
+    .search-box > .search-field,
+    .search-box > .search-field.divider {
+        padding: 12px;
+        border: 1px solid #e5eaf2;
+        border-radius: 10px;
+    }
+
+    .search-box > .btn-search {
+        width: 100%;
+        grid-column: 1 / -1;
+        margin-top: 2px;
+    }
+}
+
+@media (max-width: 900px) {
+    .search-box {
+        gap: 9px;
+        padding: 13px;
+    }
+
+    .search-box > .search-field,
+    .search-box > .search-field.divider {
+        padding: 10px 11px;
+        border: 1px solid #e5eaf2;
+        border-radius: 10px;
+    }
+
+    .search-field > input,
+    .search-field > select,
+    .location-input-wrap {
+        min-height: 42px;
+    }
+
+    .btn-search {
+        margin-top: 1px;
+    }
+}
+
+@media (max-width: 640px) {
+    .hero-content {
+        max-width: 560px;
+    }
+
+    .search-box {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 9px;
+        padding: 12px;
+        border-radius: 14px;
+    }
+
+    .search-box > .search-field,
+    .search-box > .search-field.divider {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #e5eaf2;
+        border-radius: 10px;
+    }
+
+    .search-field label {
+        margin-bottom: 7px;
+        font-size: 0.69rem;
+    }
+
+    .search-field > input,
+    .search-field > select,
+    .location-input-wrap {
+        height: 44px;
+        min-height: 44px;
+        font-size: 0.95rem;
+    }
+
+    .location-input-wrap input,
+    .location-input-wrap input:focus {
+        height: 42px;
+        font-size: 0.95rem;
+    }
+
+    .btn-search {
+        grid-column: 1 / -1;
+        width: 100%;
+        min-height: 52px;
+        margin-top: 1px;
+    }
+}
+
+@media (max-width: 380px) {
+    .search-box {
+        padding: 9px;
+    }
+
+    .search-box > .search-field,
+    .search-box > .search-field.divider {
+        padding: 9px;
+    }
+
+    .search-field > input,
+    .search-field > select,
+    .location-input-wrap input {
+        font-size: 0.88rem;
+    }
+}

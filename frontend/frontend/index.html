@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Saarthi | Smart Car Rental</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Font Awesome -->
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Homepage CSS -->
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+
+<body>
+
+    <!-- =====================================================
+         NAVIGATION
+    ====================================================== -->
+
+    <nav class="navbar">
+
+        <div class="nav-container">
+
+            <a
+                href="index.html"
+                class="logo"
+                aria-label="Saarthi Home"
+            >
+                <i
+                    class="fa-solid fa-car-side"
+                    aria-hidden="true"
+                ></i>
+
+                <span>Saarthi</span>
+            </a>
+
+
+            <div class="nav-links">
+
+                <a href="cars.html">
+                    Browse Cars
+                </a>
+
+                <a href="ai-trip-planner.html">
+                    AI Trip Planner
+                </a>
+
+                <a href="host.html">
+                    Host Your Car
+                </a>
+
+                <a
+                    href="auth.html"
+                    class="btn-primary"
+                >
+                    Log In
+                </a>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+    <!-- =====================================================
+         HERO SECTION
+    ====================================================== -->
+
+    <header class="hero">
+
+        <div class="hero-overlay"></div>
+
+        <div class="hero-content">
+
+            <h1>
+                Smart Travel, Instant Rides.
+            </h1>
+
+
+            <!-- =================================================
+                 SMART CAR SEARCH
+            ================================================== -->
+
+            <form
+                id="carSearchForm"
+                class="search-box"
+                novalidate
+            >
+
+                <!-- =========================================
+                     LOCATION
+                ========================================== -->
+
+                <div class="search-field location-field">
+
+                    <label for="locationInput">
+                        Location
+                    </label>
+
+
+                    <div class="location-input-wrap">
+
+                        <i
+                            class="fa-solid fa-location-dot location-icon"
+                            aria-hidden="true"
+                        ></i>
+
+
+                        <input
+                            id="locationInput"
+                            name="location"
+                            type="text"
+                            placeholder="e.g. Nagpur, Maharashtra"
+                            autocomplete="off"
+                            role="combobox"
+                            aria-autocomplete="list"
+                            aria-expanded="false"
+                            aria-controls="locationDropdown"
+                            aria-haspopup="listbox"
+                        >
+
+
+                        <button
+                            id="clearLocationBtn"
+                            type="button"
+                            class="clear-location hidden"
+                            aria-label="Clear location"
+                        >
+                            <i
+                                class="fa-solid fa-xmark"
+                                aria-hidden="true"
+                            ></i>
+                        </button>
+
+                    </div>
+
+
+                    <!-- Location autocomplete -->
+                    <div
+                        id="locationDropdown"
+                        class="location-dropdown"
+                        role="listbox"
+                    ></div>
+
+                </div>
+
+
+                <!-- =========================================
+                     PICKUP DATE
+                ========================================== -->
+
+                <div class="search-field divider">
+
+                    <label for="pickupDateInput">
+                        Pickup Date
+                    </label>
+
+
+                    <input
+                        id="pickupDateInput"
+                        name="startDate"
+                        type="date"
+                    >
+
+                </div>
+
+
+                <!-- =========================================
+                     RETURN DATE
+                ========================================== -->
+
+                <div class="search-field divider">
+
+                    <label for="returnDateInput">
+                        Return Date
+                    </label>
+
+
+                    <input
+                        id="returnDateInput"
+                        name="endDate"
+                        type="date"
+                    >
+
+                </div>
+
+
+                <!-- =========================================
+                     TRAVELLERS
+                ========================================== -->
+
+                <div class="search-field divider">
+
+                    <label for="travelersInput">
+                        Travellers
+                    </label>
+
+
+                    <select
+                        id="travelersInput"
+                        name="travelers"
+                    >
+
+                        <option value="">
+                            Any
+                        </option>
+
+                        <option value="1">
+                            1+
+                        </option>
+
+                        <option value="2">
+                            2+
+                        </option>
+
+                        <option value="3">
+                            3+
+                        </option>
+
+                        <option value="4">
+                            4+
+                        </option>
+
+                        <option value="5">
+                            5+
+                        </option>
+
+                        <option value="6">
+                            6+
+                        </option>
+
+                        <option value="7">
+                            7+
+                        </option>
+
+                        <option value="8">
+                            8+
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- =========================================
+                     TRIP VIBE
+                ========================================== -->
+
+                <div class="search-field divider">
+
+                    <label for="tripVibeInput">
+                        Trip Vibe (AI Search)
+                    </label>
+
+
+                    <input
+                        id="tripVibeInput"
+                        name="tripVibe"
+                        type="text"
+                        placeholder="e.g. Weekend getaway"
+                        autocomplete="off"
+                    >
+
+                </div>
+
+
+                <!-- =========================================
+                     FIND CARS
+                ========================================== -->
+
+                <button
+                    id="findCarsBtn"
+                    class="btn-search"
+                    type="submit"
+                >
+
+                    <i
+                        class="fa-solid fa-magnifying-glass"
+                        aria-hidden="true"
+                    ></i>
+
+                    <span>
+                        Find Cars
+                    </span>
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         FEATURES
+    ====================================================== -->
+
+    <section
+        class="features"
+        aria-label="Saarthi Features"
+    >
+
+        <div class="feature-container">
+
+
+            <!-- Feature 1 -->
+            <article class="card">
+
+                <div class="icon bg-blue">
+
+                    <i
+                        class="fa-solid fa-wand-magic-sparkles"
+                        aria-hidden="true"
+                    ></i>
+
+                </div>
+
+
+                <h3>
+                    AI Recommendations
+                </h3>
+
+
+                <p>
+                    Find cars based on your trip, preferences,
+                    budget, and travel needs.
+                </p>
+
+            </article>
+
+
+            <!-- Feature 2 -->
+            <article class="card">
+
+                <div class="icon bg-green">
+
+                    <i
+                        class="fa-solid fa-shield-halved"
+                        aria-hidden="true"
+                    ></i>
+
+                </div>
+
+
+                <h3>
+                    Smart &amp; Secure
+                </h3>
+
+
+                <p>
+                    AI-powered features help make every rental
+                    safer and more reliable.
+                </p>
+
+            </article>
+
+
+            <!-- Feature 3 -->
+            <article class="card">
+
+                <div class="icon bg-purple">
+
+                    <i
+                        class="fa-solid fa-tags"
+                        aria-hidden="true"
+                    ></i>
+
+                </div>
+
+
+                <h3>
+                    Smart Offers
+                </h3>
+
+
+                <p>
+                    Discover relevant pricing, coupons,
+                    and promotional discounts.
+                </p>
+
+            </article>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer>
+
+        <div class="footer-content">
+
+            <h2>
+                Ready to hit the road?
+            </h2>
+
+
+            <p>
+                Join as a driver or host your car to start earning today.
+            </p>
+
+
+            <div class="footer-buttons">
+
+                <a
+                    href="cars.html"
+                    class="btn-primary"
+                >
+                    Book Now
+                </a>
+
+
+                <a
+                    href="host.html"
+                    class="btn-outline"
+                >
+                    Become a Host
+                </a>
+
+            </div>
+
+
+            <div class="copyright">
+
+                &copy; 2026 Saarthi Smart Car Rental.
+                All rights reserved.
+
+            </div>
+
+        </div>
+
+    </footer>
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+    <!-- City database -->
+    <script src="js/data/cities.js"></script>
+
+    <!-- Homepage page logic -->
+    <script src="js/pages/index.js"></script>
+
+</body>
+
+</html>

@@ -2,6 +2,80 @@ const mongoose = require("mongoose");
 
 
 /* =========================================================
+   VEHICLE INSPECTION PHOTO SCHEMAS
+========================================================= */
+
+const inspectionPhotoSchema = new mongoose.Schema(
+    {
+        angle: {
+            type: String,
+            enum: [
+                "front",
+                "front-left",
+                "left",
+                "rear-left",
+                "rear",
+                "rear-right",
+                "right",
+                "front-right"
+            ],
+            required: true
+        },
+        path: {
+            type: String,
+            required: true
+        },
+        capturedAt: {
+            type: Date,
+            default: Date.now
+        }
+    },
+    {
+        _id: false
+    }
+);
+
+const vehicleInspectionSchema = new mongoose.Schema(
+    {
+        status: {
+            type: String,
+            enum: ["pending", "completed"],
+            default: "pending"
+        },
+        photos: {
+            type: [inspectionPhotoSchema],
+            default: []
+        },
+        completedAt: {
+            type: Date,
+            default: null
+        },
+        completedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            default: null
+        },
+        notes: {
+            type: String,
+            default: "",
+            trim: true
+        },
+        aiAnalysis: {
+            type: mongoose.Schema.Types.Mixed,
+            default: null
+        },
+        aiAnalyzedAt: {
+            type: Date,
+            default: null
+        }
+    },
+    {
+        _id: false
+    }
+);
+
+
+/* =========================================================
    BOOKING SCHEMA
 ========================================================= */
 
@@ -259,6 +333,34 @@ const bookingSchema =
                 default: "",
 
                 trim: true
+
+            },
+
+
+            /* ---------------------------------------------
+               PICKUP / RETURN VEHICLE INSPECTIONS
+            --------------------------------------------- */
+
+            pickupInspection: {
+
+                type: vehicleInspectionSchema,
+
+                default: () => ({
+                    status: "pending",
+                    photos: []
+                })
+
+            },
+
+
+            returnInspection: {
+
+                type: vehicleInspectionSchema,
+
+                default: () => ({
+                    status: "pending",
+                    photos: []
+                })
 
             },
 

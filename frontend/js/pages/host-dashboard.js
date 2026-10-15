@@ -1542,6 +1542,104 @@ function renderBooking(
         returnStatus ===
         "confirmed";
 
+    function hasEightInspectionPhotos(inspection) {
+        const photos = Array.isArray(inspection?.photos)
+            ? inspection.photos
+            : [];
+
+        const requiredAngles = [
+            "front",
+            "front-left",
+            "left",
+            "rear-left",
+            "rear",
+            "rear-right",
+            "right",
+            "front-right"
+        ];
+
+        const uploadedAngles = photos.map(photo => photo?.angle);
+
+        return (
+            inspection?.status === "completed" &&
+            photos.length === requiredAngles.length &&
+            new Set(uploadedAngles).size === requiredAngles.length &&
+            requiredAngles.every(angle => uploadedAngles.includes(angle))
+        );
+    }
+
+    const pickupInspectionComplete =
+        hasEightInspectionPhotos(booking.pickupInspection);
+
+    const returnInspectionComplete =
+        hasEightInspectionPhotos(booking.returnInspection);
+
+
+    /* -----------------------------------------------------
+       AI DAMAGE REPORT (generated after return inspection)
+    ----------------------------------------------------- */
+
+    const returnDamageReport =
+        booking.returnInspection?.aiAnalysis || null;
+
+    const returnDamageReportStatus =
+        returnDamageReport?.status || "";
+
+    const returnDamageChanges =
+        Array.isArray(returnDamageReport?.changes)
+            ? returnDamageReport.changes
+            : [];
+
+    const returnDamageReportHTML =
+        returnDamageReportStatus === "completed" &&
+        returnDamageReport?.overallAssessment
+            ? `
+                <section style="margin-top:16px;padding:16px;border:1px solid #dbe5f2;border-radius:14px;background:#f8fbff;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+                        <strong style="font-size:14px;color:#20314a;">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            AI Return Damage Report
+                        </strong>
+                        <span style="font-size:12px;font-weight:800;color:${returnDamageReport.overallAssessment.damageDetected ? '#a43a43' : '#267348'};">
+                            ${returnDamageReport.overallAssessment.damageDetected ? 'Possible damage found' : 'No reliable new damage found'}
+                        </span>
+                    </div>
+                    <p style="margin:10px 0 6px;font-size:13px;line-height:1.6;color:#4d5e75;">
+                        ${escapeHTML(returnDamageReport.overallAssessment.summary || 'Review the inspection report manually.')}
+                    </p>
+                    <div style="font-size:12px;color:#687991;margin-bottom:10px;">
+                        Severity: <strong>${escapeHTML(returnDamageReport.overallAssessment.severity || 'not assessed')}</strong>
+                        &nbsp;·&nbsp; Confidence: <strong>${Math.max(0, Math.min(100, Number(returnDamageReport.overallAssessment.confidence) || 0))}%</strong>
+                        &nbsp;·&nbsp; Vehicle match: <strong>${Math.max(0, Math.min(100, Number(returnDamageReport.vehicleMatch?.confidence) || 0))}%</strong>
+                    </div>
+                    ${returnDamageChanges.length
+                        ? `<div style="display:grid;gap:8px;">
+                            ${returnDamageChanges.map(change => `
+                                <div style="padding:10px 12px;border-radius:10px;background:#fff;border:1px solid #e6ebf3;">
+                                    <div style="font-size:12px;font-weight:800;color:#27364d;">
+                                        ${escapeHTML(change.angle || 'Vehicle')} · ${escapeHTML(change.area || 'Area not specified')}
+                                    </div>
+                                    <div style="margin-top:3px;font-size:12px;color:#6c7a8f;">
+                                        ${escapeHTML(change.type || 'Visible change')} — ${escapeHTML(change.severity || 'unrated')} · ${Math.max(0, Math.min(100, Number(change.confidence) || 0))}% confidence
+                                    </div>
+                                    <p style="margin:5px 0 0;font-size:12px;line-height:1.5;color:#52627a;">${escapeHTML(change.description || '')}</p>
+                                </div>
+                            `).join('')}
+                        </div>`
+                        : '<p style="margin:8px 0 0;font-size:12px;color:#267348;">No individual new-damage findings were returned.</p>'}
+                    <p style="margin:12px 0 0;font-size:11px;line-height:1.5;color:#8490a2;">
+                        AI output is an inspection aid, not a legal or insurance determination. Review photos manually.
+                    </p>
+                </section>
+            `
+            : returnDamageReportStatus === "failed"
+                ? `
+                    <section style="margin-top:16px;padding:14px;border:1px solid #f0dfb7;border-radius:12px;background:#fffaf0;color:#79623b;font-size:12px;line-height:1.6;">
+                        <strong><i class="fa-solid fa-circle-exclamation"></i> AI comparison did not complete.</strong>
+                        ${escapeHTML(returnDamageReport.message || 'The photos remain saved; repeat the return inspection upload to retry the comparison before confirming return.')}
+                    </section>
+                `
+                : "";
 
     /* -----------------------------------------------------
        PICKUP ACTION CONDITION
@@ -2134,7 +2232,33 @@ function renderBooking(
 
         }
 
+        ${returnDamageReportHTML}
+
     `;
+
+
+    // Make each action clear about whether photos or confirmation are next.
+    const pickupActionButton = card.querySelector(
+        '[data-handover-action="pickup"]'
+    );
+
+    if (pickupActionButton && !pickupInspectionComplete) {
+        pickupActionButton.innerHTML = `
+            <i class="fa-solid fa-camera"></i>
+            Start Pickup Inspection
+        `;
+    }
+
+    const returnActionButton = card.querySelector(
+        '[data-handover-action="return"]'
+    );
+
+    if (returnActionButton && !returnInspectionComplete) {
+        returnActionButton.innerHTML = `
+            <i class="fa-solid fa-camera"></i>
+            Start Return Inspection
+        `;
+    }
 
 
     /* =====================================================
@@ -2180,21 +2304,18 @@ function renderBooking(
         );
 
 
-    if (
-        pickupButton
-    ) {
-
-        pickupButton.addEventListener(
-            "click",
-            async () => {
-
-                await confirmPickup(
-                    booking.bookingId
-                );
-
+    if (pickupButton) {
+        pickupButton.addEventListener("click", async () => {
+            if (!pickupInspectionComplete) {
+                window.location.href =
+                    `booking-inspection.html?bookingId=${encodeURIComponent(
+                        booking.bookingId
+                    )}&phase=pickup`;
+                return;
             }
-        );
 
+            await confirmPickup(booking.bookingId);
+        });
     }
 
 
@@ -2208,21 +2329,18 @@ function renderBooking(
         );
 
 
-    if (
-        returnButton
-    ) {
-
-        returnButton.addEventListener(
-            "click",
-            async () => {
-
-                await confirmReturn(
-                    booking.bookingId
-                );
-
+    if (returnButton) {
+        returnButton.addEventListener("click", async () => {
+            if (!returnInspectionComplete) {
+                window.location.href =
+                    `booking-inspection.html?bookingId=${encodeURIComponent(
+                        booking.bookingId
+                    )}&phase=return`;
+                return;
             }
-        );
 
+            await confirmReturn(booking.bookingId);
+        });
     }
 
 
@@ -2235,7 +2353,7 @@ function renderBooking(
     );
 
 }
-
+/* =========================================================*/
 
 /* =========================================================
    UPDATE BOOKING STATUS

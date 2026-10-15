@@ -1,50 +1,56 @@
-const express =
-    require("express");
-
+const express = require("express");
+const router = express.Router();
 
 const {
     checkAvailability,
     createBooking,
     getCustomerBookings,
-    cancelCustomerBooking,
     getHostBookings,
     updateHostBookingStatus,
+    cancelCustomerBooking,
     confirmPickup,
     confirmReturn
-} =
-    require(
-        "../controllers/bookingController"
-    );
+} = require("../controllers/bookingController");
 
+const {
+    saveBookingInspection
+} = require("../controllers/bookingInspectionController");
+
+const {
+    requireCompletedInspection
+} = require("../middleware/inspectionMiddleware");
 
 const {
     authenticateUser,
     requireHost
-} =
-    require(
-        "../middleware/authMiddleware"
-    );
-
-
-const router =
-    express.Router();
+} = require("../middleware/authMiddleware");
 
 
 /* =========================================================
-   MY BOOKINGS
+   PUBLIC / CUSTOMER BOOKING ROUTES
 ========================================================= */
 
+// Check vehicle availability
+router.get(
+    "/availability/:carId",
+    checkAvailability
+);
+
+// Create a booking
+router.post(
+    "/",
+    authenticateUser,
+    createBooking
+);
+
+// Get logged-in customer's bookings
 router.get(
     "/my",
     authenticateUser,
     getCustomerBookings
 );
 
-
-/* =========================================================
-   CANCEL MY BOOKING
-========================================================= */
-
+// Cancel a customer's booking
 router.patch(
     "/my/:bookingId/cancel",
     authenticateUser,
@@ -53,9 +59,10 @@ router.patch(
 
 
 /* =========================================================
-   HOST BOOKINGS
+   HOST BOOKING ROUTES
 ========================================================= */
 
+// Get bookings for the logged-in host
 router.get(
     "/host",
     authenticateUser,
@@ -63,11 +70,7 @@ router.get(
     getHostBookings
 );
 
-
-/* =========================================================
-   UPDATE HOST BOOKING STATUS
-========================================================= */
-
+// Update booking status
 router.patch(
     "/host/:bookingId/status",
     authenticateUser,
@@ -77,49 +80,44 @@ router.patch(
 
 
 /* =========================================================
-   CONFIRM VEHICLE PICKUP
+   VEHICLE CONDITION INSPECTION
+========================================================= */
+
+// Upload the 8 pickup or return inspection photos
+router.post(
+    "/host/:bookingId/inspection/:phase",
+    authenticateUser,
+    requireHost,
+    saveBookingInspection
+);
+
+
+/* =========================================================
+   PICKUP CONFIRMATION
+   Requires all 8 pickup inspection photos
 ========================================================= */
 
 router.patch(
     "/host/:bookingId/pickup",
     authenticateUser,
     requireHost,
+    requireCompletedInspection("pickup"),
     confirmPickup
 );
 
 
 /* =========================================================
-   CONFIRM VEHICLE RETURN
+   RETURN CONFIRMATION
+   Requires all 8 return inspection photos
 ========================================================= */
 
 router.patch(
     "/host/:bookingId/return",
     authenticateUser,
     requireHost,
+    requireCompletedInspection("return"),
     confirmReturn
 );
 
 
-/* =========================================================
-   CHECK CAR AVAILABILITY
-========================================================= */
-
-router.get(
-    "/availability/:carId",
-    checkAvailability
-);
-
-
-/* =========================================================
-   CREATE BOOKING
-========================================================= */
-
-router.post(
-    "/",
-    authenticateUser,
-    createBooking
-);
-
-
-module.exports =
-    router;
+module.exports = router;

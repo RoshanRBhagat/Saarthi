@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Inspection | Saarthi</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/booking-inspection.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <a class="logo" href="host-dashboard.html">
+            <i class="fa-solid fa-car-side"></i>
+            Saarthi
+        </a>
+        <a class="back-link" href="host-dashboard.html">
+            <i class="fa-solid fa-arrow-left"></i>
+            Host Dashboard
+        </a>
+    </nav>
+
+    <main class="page">
+        <header class="page-header">
+            <span class="eyebrow">
+                <i class="fa-solid fa-shield-halved"></i>
+                Vehicle protection
+            </span>
+
+            <h1 id="pageTitle">Vehicle Inspection</h1>
+            <p id="pageDescription">
+                Photograph the vehicle from all eight required angles.
+            </p>
+
+            <div class="booking-reference">
+                Booking ID: <strong id="bookingReference">Loading...</strong>
+            </div>
+        </header>
+
+        <section class="instructions">
+            <i class="fa-solid fa-circle-info"></i>
+            <div>
+                <strong>Capture consistent photos</strong>
+                <p>
+                    Photograph the whole vehicle from each marked angle.
+                    Keep the car visible, use good lighting, and avoid
+                    changing angles between pickup and return.
+                </p>
+            </div>
+        </section>
+
+        <section class="progress-section">
+            <div class="progress-heading">
+                <strong>Inspection photos</strong>
+                <span id="photoProgress">0 of 8 completed</span>
+            </div>
+
+            <div class="progress-track">
+                <div id="progressBar" class="progress-bar"></div>
+            </div>
+        </section>
+
+        <section id="angleGrid" class="angle-grid">
+
+            <article class="angle-card" data-angle-card="front">
+                <div class="angle-number">01</div>
+                <div class="angle-icon"><i class="fa-solid fa-car"></i></div>
+                <h2>Front</h2>
+                <p>Full front view, including bumper and headlights.</p>
+                <label class="photo-button">
+                    <i class="fa-solid fa-camera"></i>
+                    <span>Select photo</span>
+                    <input type="file" accept="image/jpeg,image/png,image/webp" capture="environment" data-angle="front">
+                </label>
+                <div class="photo-preview hidden"></div>
+            </article>
+
+            <article class="angle-card" data-angle-card="front-left">
+                <div class="angle-number">02</div>
+                <div class="angle-icon"><i class="fa-solid fa-car-side"></i></div>
+                <h2>Front-left</h2>
+                <p>Front-left corner, fender and side panel.</p>
+                <label class="photo-button">
+                    <i class="fa-solid fa-camera"></i>
+                    <span>Select photo</span>
+                    <input type="file" accept="image/jpeg,image/png,image/webp" capture="environment" data-angle="front-left">
+                </label>
+                <div class="photo-preview hidden"></div>
+            </article>
+
+            <article class="angle-card" data-angle-card="left">
+                <div class="angle-number">03</div>
+                <div class="angle-icon"><i class="fa-solid fa-car-side"></i></div>
+                <h2>Left side</h2>
+                <p>Full left side, doors, mirrors and wheels.</p>
+                <label class="photo-button">
+                    <i class="fa-solid fa-camera"></i>
+                    <span>Select photo</span>
+                    <input type="file" accept="image/jpeg,image/png,image/webp" capture="environment" data-angle="left">
+                </label>
+                <div class="photo-preview hidden"></div>
+            </article>
+
+            <article class="angle-card" data-angle-card="rear-left">
+                <div class="angle-number">04</div>
+                <div class="angle-icon"><i class="fa-solid fa-car-rear"></i></div>
+                <h2>Rear-left</h2>
+                <p>Rear-left corner, bumper and tail light.</p>
+                <label class="photo-button">
+                    <i class="fa-solid fa-camera"></i>
+                    <span>Select photo</span>
+                    <input type="file" accept="image/jpeg,image/png,image/webp" capture="environment" data-angle="rear-left">
+                </label>
+                <div class="photo-preview hidden"></div>
+            </article>
+
+            <article class="angle-card" data-angle-card="rear">
+                <div class="angle-number">05</div>
+                <div class="angle-icon"><i class="fa-solid fa-car-rear"></i></div>
+                <h2>Rear</h2>
+                <p>Full rear view, including boot and bumper.</p>
+                <label class="photo-button">
+                    <i class="fa-solid fa-camera"></i>
+                    <span>Select photo</span>
+                    <input type="file" accept="image/jpeg,image/png,image/webp" capture="environment" data-angle="rear">
+                </label>
+                <div class="photo-preview hidden"></div>
+            </article>
+
+            <article class="angle-card" data-angle-card="rear-right">
+                <div class="angle-number">06</div>
+                <div class="angle-icon"><i class="fa-solid fa-car-rear"></i></div>
+                <h2>Rear-right</h2>
+                <p>Rear-right corner, bumper and tail light.</p>
+                <label class="photo-button">
+                    <i class="fa-solid fa-camera"></i>
+                    <span>Select photo</span>
+                    <input type="file" accept="image/jpeg,image/png,image/webp" capture="environment" data-angle="rear-right">
+                </label>
+                <div class="photo-preview hidden"></div>
+            </article>
+
+            <article class="angle-card" data-angle-card="right">
+                <div class="angle-number">07</div>
+                <div class="angle-icon"><i class="fa-solid fa-car-side"></i></div>
+                <h2>Right side</h2>
+                <p>Full right side, doors, mirrors and wheels.</p>
+                <label class="photo-button">
+                    <i class="fa-solid fa-camera"></i>
+                    <span>Select photo</span>
+                    <input type="file" accept="image/jpeg,image/png,image/webp" capture="environment" data-angle="right">
+                </label>
+                <div class="photo-preview hidden"></div>
+            </article>
+
+            <article class="angle-card" data-angle-card="front-right">
+                <div class="angle-number">08</div>
+                <div class="angle-icon"><i class="fa-solid fa-car-side"></i></div>
+                <h2>Front-right</h2>
+                <p>Front-right corner, fender and side panel.</p>
+                <label class="photo-button">
+                    <i class="fa-solid fa-camera"></i>
+                    <span>Select photo</span>
+                    <input type="file" accept="image/jpeg,image/png,image/webp" capture="environment" data-angle="front-right">
+                </label>
+                <div class="photo-preview hidden"></div>
+            </article>
+
+        </section>
+
+        <section class="notes-section">
+            <label for="inspectionNotes">Inspection notes (optional)</label>
+            <textarea id="inspectionNotes" rows="3" maxlength="1000"
+                placeholder="Existing scratches, fuel level, dashboard warning lights, or other observations..."></textarea>
+        </section>
+
+        <div id="inspectionError" class="message error hidden"></div>
+        <div id="inspectionSuccess" class="message success hidden"></div>
+
+        <div class="submit-area">
+            <button type="button" id="saveInspectionBtn" class="primary-button">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                Save 8 Inspection Photos
+            </button>
+
+            <a href="host-dashboard.html" id="dashboardLink" class="secondary-link">
+                Return to Host Dashboard
+            </a>
+        </div>
+
+        <p class="disclaimer">
+            Inspection photos are evidence of visible vehicle condition.
+            AI findings are estimates and do not by themselves establish liability.
+        </p>
+    </main>
+
+    <script src="js/pages/booking-inspection.js"></script>
+</body>
+</html>

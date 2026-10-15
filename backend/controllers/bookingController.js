@@ -823,6 +823,37 @@ function getRentalStatus(
 
 
 /* =========================================================
+   INSPECTION VALIDATION
+========================================================= */
+
+function hasCompleteInspection(inspection) {
+    const requiredAngles = [
+        "front",
+        "front-left",
+        "left",
+        "rear-left",
+        "rear",
+        "rear-right",
+        "right",
+        "front-right"
+    ];
+
+    const photos = Array.isArray(inspection?.photos)
+        ? inspection.photos
+        : [];
+
+    const angles = photos.map(photo => photo?.angle);
+
+    return (
+        inspection?.status === "completed" &&
+        photos.length === requiredAngles.length &&
+        new Set(angles).size === requiredAngles.length &&
+        requiredAngles.every(angle => angles.includes(angle))
+    );
+}
+
+
+/* =========================================================
    AUTO COMPLETE FINISHED BOOKINGS
 ========================================================= */
 
@@ -1141,6 +1172,28 @@ async function getHostBookings(
 
                         returnNotes:
                             booking.returnNotes,
+
+                        pickupInspection:
+                            booking.pickupInspection
+                                ? {
+                                    status: booking.pickupInspection.status,
+                                    photos: booking.pickupInspection.photos,
+                                    completedAt: booking.pickupInspection.completedAt,
+                                    notes: booking.pickupInspection.notes
+                                }
+                                : null,
+
+                        returnInspection:
+                            booking.returnInspection
+                                ? {
+                                    status: booking.returnInspection.status,
+                                    photos: booking.returnInspection.photos,
+                                    completedAt: booking.returnInspection.completedAt,
+                                    notes: booking.returnInspection.notes,
+                                    aiAnalysis: booking.returnInspection.aiAnalysis,
+                                    aiAnalyzedAt: booking.returnInspection.aiAnalyzedAt
+                                }
+                                : null,
 
                         driverRequired:
                             booking.driverRequired,
@@ -1743,6 +1796,19 @@ async function confirmPickup(
 
 
         /* -------------------------------------------------
+           PICKUP INSPECTION MUST BE COMPLETE
+        ------------------------------------------------- */
+
+        if (!hasCompleteInspection(booking.pickupInspection)) {
+            return res.status(409).json({
+                success: false,
+                message:
+                    "Upload all 8 pickup inspection photos before confirming vehicle pickup."
+            });
+        }
+
+
+        /* -------------------------------------------------
            PREVENT DUPLICATE PICKUP
         ------------------------------------------------- */
 
@@ -2024,6 +2090,19 @@ async function confirmReturn(
 
             });
 
+        }
+
+
+        /* -------------------------------------------------
+           RETURN INSPECTION MUST BE COMPLETE
+        ------------------------------------------------- */
+
+        if (!hasCompleteInspection(booking.returnInspection)) {
+            return res.status(409).json({
+                success: false,
+                message:
+                    "Upload all 8 return inspection photos before confirming vehicle return."
+            });
         }
 
 
