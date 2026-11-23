@@ -50,15 +50,15 @@
 
     <link
         rel="stylesheet"
-        href="css/style.css"
+        href="../css/style.css"
     >
 
     <link
         rel="stylesheet"
-        href="css/host-vehicle.css"
+        href="../css/host-vehicle.css"
     >
 
-    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="../css/responsive.css">
 </head>
 
 
@@ -233,99 +233,6 @@
                     method="POST"
                     class="host-form"
                 >
-
-
-                    <!-- =================================================
-                         PERSONAL DETAILS
-                    ================================================== -->
-
-                    <div class="form-row">
-
-
-                        <div class="form-group">
-
-                            <label>
-                                First Name
-                            </label>
-
-
-                            <input
-                                id="firstName"
-                                name="firstName"
-                                type="text"
-                                placeholder="Rahul"
-                                required
-                            >
-
-                        </div>
-
-
-                        <div class="form-group">
-
-                            <label>
-                                Last Name
-                            </label>
-
-
-                            <input
-                                id="lastName"
-                                name="lastName"
-                                type="text"
-                                placeholder="Sharma"
-                                required
-                            >
-
-                        </div>
-
-
-                    </div>
-
-
-
-                    <!-- =================================================
-                         CONTACT
-                    ================================================== -->
-
-                    <div class="form-group">
-
-                        <label>
-                            Mobile Number
-                        </label>
-
-
-                        <input
-                            id="mobileNumber"
-                            name="mobileNumber"
-                            type="tel"
-                            placeholder="+91 98765 43210"
-                            required
-                        >
-
-                    </div>
-
-
-
-                    <!-- =================================================
-                         EMAIL
-                    ================================================== -->
-
-                    <div class="form-group">
-
-                        <label>
-                            Email Address
-                        </label>
-
-
-                        <input
-                            id="email"
-                            name="email"
-                            type="email"
-                            placeholder="e.g. rahul.sharma@example.com"
-                            required
-                        >
-
-                    </div>
-
 
 
                     <!-- =================================================
@@ -746,6 +653,18 @@
 
                         </div>
 
+                        <div class="form-group">
+                            <label for="handoverInstructions">Pickup handover instructions</label>
+                            <textarea
+                                id="handoverInstructions"
+                                name="handoverInstructions"
+                                rows="3"
+                                maxlength="500"
+                                placeholder="Add a meeting point, landmark, or pickup directions."
+                            ></textarea>
+                            <small>Private: shared with the customer after payment and confirmation, and with the assigned driver.</small>
+                        </div>
+
 
                     </div>
 
@@ -911,12 +830,7 @@
 
 
                     <p class="terms-text">
-
-                        By clicking Start Hosting, you agree to our
-                        <a href="#">
-                            Terms & Conditions
-                        </a>.
-
+                        New host applications are reviewed before listings go live.
                     </p>
 
 
@@ -931,91 +845,16 @@
 
 
     <!-- =====================================================
-         OTP MODAL
-    ====================================================== -->
-
-    <div
-        id="otpModal"
-        class="modal-overlay hidden"
-    >
-
-        <div class="modal-card">
-
-
-            <h2>
-                Verify Mobile Number
-            </h2>
-
-
-            <p>
-                We've sent a 4-digit OTP to your number.
-            </p>
-
-
-
-            <div class="otp-inputs">
-
-                <input
-                    type="text"
-                    maxlength="1"
-                    class="otp-box"
-                >
-
-                <input
-                    type="text"
-                    maxlength="1"
-                    class="otp-box"
-                >
-
-                <input
-                    type="text"
-                    maxlength="1"
-                    class="otp-box"
-                >
-
-                <input
-                    type="text"
-                    maxlength="1"
-                    class="otp-box"
-                >
-
-            </div>
-
-
-
-            <button
-                id="verifyOtpBtn"
-                class="btn-submit w-full"
-            >
-                Verify & Register
-            </button>
-
-
-            <button
-                id="closeModalBtn"
-                class="btn-cancel"
-            >
-                Cancel
-            </button>
-
-
-        </div>
-
-    </div>
-
-
-
-    <!-- =====================================================
          JAVASCRIPT
     ====================================================== -->
 
-    <script src="js/data/cities.js"></script>
+    <script src="../js/data/cities.js"></script>
 
-    <script src="js/pages/host-location.js"></script>
+    <script src="../js/pages/host-location.js"></script>
 
-    <script src="js/pages/host-form.js"></script>
+    <script src="../js/pages/host-form.js"></script>
 
-    <script src="js/core/auth-ui.js"></script>
+    <script src="../js/core/auth-ui.js"></script>
 
 
 </body>

@@ -1,0 +1,22 @@
+SAARTHI — CUSTOMER INSPECTION PHOTO VIEWER
+
+Files included:
+- backend/controllers/bookingInspectionPhotoController.js (new)
+- backend/routes/bookingRoutes.js (updated; coupon validation route preserved)
+- backend/server.js (updated; only car images remain publicly served)
+- frontend/js/pages/bookings.js (updated; coupon breakdown preserved)
+- frontend/css/bookings.css (updated responsive inspection-photo gallery)
+
+Install:
+1. Back up the current Saarthi folder.
+2. Extract this ZIP into C:\Users\bhaga\Saarthi, preserving folders and replacing the included files.
+3. Restart the backend: cd backend; node server.js
+4. Sign in as a CUSTOMER and open My Bookings.
+5. On a booking where the host completed an inspection, expand Pickup inspection or Return inspection to load the images.
+
+Security:
+- Inspection photo requests require a valid login and the booking must belong to the logged-in customer.
+- Inspection images are not served through public static paths. Only /uploads/cars remains public for car listing images.
+- Customer photo requests use the authenticated API and browser blob URLs.
+
+The coupon code feature is retained in the updated booking page and booking route.

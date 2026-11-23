@@ -22,6 +22,46 @@ document.addEventListener("DOMContentLoaded", () => {
     const form =
         document.querySelector(".host-form");
 
+    // Authenticate before the host starts entering a listing. Redirecting only
+    // after submit discarded the form fields and selected photo files.
+    if (!localStorage.getItem("saarthiToken")) {
+        window.location.replace("auth.html?returnUrl=%2Fhost.html");
+        return;
+    }
+
+    let signedInUser = null;
+    try {
+        signedInUser = JSON.parse(localStorage.getItem("saarthiUser") || "null");
+    } catch {
+        localStorage.removeItem("saarthiUser");
+    }
+
+    if (signedInUser?.role !== "host") {
+        if (form) {
+            form.hidden = true;
+            const notice = document.createElement("section");
+            notice.className = "host-role-notice";
+            notice.setAttribute("role", "alert");
+
+            const heading = document.createElement("h2");
+            heading.textContent = "A host account is required";
+            const message = document.createElement("p");
+            message.textContent = "Your current account cannot list vehicles. Sign out and choose the Host role when creating a host account.";
+            const signOut = document.createElement("button");
+            signOut.type = "button";
+            signOut.textContent = "Sign out and continue";
+            signOut.addEventListener("click", () => {
+                localStorage.removeItem("saarthiToken");
+                localStorage.removeItem("saarthiUser");
+                window.location.href = "auth.html?mode=register&role=host&returnUrl=%2Fhost.html";
+            });
+
+            notice.append(heading, message, signOut);
+            form.before(notice);
+        }
+        return;
+    }
+
     const imageInput =
         document.getElementById("carImages");
 
@@ -410,42 +450,6 @@ document.addEventListener("DOMContentLoaded", () => {
                    GET FORM VALUES
                    ========================================= */
 
-                const firstName =
-                    document
-                        .getElementById(
-                            "firstName"
-                        )
-                        .value
-                        .trim();
-
-
-                const lastName =
-                    document
-                        .getElementById(
-                            "lastName"
-                        )
-                        .value
-                        .trim();
-
-
-                const mobileNumber =
-                    document
-                        .getElementById(
-                            "mobileNumber"
-                        )
-                        .value
-                        .trim();
-
-
-                const email =
-                    document
-                        .getElementById(
-                            "email"
-                        )
-                        .value
-                        .trim();
-
-
                 const make =
                     document
                         .getElementById(
@@ -528,6 +532,12 @@ document.addEventListener("DOMContentLoaded", () => {
                         .value
                         .trim();
 
+                const handoverInstructions =
+                    document
+                        .getElementById("handoverInstructions")
+                        .value
+                        .trim();
+
 
                 const city =
                     document
@@ -548,50 +558,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 /* =========================================
                    BASIC VALIDATION
                    ========================================= */
-
-                if (!firstName) {
-
-                    alert(
-                        "Please enter your first name."
-                    );
-
-                    return;
-
-                }
-
-
-                if (!lastName) {
-
-                    alert(
-                        "Please enter your last name."
-                    );
-
-                    return;
-
-                }
-
-
-                if (!mobileNumber) {
-
-                    alert(
-                        "Please enter your mobile number."
-                    );
-
-                    return;
-
-                }
-
-
-                if (!email) {
-
-                    alert(
-                        "Please enter your email address."
-                    );
-
-                    return;
-
-                }
-
 
                 if (!city) {
 
@@ -687,35 +653,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     description
                 );
 
-
-                /*
-                    Host information.
-
-                    We are not storing these in Car.js yet.
-                    They are included because the host is the
-                    person submitting the vehicle.
-
-                    We will connect this to Host.js later.
-                */
-
                 formData.append(
-                    "firstName",
-                    firstName
-                );
-
-                formData.append(
-                    "lastName",
-                    lastName
-                );
-
-                formData.append(
-                    "mobileNumber",
-                    mobileNumber
-                );
-
-                formData.append(
-                    "email",
-                    email
+                    "handoverInstructions",
+                    handoverInstructions
                 );
 
 

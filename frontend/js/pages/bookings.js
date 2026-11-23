@@ -314,6 +314,8 @@ function renderBooking(
         booking.paymentStatus ||
         "pending";
 
+    const refundStatus = booking.refundStatus || "none";
+
 
     const rentalStatus =
         booking.rentalStatus ||
@@ -355,6 +357,10 @@ function renderBooking(
         Number(
             booking.totalAmount || 0
         );
+
+    const subtotalAmount = Number(booking.subtotalAmount ?? totalAmount);
+    const discountAmount = Math.max(0, Number(booking.discountAmount || 0));
+    const couponCode = String(booking.couponCode || "");
 
 
     /* =====================================================
@@ -502,6 +508,21 @@ function renderBooking(
             </div>
 
 
+            ${
+                discountAmount > 0
+                    ? `
+                        <div class="booking-detail-row">
+                            <span>Rental subtotal</span>
+                            <strong>₹${subtotalAmount.toLocaleString("en-IN")}</strong>
+                        </div>
+                        <div class="booking-detail-row booking-coupon-discount-row">
+                            <span>Coupon ${escapeHTML(couponCode)}</span>
+                            <strong>−₹${discountAmount.toLocaleString("en-IN")}</strong>
+                        </div>
+                    `
+                    : ""
+            }
+
             <div
                 class="booking-detail-row booking-total-row"
             >
@@ -519,6 +540,14 @@ function renderBooking(
             </div>
 
         </div>
+
+
+        ${booking.handoverInstructions ? `
+            <div class="booking-handover-instructions">
+                <strong>Pickup instructions from the host</strong>
+                <p>${escapeHTML(booking.handoverInstructions)}</p>
+            </div>
+        ` : ""}
 
 
         <!-- Driver information -->
@@ -539,7 +568,7 @@ function renderBooking(
 
                 ${
                     driverRequired
-                        ? "Driver requested"
+                        ? (booking.assignedDriver?.userId?.name ? `Driver assigned: ${escapeHTML(booking.assignedDriver.userId.name)} · ${escapeHTML(booking.assignedDriver.userId.phone || "Contact details unavailable")}` : "Driver requested · awaiting host assignment")
                         : "Self-drive booking"
                 }
 
@@ -548,13 +577,19 @@ function renderBooking(
         </div>
 
 
+        <!-- Customer inspection photos -->
+
+        ${renderCustomerInspectionSection(booking)}
+
+
         <!-- Customer actions -->
 
         ${
             [
                 "pending",
                 "confirmed"
-            ].includes(status)
+            ].includes(status) &&
+            !["pending_review", "processing", "failed"].includes(refundStatus)
                 ? `
 
                     <div
@@ -570,7 +605,7 @@ function renderBooking(
                                 class="fa-solid fa-xmark"
                             ></i>
 
-                            Cancel Booking
+                            ${paymentStatus === "paid" ? "Request Cancellation & Refund" : "Cancel Booking"}
 
                         </button>
 
@@ -579,6 +614,17 @@ function renderBooking(
                 `
                 : ""
         }
+
+        ${["pending_review", "processing"].includes(refundStatus) ? `
+            <div class="customer-payment-status" role="status">
+                <i class="fa-solid fa-hourglass-half" aria-hidden="true"></i>
+                ${refundStatus === "processing" ? "Refund processing; the booking remains active until completion." : "Cancellation and refund request is awaiting administrator review."}
+            </div>
+        ` : refundStatus === "rejected" ? `
+            <div class="customer-payment-status" role="status">Refund request was rejected. The booking remains active.</div>
+        ` : refundStatus === "failed" ? `
+            <div class="customer-payment-status" role="status">Refund needs administrator attention. The booking remains active.</div>
+        ` : ""}
 
 
         <!-- Payment action -->
@@ -634,6 +680,13 @@ function renderBooking(
                 : ""
         }
 
+        ${["refunded", "partially_refunded"].includes(paymentStatus) ? `
+            <div class="customer-payment-status paid" role="status">
+                <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                ${paymentStatus === "refunded" ? "Refund completed" : "Partial refund completed"} · ₹${(Number(booking.refundedAmountPaise || 0) / 100).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </div>
+        ` : ""}
+
     `;
 
 
@@ -644,6 +697,8 @@ function renderBooking(
     bookingsGrid.appendChild(
         card
     );
+
+    setupCustomerInspectionPhotoPanels(card);
 
 
     /* =====================================================
@@ -696,7 +751,8 @@ function renderBooking(
 
                 await cancelCustomerBooking(
                     booking.bookingId,
-                    cancelButton
+                    cancelButton,
+                    paymentStatus === "paid"
                 );
 
             }
@@ -704,6 +760,344 @@ function renderBooking(
 
     }
 
+}
+
+
+/* =========================================================
+   CUSTOMER INSPECTION PHOTOS
+========================================================= */
+
+const inspectionPhotoObjectUrls = [];
+
+window.addEventListener("beforeunload", () => {
+    inspectionPhotoObjectUrls.forEach(url => URL.revokeObjectURL(url));
+});
+
+function renderCustomerInspectionSection(booking) {
+    return `
+        <section class="customer-inspection-section" aria-label="Vehicle inspection photos">
+            <div class="customer-inspection-heading">
+                <h4><i class="fa-solid fa-camera-retro" aria-hidden="true"></i> Vehicle inspection photos</h4>
+                <p>View the photos recorded by the host at pickup and return.</p>
+            </div>
+            ${renderCustomerInspectionPanel(booking, "pickup", booking.pickupInspection)}
+            ${renderCustomerInspectionPanel(booking, "return", booking.returnInspection)}
+        </section>
+    `;
+}
+
+function renderCustomerInspectionPanel(booking, phase, inspection) {
+    const label = phase === "pickup" ? "Pickup inspection" : "Return inspection";
+    const photos = Array.isArray(inspection?.photos) ? inspection.photos : [];
+    const completed = inspection?.status === "completed" && photos.length > 0;
+
+    if (!completed) {
+        const waitMessage = phase === "pickup"
+            ? "Pickup photos will appear here after the host completes the pickup inspection."
+            : "Return photos will appear here after the host completes the return inspection.";
+        return `
+            <div class="customer-inspection-unavailable">
+                <span>${escapeHTML(label)}</span>
+                <p>${waitMessage}</p>
+            </div>
+        `;
+    }
+
+    const safePhotos = photos.filter(photo => INSPECTION_ANGLE_LABELS[photo?.angle]);
+    const notes = String(inspection.notes || "").trim();
+
+    return `
+        <details class="customer-inspection-panel" data-inspection-phase="${phase}">
+            <summary>
+                <span class="customer-inspection-summary-label">
+                    <i class="fa-solid ${phase === "pickup" ? "fa-car-side" : "fa-flag-checkered"}" aria-hidden="true"></i>
+                    ${escapeHTML(label)}
+                </span>
+                <span class="customer-inspection-count">${safePhotos.length} photo${safePhotos.length === 1 ? "" : "s"}</span>
+            </summary>
+            <div class="customer-inspection-panel-body">
+                <p class="customer-inspection-date">Completed ${escapeHTML(formatDate(inspection.completedAt))}</p>
+                <div class="customer-inspection-photo-grid">
+                    ${safePhotos.map(photo => `
+                        <figure class="customer-inspection-photo-card">
+                            <button
+                                type="button"
+                                class="customer-inspection-photo-frame customer-inspection-photo-open"
+                                aria-label="Open ${escapeHTML(INSPECTION_ANGLE_LABELS[photo.angle])} photo in full-screen viewer"
+                                disabled
+                            >
+                                <img
+                                    alt="${escapeHTML(INSPECTION_ANGLE_LABELS[photo.angle])} vehicle inspection photo"
+                                    data-inspection-photo="true"
+                                    data-booking-id="${escapeHTML(booking.bookingId)}"
+                                    data-phase="${phase}"
+                                    data-angle="${escapeHTML(photo.angle)}"
+                                    hidden
+                                >
+                                <div class="customer-inspection-photo-placeholder" role="status">Open this section to load photo</div>
+                                <span class="customer-inspection-photo-zoom-hint" aria-hidden="true"><i class="fa-solid fa-expand"></i></span>
+                            </button>
+                            <figcaption>${escapeHTML(INSPECTION_ANGLE_LABELS[photo.angle])}</figcaption>
+                        </figure>
+                    `).join("")}
+                </div>
+                ${notes ? `<p class="customer-inspection-notes"><strong>Host notes:</strong> ${escapeHTML(notes)}</p>` : ""}
+            </div>
+        </details>
+    `;
+}
+
+const INSPECTION_ANGLE_LABELS = Object.freeze({
+    "front": "Front",
+    "front-left": "Front left",
+    "left": "Left side",
+    "rear-left": "Rear left",
+    "rear": "Rear",
+    "rear-right": "Rear right",
+    "right": "Right side",
+    "front-right": "Front right"
+});
+
+function setupCustomerInspectionPhotoPanels(card) {
+    card.querySelectorAll(".customer-inspection-panel").forEach(panel => {
+        panel.addEventListener("toggle", () => {
+            if (panel.open) {
+                loadCustomerInspectionPhotos(panel);
+            }
+        });
+
+        panel.addEventListener("click", event => {
+            const photoButton = event.target.closest(".customer-inspection-photo-open");
+            if (!photoButton || photoButton.disabled) return;
+            openCustomerInspectionGallery(panel, photoButton);
+        });
+    });
+}
+
+let customerInspectionLightbox = null;
+let customerInspectionGalleryState = null;
+let customerInspectionLastFocusedElement = null;
+
+function ensureCustomerInspectionLightbox() {
+    if (customerInspectionLightbox) return customerInspectionLightbox;
+
+    const modal = document.createElement("div");
+    modal.className = "customer-inspection-lightbox";
+    modal.hidden = true;
+    modal.setAttribute("role", "dialog");
+    modal.setAttribute("aria-modal", "true");
+    modal.setAttribute("aria-label", "Vehicle inspection photo viewer");
+    modal.innerHTML = `
+        <div class="customer-inspection-lightbox-backdrop" data-lightbox-close="true"></div>
+        <div class="customer-inspection-lightbox-shell">
+            <header class="customer-inspection-lightbox-header">
+                <div class="customer-inspection-lightbox-heading">
+                    <strong class="customer-inspection-lightbox-title">Pickup inspection</strong>
+                    <span class="customer-inspection-lightbox-counter" aria-live="polite">1 / 8</span>
+                </div>
+                <button type="button" class="customer-inspection-lightbox-close" aria-label="Close photo viewer">
+                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                </button>
+            </header>
+            <div class="customer-inspection-lightbox-stage">
+                <button type="button" class="customer-inspection-lightbox-nav customer-inspection-lightbox-prev" aria-label="Previous photo">
+                    <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+                </button>
+                <div class="customer-inspection-lightbox-image-wrap">
+                    <img class="customer-inspection-lightbox-image" alt="Vehicle inspection photo" draggable="false">
+                    <div class="customer-inspection-lightbox-caption" aria-live="polite">Front</div>
+                </div>
+                <button type="button" class="customer-inspection-lightbox-nav customer-inspection-lightbox-next" aria-label="Next photo">
+                    <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                </button>
+            </div>
+            <footer class="customer-inspection-lightbox-footer">
+                <span>Swipe to browse on mobile</span>
+                <span class="customer-inspection-lightbox-key-hint">Use ← and → to navigate · Esc to close</span>
+            </footer>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+    customerInspectionLightbox = modal;
+
+    modal.querySelector(".customer-inspection-lightbox-close").addEventListener("click", closeCustomerInspectionGallery);
+    modal.querySelector(".customer-inspection-lightbox-prev").addEventListener("click", () => moveCustomerInspectionGallery(-1));
+    modal.querySelector(".customer-inspection-lightbox-next").addEventListener("click", () => moveCustomerInspectionGallery(1));
+    modal.addEventListener("click", event => {
+        if (event.target === modal || event.target?.dataset?.lightboxClose === "true") {
+            closeCustomerInspectionGallery();
+        }
+    });
+
+    const stage = modal.querySelector(".customer-inspection-lightbox-stage");
+    let touchStartX = null;
+    let touchStartY = null;
+    stage.addEventListener("touchstart", event => {
+        if (!event.changedTouches?.length) return;
+        touchStartX = event.changedTouches[0].clientX;
+        touchStartY = event.changedTouches[0].clientY;
+    }, { passive: true });
+    stage.addEventListener("touchend", event => {
+        if (touchStartX === null || !event.changedTouches?.length) return;
+        const deltaX = event.changedTouches[0].clientX - touchStartX;
+        const deltaY = event.changedTouches[0].clientY - touchStartY;
+        touchStartX = null;
+        touchStartY = null;
+        if (Math.abs(deltaX) >= 45 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
+            moveCustomerInspectionGallery(deltaX < 0 ? 1 : -1);
+        }
+    }, { passive: true });
+
+    document.addEventListener("keydown", event => {
+        if (!customerInspectionGalleryState || customerInspectionLightbox?.hidden) return;
+        if (event.key === "Escape") {
+            event.preventDefault();
+            closeCustomerInspectionGallery();
+        } else if (event.key === "ArrowLeft") {
+            event.preventDefault();
+            moveCustomerInspectionGallery(-1);
+        } else if (event.key === "ArrowRight") {
+            event.preventDefault();
+            moveCustomerInspectionGallery(1);
+        } else if (event.key === "Tab") {
+            // Keep keyboard focus within the modal while it is open.
+            const focusable = Array.from(modal.querySelectorAll("button:not([disabled]):not([hidden])"));
+            if (!focusable.length) return;
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            } else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
+        }
+    });
+
+    return modal;
+}
+
+function openCustomerInspectionGallery(panel, photoButton) {
+    const modal = ensureCustomerInspectionLightbox();
+    const photos = Array.from(panel.querySelectorAll('img[data-inspection-photo="true"][data-loaded="true"]'))
+        .filter(img => !img.hidden && img.src)
+        .map(img => ({
+            src: img.src,
+            angle: img.dataset.angle,
+            label: INSPECTION_ANGLE_LABELS[img.dataset.angle] || "Vehicle photo",
+            alt: img.alt || "Vehicle inspection photo"
+        }));
+
+    if (!photos.length) return;
+
+    const clickedImage = photoButton.querySelector('img[data-inspection-photo="true"]');
+    const clickedIndex = photos.findIndex(photo => photo.src === clickedImage?.src);
+    const phase = panel.dataset.inspectionPhase === "return" ? "Return inspection" : "Pickup inspection";
+
+    customerInspectionLastFocusedElement = photoButton;
+    customerInspectionGalleryState = {
+        photos,
+        index: Math.max(0, clickedIndex),
+        title: phase
+    };
+
+    modal.querySelector(".customer-inspection-lightbox-title").textContent = phase;
+    modal.hidden = false;
+    document.body.classList.add("customer-inspection-lightbox-open");
+    renderCustomerInspectionGalleryImage();
+    modal.querySelector(".customer-inspection-lightbox-close").focus();
+}
+
+function moveCustomerInspectionGallery(step) {
+    if (!customerInspectionGalleryState?.photos?.length) return;
+    const total = customerInspectionGalleryState.photos.length;
+    customerInspectionGalleryState.index = (customerInspectionGalleryState.index + step + total) % total;
+    renderCustomerInspectionGalleryImage();
+}
+
+function renderCustomerInspectionGalleryImage() {
+    if (!customerInspectionGalleryState || !customerInspectionLightbox) return;
+    const { photos, index, title } = customerInspectionGalleryState;
+    const photo = photos[index];
+    customerInspectionLightbox.querySelector(".customer-inspection-lightbox-title").textContent = title;
+    customerInspectionLightbox.querySelector(".customer-inspection-lightbox-counter").textContent = `${index + 1} / ${photos.length}`;
+    customerInspectionLightbox.querySelector(".customer-inspection-lightbox-image").src = photo.src;
+    customerInspectionLightbox.querySelector(".customer-inspection-lightbox-image").alt = `${photo.label} ${title.toLowerCase()} photo`;
+    customerInspectionLightbox.querySelector(".customer-inspection-lightbox-caption").textContent = photo.label;
+    const navButtons = customerInspectionLightbox.querySelectorAll(".customer-inspection-lightbox-nav");
+    navButtons.forEach(button => { button.hidden = photos.length < 2; });
+}
+
+function closeCustomerInspectionGallery() {
+    if (!customerInspectionLightbox || customerInspectionLightbox.hidden) return;
+    customerInspectionLightbox.hidden = true;
+    document.body.classList.remove("customer-inspection-lightbox-open");
+    customerInspectionGalleryState = null;
+    if (customerInspectionLastFocusedElement?.isConnected) {
+        customerInspectionLastFocusedElement.focus();
+    }
+    customerInspectionLastFocusedElement = null;
+}
+
+async function loadCustomerInspectionPhotos(panel) {
+    const images = Array.from(
+        panel.querySelectorAll('img[data-inspection-photo="true"]')
+    ).filter(img => img.dataset.loaded !== "true" && img.dataset.loading !== "true");
+
+    if (!images.length) return;
+
+    await Promise.all(images.map(async img => {
+        img.dataset.loading = "true";
+        const placeholder = img.parentElement.querySelector(".customer-inspection-photo-placeholder");
+        const bookingId = img.dataset.bookingId;
+        const phase = img.dataset.phase;
+        const angle = img.dataset.angle;
+
+        try {
+            const response = await fetch(
+                `/api/bookings/my/${encodeURIComponent(bookingId)}/inspection-photo/${encodeURIComponent(phase)}/${encodeURIComponent(angle)}`,
+                {
+                    method: "GET",
+                    headers: { "Authorization": `Bearer ${token}` }
+                }
+            );
+
+            if (response.status === 401) {
+                localStorage.removeItem("saarthiToken");
+                localStorage.removeItem("saarthiUser");
+                window.location.href = `auth.html?returnUrl=${encodeURIComponent(window.location.href)}`;
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error(response.status === 403
+                    ? "You are not authorized to view this photo."
+                    : "Photo is currently unavailable.");
+            }
+
+            const blob = await response.blob();
+            if (!blob.type.startsWith("image/")) {
+                throw new Error("The server returned an invalid image.");
+            }
+
+            const objectUrl = URL.createObjectURL(blob);
+            inspectionPhotoObjectUrls.push(objectUrl);
+            img.src = objectUrl;
+            img.hidden = false;
+            img.dataset.loaded = "true";
+            const openButton = img.closest(".customer-inspection-photo-open");
+            if (openButton) openButton.disabled = false;
+            if (placeholder) placeholder.hidden = true;
+        } catch (error) {
+            console.error("Unable to load customer inspection photo:", error);
+            if (placeholder) placeholder.textContent = error.message || "Unable to load photo.";
+            img.dataset.error = "true";
+        } finally {
+            delete img.dataset.loading;
+        }
+    }));
 }
 
 
@@ -805,12 +1199,15 @@ function escapeHTML(
 
 async function cancelCustomerBooking(
     bookingId,
-    button
+    button,
+    requestRefund
 ) {
 
     const confirmed =
         window.confirm(
-            "Are you sure you want to cancel this booking?"
+            requestRefund
+                ? "Send a cancellation and refund request for administrator review? Your booking will remain active until a refund is processed."
+                : "Are you sure you want to cancel this booking?"
         );
 
 
@@ -924,7 +1321,7 @@ async function cancelCustomerBooking(
         ------------------------------------------------- */
 
         alert(
-            "Booking cancelled successfully."
+            result.message || "Booking cancelled successfully."
         );
 
 

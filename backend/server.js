@@ -24,10 +24,13 @@ const mongoose =
 
 const path =
     require("path");
-
-
-const Razorpay =
-    require("razorpay");
+const { getCarUploadsDir, getLegacyCarUploadsDir } = require("./services/storagePaths");
+const { getHealthStatus } = require("./services/healthStatus");
+const { getMissingProductionVariables, getTrustProxyHops } = require("./services/runtimeConfig");
+const { isUploadStorageWritable } = require("./services/storageHealth");
+const { getRazorpayTestPublicKey } = require("./services/razorpayMode");
+const { reconcileCarDateReservations } = require("./services/carReservationService");
+const { reconcileDriverDateReservations } = require("./services/driverReservationService");
 
 
 /* =========================================================
@@ -53,6 +56,18 @@ const authRoutes =
 
 const damageDetectionRoutes =
     require("./routes/damageDetectionRoutes");
+const recommendationRoutes =
+    require("./routes/recommendationRoutes");
+const {
+    aiTripRateLimit,
+    damageDetectionRateLimit,
+    damageComparisonRetryRateLimit,
+    recommendationRateLimit
+} = require("./middleware/aiRateLimit");
+const driverRoutes = require("./routes/driverRoutes");
+const CarReservation = require("./models/CarReservation");
+const RazorpayWebhookEvent = require("./models/RazorpayWebhookEvent");
+const DriverReservation = require("./models/DriverReservation");
 
 /* =========================================================
    EXPRESS APP
@@ -60,6 +75,36 @@ const damageDetectionRoutes =
 
 const app =
     express();
+
+const {
+    setSecurityHeaders,
+    preventApiCaching
+} = require("./middleware/securityHeaders");
+
+app.use(setSecurityHeaders);
+app.use("/api", preventApiCaching);
+
+async function runReservationRecovery() {
+    try {
+        const recovered = await reconcileCarDateReservations();
+        const driverRecovered = await reconcileDriverDateReservations();
+        if (recovered.activated || recovered.released || driverRecovered.activated || driverRecovered.released) {
+            console.info("Booking reservation recovery completed.", { cars: recovered, drivers: driverRecovered });
+        }
+    } catch (error) {
+        console.error("Car reservation recovery failed:", error.message);
+    }
+}
+
+function secureCarUploadHeaders(response) {
+    response.setHeader("X-Content-Type-Options", "nosniff");
+}
+
+app.get("/api/health", async (req, res) => {
+    const storageWritable = await isUploadStorageWritable();
+    const health = getHealthStatus(mongoose.connection.readyState, storageWritable);
+    return res.status(health.httpStatus).json(health.body);
+});
 
 
 /* =========================================================
@@ -76,24 +121,23 @@ const MONGODB_URI =
 
 
 /* =========================================================
-   RAZORPAY
-========================================================= */
-
-const razorpay =
-    new Razorpay({
-
-        key_id:
-            process.env.RAZORPAY_KEY_ID,
-
-        key_secret:
-            process.env.RAZORPAY_KEY_SECRET
-
-    });
-
-
-/* =========================================================
    MIDDLEWARE
 ========================================================= */
+
+// Preserve exact signed bytes for Razorpay before the JSON parser consumes the body.
+app.use(
+    "/api/payments/webhook",
+    express.raw({ type: "application/json", limit: "1mb" })
+);
+
+// Limit paid AI requests before JSON parsing to reduce provider and parser abuse.
+app.use("/api/ai-trip", aiTripRateLimit);
+app.use("/api/damage-detection", damageDetectionRateLimit);
+app.use("/api/recommendations", recommendationRateLimit);
+app.use(
+    "/api/bookings/host/:bookingId/inspection/return/retry-analysis",
+    damageComparisonRetryRateLimit
+);
 
 app.use(
     express.json({
@@ -146,6 +190,11 @@ app.use(
     damageDetectionRoutes
 );
 
+app.use(
+    "/api/recommendations",
+    recommendationRoutes
+);
+
 
 /* ---------- Payment APIs ---------- */
 
@@ -154,21 +203,34 @@ app.use(
     paymentRoutes
 );
 
-app.use("/api/ai-trip", aiTripRoutes);
+app.use("/api/drivers", driverRoutes);
 
 
 /* =========================================================
    UPLOADS
 ========================================================= */
 
+// Car listing images are public. Inspection evidence lives under
+// uploads/damage and is served only through the authenticated inspection-photo API.
 app.use(
-    "/uploads",
+    "/uploads/cars",
     express.static(
-        path.join(
-            __dirname,
-            "uploads"
-        )
+        getCarUploadsDir(),
+        {
+            fallthrough: true,
+            maxAge: "1h",
+            setHeaders: secureCarUploadHeaders
+        }
     )
+);
+
+app.use(
+    "/uploads/cars",
+    express.static(getLegacyCarUploadsDir(), {
+        fallthrough: true,
+        maxAge: "1h",
+        setHeaders: secureCarUploadHeaders
+    })
 );
 
 
@@ -218,11 +280,7 @@ app.get(
     "/api/payment/config",
     (req, res) => {
 
-        const configured =
-            Boolean(
-                process.env.RAZORPAY_KEY_ID &&
-                process.env.RAZORPAY_KEY_SECRET
-            );
+        const keyId = getRazorpayTestPublicKey();
 
 
         return res.json({
@@ -230,11 +288,9 @@ app.get(
             success:
                 true,
 
-            configured,
+            configured: Boolean(keyId),
 
-            keyId:
-                process.env.RAZORPAY_KEY_ID ||
-                null
+            keyId
 
         });
 
@@ -310,44 +366,48 @@ app.use(
    START SERVER
 ========================================================= */
 
+let initializationPromise;
+
+async function initializeApp() {
+    if (mongoose.connection.readyState === 1) return;
+    if (initializationPromise) return initializationPromise;
+
+    initializationPromise = (async () => {
+        app.set("trust proxy", getTrustProxyHops());
+        const missingProductionVariables = getMissingProductionVariables();
+        if (missingProductionVariables.length > 0) {
+            throw new Error(`Missing required production configuration: ${missingProductionVariables.join(", ")}`);
+        }
+
+        await mongoose.connect(MONGODB_URI);
+        await CarReservation.init();
+        await DriverReservation.init();
+        await RazorpayWebhookEvent.init();
+        await runReservationRecovery();
+
+        if (!process.env.NETLIFY) {
+            const reservationRecoveryTimer = setInterval(runReservationRecovery, 60_000);
+            reservationRecoveryTimer.unref();
+        }
+
+        console.log("MongoDB connected.");
+        if (getRazorpayTestPublicKey()) console.log("Razorpay configuration loaded.");
+        else console.warn("Warning: Razorpay keys are not configured.");
+    })();
+
+    try {
+        await initializationPromise;
+    } catch (error) {
+        initializationPromise = null;
+        throw error;
+    }
+}
+
 async function startServer() {
 
     try {
 
-        /* -------------------------------------------------
-           CONNECT MONGODB
-        ------------------------------------------------- */
-
-        await mongoose.connect(
-            MONGODB_URI
-        );
-
-
-        console.log(
-            "MongoDB connected."
-        );
-
-
-        /* -------------------------------------------------
-           RAZORPAY CHECK
-        ------------------------------------------------- */
-
-        if (
-            process.env.RAZORPAY_KEY_ID &&
-            process.env.RAZORPAY_KEY_SECRET
-        ) {
-
-            console.log(
-                "Razorpay configuration loaded."
-            );
-
-        } else {
-
-            console.warn(
-                "Warning: Razorpay keys are not configured."
-            );
-
-        }
+        await initializeApp();
 
 
         /* -------------------------------------------------
@@ -384,4 +444,6 @@ async function startServer() {
    START APPLICATION
 ========================================================= */
 
-startServer();
+if (require.main === module) startServer();
+
+module.exports = { app, initializeApp };

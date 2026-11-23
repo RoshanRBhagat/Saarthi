@@ -1381,3 +1381,91 @@
     }
 
 }
+
+/* =========================================================
+   COUPON CODE / DISCOUNT SUMMARY
+========================================================= */
+
+.booking-coupon {
+    margin-top: 16px;
+    padding: 14px;
+    border: 1px solid #dbe3ef;
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.booking-coupon > label {
+    display: block;
+    margin-bottom: 8px;
+    color: #334155;
+    font-size: 0.82rem;
+    font-weight: 800;
+}
+
+.booking-coupon-controls {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+}
+
+.booking-coupon-controls input {
+    min-width: 0;
+    height: 43px;
+    padding: 0 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 9px;
+    color: #0f172a;
+    font: inherit;
+    font-size: 0.88rem;
+    text-transform: uppercase;
+}
+
+.booking-coupon-controls input:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.booking-coupon-controls button {
+    min-width: 78px;
+    padding: 0 15px;
+    border: 0;
+    border-radius: 9px;
+    background: #2563eb;
+    color: #ffffff;
+    font: inherit;
+    font-size: 0.84rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.booking-coupon-controls button:hover { background: #1d4ed8; }
+.booking-coupon-controls button:disabled { opacity: 0.65; cursor: wait; }
+
+.coupon-hint {
+    margin: 8px 0 0;
+    color: #64748b;
+    font-size: 0.72rem;
+    line-height: 1.5;
+}
+
+.coupon-message {
+    margin: 8px 0 0;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.coupon-message.success { color: #047857; }
+.coupon-message.error { color: #b91c1c; }
+.coupon-message.info { color: #475569; }
+
+.summary-discount-row strong {
+    color: #047857 !important;
+}
+
+@media (max-width: 420px) {
+    .booking-coupon { padding: 11px; }
+    .booking-coupon-controls { grid-template-columns: minmax(0, 1fr) 76px; }
+    .booking-coupon-controls button { min-width: 0; padding: 0 10px; }
+}

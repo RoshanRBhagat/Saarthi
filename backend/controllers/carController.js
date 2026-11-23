@@ -1,5 +1,12 @@
 const Car = require("../models/Car");
 
+function normalizeHandoverInstructions(value) {
+    if (value === undefined) return "";
+    if (typeof value !== "string") return null;
+    const normalized = value.trim();
+    return normalized.length <= 500 ? normalized : null;
+}
+
 
 // =========================================================
 // GET AVAILABLE CARS WITH FILTERS
@@ -348,9 +355,15 @@ async function createCar(
             city,
             state,
             dailyPrice,
-            description
+            description,
+            handoverInstructions
 
         } = req.body;
+
+        const normalizedHandoverInstructions = normalizeHandoverInstructions(handoverInstructions);
+        if (normalizedHandoverInstructions === null) {
+            return res.status(400).json({ success: false, message: "Pickup instructions must be text of 500 characters or fewer." });
+        }
 
 
         // =================================================
@@ -618,6 +631,8 @@ async function createCar(
                         state
                     ).trim(),
 
+                handoverInstructions: normalizedHandoverInstructions,
+
                 // -----------------------------------------
                 // PRICE
                 // -----------------------------------------
@@ -741,7 +756,7 @@ async function getHostCars(
 
                 ownerId
 
-            }).sort({
+            }).select("+handoverInstructions").sort({
 
                 createdAt:
                     -1
@@ -957,7 +972,8 @@ async function updateHostCar(
             city,
             state,
             dailyPrice,
-            description
+            description,
+            handoverInstructions
         } = req.body;
 
 
@@ -1238,6 +1254,14 @@ async function updateHostCar(
 
         }
 
+        if (handoverInstructions !== undefined) {
+            const normalized = normalizeHandoverInstructions(handoverInstructions);
+            if (normalized === null) {
+                return res.status(400).json({ success: false, message: "Pickup instructions must be text of 500 characters or fewer." });
+            }
+            car.handoverInstructions = normalized;
+        }
+
 
         /* -------------------------------------------------
            SAVE
@@ -1317,6 +1341,7 @@ module.exports = {
 
     updateHostCarStatus,
 
-    updateHostCar
+    updateHostCar,
+    normalizeHandoverInstructions
 
 };

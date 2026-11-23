@@ -1,9 +1,14 @@
 const fs = require("fs/promises");
 const path = require("path");
+const crypto = require("crypto");
 
 const Booking = require("../models/Booking");
 const Car = require("../models/Car");
+const Driver = require("../models/Driver");
 const { compareBookingInspections } = require("../services/damageComparisonService");
+const { getDamageUploadsDir } = require("../services/storagePaths");
+const { replaceDirectory } = require("../services/atomicDirectory");
+const { getIndiaTodayStartUtc } = require("../services/bookingValidation");
 
 const REQUIRED_ANGLES = [
     "front",
@@ -18,6 +23,25 @@ const REQUIRED_ANGLES = [
 
 const MAX_IMAGE_BYTES = 1.5 * 1024 * 1024;
 const MAX_TOTAL_BYTES = 9 * 1024 * 1024;
+const INSPECTION_UPLOAD_LEASE_MS = 15 * 60 * 1000;
+
+async function isAuthorizedInspector(userId, booking) {
+    const ownedCar = await Car.findOne({
+        carId: booking.carId,
+        ownerId: userId
+    }).select("carId");
+
+    if (ownedCar) return true;
+    if (!booking.driverRequired || !booking.driverId) return false;
+
+    const driver = await Driver.findOne({
+        userId,
+        status: "active",
+        licenseExpiry: { $gte: getIndiaTodayStartUtc() }
+    }).select("_id").lean();
+
+    return Boolean(driver && String(driver._id) === String(booking.driverId));
+}
 
 function decodeImage(dataUrl) {
     const match = String(dataUrl || "").match(
@@ -68,13 +92,7 @@ function validateBookingId(bookingId) {
 }
 
 async function savePhotoSetAtomically(bookingId, phase, decodedPhotos) {
-    const bookingRoot = path.join(
-        __dirname,
-        "..",
-        "uploads",
-        "damage",
-        bookingId
-    );
+    const bookingRoot = path.join(getDamageUploadsDir(), bookingId);
 
     await fs.mkdir(bookingRoot, { recursive: true });
 
@@ -102,9 +120,8 @@ async function savePhotoSetAtomically(bookingId, phase, decodedPhotos) {
             });
         }
 
-        // Replace a previous unconfirmed submission only after every new photo is written.
-        await fs.rm(finalRoot, { recursive: true, force: true });
-        await fs.rename(tempRoot, finalRoot);
+        // Preserve the previous set until the fully written replacement is installed.
+        await replaceDirectory(tempRoot, finalRoot);
 
         return savedPhotos;
     } catch (error) {
@@ -114,6 +131,7 @@ async function savePhotoSetAtomically(bookingId, phase, decodedPhotos) {
 }
 
 async function saveBookingInspection(req, res) {
+    let uploadClaim = null;
     try {
         const { bookingId, phase } = req.params;
         const { photos, notes = "" } = req.body || {};
@@ -167,7 +185,7 @@ async function saveBookingInspection(req, res) {
             });
         }
 
-        const booking = await Booking.findOne({ bookingId });
+        let booking = await Booking.findOne({ bookingId });
 
         if (!booking) {
             return res.status(404).json({
@@ -176,15 +194,10 @@ async function saveBookingInspection(req, res) {
             });
         }
 
-        const ownedCar = await Car.findOne({
-            carId: booking.carId,
-            ownerId: req.user._id
-        }).select("carId");
-
-        if (!ownedCar) {
+        if (!await isAuthorizedInspector(req.user._id, booking)) {
             return res.status(403).json({
                 success: false,
-                message: "You are not authorized to inspect this booking."
+                message: "Only this vehicle's host or its approved, assigned driver can upload inspection photos."
             });
         }
 
@@ -195,7 +208,20 @@ async function saveBookingInspection(req, res) {
             });
         }
 
+        if (["pending_review", "processing", "failed"].includes(booking.refundStatus)) {
+            return res.status(409).json({
+                success: false,
+                message: "Inspection is paused while the cancellation and refund request is under review."
+            });
+        }
+
         if (phase === "pickup") {
+            if (booking.pickupInspection?.status === "completed") {
+                return res.status(409).json({
+                    success: false,
+                    message: "Pickup inspection photos are already saved. They cannot be replaced."
+                });
+            }
             if (booking.pickupStatus === "confirmed") {
                 return res.status(409).json({
                     success: false,
@@ -203,6 +229,12 @@ async function saveBookingInspection(req, res) {
                 });
             }
         } else {
+            if (booking.returnInspection?.status === "completed") {
+                return res.status(409).json({
+                    success: false,
+                    message: "Return inspection photos are already saved. Retry the AI analysis separately if needed."
+                });
+            }
             if (booking.pickupStatus !== "confirmed") {
                 return res.status(409).json({
                     success: false,
@@ -218,28 +250,86 @@ async function saveBookingInspection(req, res) {
             }
         }
 
+        const fieldName = phase === "pickup"
+            ? "pickupInspection"
+            : "returnInspection";
+        const leaseToken = crypto.randomUUID();
+        const now = new Date();
+        const claimFilter = {
+            bookingId,
+            status: "confirmed",
+            paymentStatus: "paid",
+            [`${fieldName}.status`]: { $ne: "completed" },
+            $or: [
+                { [`${fieldName}.status`]: { $ne: "uploading" } },
+                { [`${fieldName}.uploadLeaseExpiresAt`]: { $lte: now } }
+            ]
+        };
+
+        if (phase === "pickup") {
+            claimFilter.pickupStatus = { $ne: "confirmed" };
+        } else {
+            claimFilter.pickupStatus = "confirmed";
+            claimFilter.returnStatus = { $ne: "confirmed" };
+        }
+
+        const claimedBooking = await Booking.findOneAndUpdate(
+            claimFilter,
+            {
+                $set: {
+                    [`${fieldName}.status`]: "uploading",
+                    [`${fieldName}.uploadLeaseToken`]: leaseToken,
+                    [`${fieldName}.uploadLeaseExpiresAt`]: new Date(now.getTime() + INSPECTION_UPLOAD_LEASE_MS)
+                }
+            },
+            { returnDocument: "after", runValidators: true }
+        );
+
+        if (!claimedBooking) {
+            return res.status(409).json({
+                success: false,
+                message: "An inspection upload is already in progress, was completed, or the booking is no longer eligible. Refresh and try again."
+            });
+        }
+
+        booking = claimedBooking;
+        uploadClaim = { bookingId: booking._id, fieldName, leaseToken };
+
         const savedPhotos = await savePhotoSetAtomically(
             bookingId,
             phase,
             decodedPhotos
         );
 
-        const fieldName = phase === "pickup"
-            ? "pickupInspection"
-            : "returnInspection";
+        // Persist evidence before making external AI calls, and only finalize the
+        // inspection if this request still owns the MongoDB-backed upload lease.
+        const completedAt = new Date();
+        const finalizedBooking = await Booking.findOneAndUpdate(
+            { _id: booking._id, [`${fieldName}.uploadLeaseToken`]: leaseToken },
+            {
+                $set: {
+                    [`${fieldName}.status`]: "completed",
+                    [`${fieldName}.photos`]: savedPhotos,
+                    [`${fieldName}.completedAt`]: completedAt,
+                    [`${fieldName}.completedBy`]: req.user._id,
+                    [`${fieldName}.notes`]: String(notes).trim().slice(0, 1000),
+                    [`${fieldName}.aiAnalysis`]: null,
+                    [`${fieldName}.aiAnalyzedAt`]: null
+                },
+                $unset: {
+                    [`${fieldName}.uploadLeaseToken`]: 1,
+                    [`${fieldName}.uploadLeaseExpiresAt`]: 1
+                }
+            },
+            { returnDocument: "after", runValidators: true }
+        );
 
-        booking[fieldName] = {
-            status: "completed",
-            photos: savedPhotos,
-            completedAt: new Date(),
-            completedBy: req.user._id,
-            notes: String(notes).trim().slice(0, 1000),
-            aiAnalysis: null,
-            aiAnalyzedAt: null
-        };
+        if (!finalizedBooking) {
+            throw new Error("The inspection upload lease expired. Please submit the photos again.");
+        }
 
-        // Persist evidence before making external AI calls.
-        await booking.save();
+        booking = finalizedBooking;
+        uploadClaim = null;
 
         let analysis = null;
         let analysisError = null;
@@ -280,7 +370,7 @@ async function saveBookingInspection(req, res) {
                 ? "Pickup inspection photos saved. You can now confirm pickup."
                 : analysis
                     ? "Return photos saved and AI damage comparison completed. Review the report on the Host Dashboard."
-                    : "Return photos saved, but AI analysis did not complete. The photos are saved; you can retry by uploading the return inspection again before confirming return.",
+                : "Return photos saved, but AI analysis did not complete. The photos are saved; use Retry AI comparison to analyze the same evidence again.",
             data: {
                 bookingId,
                 phase,
@@ -292,7 +382,22 @@ async function saveBookingInspection(req, res) {
             }
         });
     } catch (error) {
-        console.error("Booking inspection upload error:", error);
+        if (uploadClaim) {
+            const nestedPath = uploadClaim.fieldName;
+            await Booking.updateOne(
+                { _id: uploadClaim.bookingId, [`${nestedPath}.uploadLeaseToken`]: uploadClaim.leaseToken },
+                {
+                    $set: { [`${nestedPath}.status`]: "pending" },
+                    $unset: {
+                        [`${nestedPath}.uploadLeaseToken`]: 1,
+                        [`${nestedPath}.uploadLeaseExpiresAt`]: 1
+                    }
+                }
+            ).catch(releaseError => {
+                console.error("Unable to release failed inspection upload claim:", releaseError.message);
+            });
+        }
+        console.error("Booking inspection upload error:", error.message);
 
         if (error.code === "GEMINI_CONFIG_MISSING") {
             return res.status(503).json({
@@ -308,13 +413,60 @@ async function saveBookingInspection(req, res) {
             });
         }
 
-        return res.status(500).json({
+            return res.status(500).json({
             success: false,
-            message: error.message || "Unable to save inspection photos."
+                message: "Unable to save inspection photos. Please try again."
         });
     }
 }
 
+async function retryReturnDamageAnalysis(req, res) {
+    try {
+        const bookingId = req.params.bookingId;
+        if (!validateBookingId(bookingId)) return res.status(400).json({ success: false, message: "Invalid booking ID." });
+        const booking = await Booking.findOne({ bookingId });
+        if (!booking) return res.status(404).json({ success: false, message: "Booking not found." });
+
+        const ownedCar = await Car.findOne({ carId: booking.carId, ownerId: req.user._id }).select("carId");
+        if (!ownedCar) return res.status(403).json({ success: false, message: "You are not authorized to analyze this booking." });
+        if (
+            booking.status !== "confirmed" || booking.paymentStatus !== "paid" ||
+            booking.pickupStatus !== "confirmed" || booking.returnStatus === "confirmed" ||
+            booking.returnInspection?.status !== "completed"
+        ) {
+            return res.status(409).json({ success: false, message: "A saved return inspection is required, and return must not yet be confirmed." });
+        }
+
+        try {
+            const analysis = await compareBookingInspections({
+                bookingId,
+                pickupPhotos: booking.pickupInspection?.photos,
+                returnPhotos: booking.returnInspection?.photos
+            });
+            booking.returnInspection.aiAnalysis = analysis;
+            booking.returnInspection.aiAnalyzedAt = new Date();
+            booking.markModified("returnInspection.aiAnalysis");
+            await booking.save();
+            return res.json({ success: true, message: "AI comparison completed.", data: { bookingId, analysis } });
+        } catch (error) {
+            booking.returnInspection.aiAnalysis = {
+                status: "failed",
+                message: error.message || "AI comparison could not be completed.",
+                failedAt: new Date().toISOString()
+            };
+            booking.returnInspection.aiAnalyzedAt = null;
+            booking.markModified("returnInspection.aiAnalysis");
+            await booking.save();
+            return res.status(503).json({ success: false, message: "AI comparison is still unavailable. Your original inspection photos remain saved." });
+        }
+    } catch (error) {
+        console.error("Retry return damage analysis error:", error);
+        return res.status(500).json({ success: false, message: "Unable to retry AI comparison." });
+    }
+}
+
 module.exports = {
-    saveBookingInspection
+    saveBookingInspection,
+    retryReturnDamageAnalysis,
+    isAuthorizedInspector
 };

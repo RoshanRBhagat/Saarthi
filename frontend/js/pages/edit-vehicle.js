@@ -75,6 +75,10 @@ const carDescriptionInput =
     document.getElementById("carDescription");
 
 
+const handoverInstructionsInput =
+    document.getElementById("handoverInstructions");
+
+
 const saveVehicleBtn =
     document.getElementById("saveVehicleBtn");
 
@@ -328,6 +332,9 @@ function populateForm(
 
     carDescriptionInput.value =
         car.description || "";
+
+    handoverInstructionsInput.value =
+        car.handoverInstructions || "";
 
 
     editSubtitle.textContent =
@@ -1188,7 +1195,10 @@ async function saveVehicle(
             dailyPrice,
 
             description:
-                carDescriptionInput.value.trim()
+                carDescriptionInput.value.trim(),
+
+            handoverInstructions:
+                handoverInstructionsInput.value.trim()
 
         };
 

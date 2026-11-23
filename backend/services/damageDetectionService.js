@@ -12,6 +12,7 @@ const GEMINI_MODELS = [
 
 const MAX_IMAGE_BYTES =
     5 * 1024 * 1024;
+const MODEL_REQUEST_TIMEOUT_MS = 45_000;
 
 
 /* =========================================================
@@ -321,6 +322,8 @@ and:
                     {
 
                         method: "POST",
+
+                        signal: AbortSignal.timeout(MODEL_REQUEST_TIMEOUT_MS),
 
                         headers: {
 

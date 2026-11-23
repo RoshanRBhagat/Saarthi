@@ -1,0 +1,9 @@
+SAARTHI — CUSTOMER INSPECTION FULL-SCREEN GALLERY UPDATE
+
+Replace only these files in your existing project:
+- frontend/js/pages/bookings.js
+- frontend/css/bookings.css
+
+This update keeps the existing authenticated photo API and booking/coupon functionality. Customer inspection thumbnails become buttons. Tapping a photo opens a full-screen viewer with previous/next controls, photo angle, counter, Escape/arrow-key support, swipe navigation on touch screens, and body scroll lock. It only uses photos that have already loaded from the authenticated inspection-photo endpoint.
+
+Apply by extracting this ZIP into C:\Users\bhaga\Saarthi and allowing the two files to replace their existing versions. Then hard-refresh the My Bookings page with Ctrl+F5.

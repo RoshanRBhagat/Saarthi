@@ -1,8 +1,34 @@
 const Car =
     require("../models/Car");
 
+const crypto = require("crypto");
+const {
+    createCarDateReservations,
+    activateCarDateReservations,
+    releaseCarDateReservations,
+    hasReservedDates,
+    MAX_RENTAL_DAYS
+} = require("../services/carReservationService");
+const { releaseDriverDateReservations } = require("../services/driverReservationService");
+
 const Booking =
     require("../models/Booking");
+
+const { calculateCoupon, roundMoney } =
+    require("../services/couponService");
+const { queueCancellationRefund } =
+    require("../services/bookingCancellation");
+const { parseDateOnly: parseStrictDateOnly, parseDriverRequest, isTodayOrFutureIndia } =
+    require("../services/bookingValidation");
+
+function canViewHandoverInstructions(booking) {
+    return Boolean(
+        booking &&
+        ["confirmed", "completed"].includes(booking.status) &&
+        booking.paymentStatus === "paid" &&
+        !["pending_review", "processing", "failed"].includes(booking.refundStatus)
+    );
+}
 
 
 
@@ -52,12 +78,12 @@ async function checkAvailability(
         ------------------------------------------------- */
 
         const requestedPickup =
-            parseDateOnly(
+            parseStrictDateOnly(
                 pickupDate
             );
 
         const requestedReturn =
-            parseDateOnly(
+            parseStrictDateOnly(
                 returnDate
             );
 
@@ -97,6 +123,14 @@ async function checkAvailability(
 
             });
 
+        }
+
+        if (Math.floor((requestedReturn - requestedPickup) / 86400000) + 1 > MAX_RENTAL_DAYS) {
+            return res.status(400).json({ success: false, message: `Rentals cannot exceed ${MAX_RENTAL_DAYS} days.` });
+        }
+
+        if (!isTodayOrFutureIndia(requestedPickup)) {
+            return res.status(400).json({ success: false, message: "Pickup date cannot be in the past." });
         }
 
 
@@ -175,6 +209,10 @@ async function checkAvailability(
 
         }
 
+        if (await hasReservedDates(carId, requestedPickup, requestedReturn)) {
+            return res.json({ success: true, available: false, message: "This car is already reserved for the selected dates." });
+        }
+
 
         /* -------------------------------------------------
            AVAILABLE
@@ -249,7 +287,8 @@ async function createBooking(
             customerEmail,
             pickupDate,
             returnDate,
-            driverRequired
+            driverRequired,
+            couponCode
         } = req.body;
 
 
@@ -327,24 +366,14 @@ async function createBooking(
            DATE VALIDATION
         ------------------------------------------------- */
 
-        const requestedPickup =
-            new Date(
-                `${pickupDate}T00:00:00`
-            );
-
-        const requestedReturn =
-            new Date(
-                `${returnDate}T00:00:00`
-            );
+        const requestedPickup = parseStrictDateOnly(pickupDate);
+        const requestedReturn = parseStrictDateOnly(returnDate);
+        const normalizedDriverRequest = parseDriverRequest(driverRequired);
 
 
         if (
-            Number.isNaN(
-                requestedPickup.getTime()
-            ) ||
-            Number.isNaN(
-                requestedReturn.getTime()
-            )
+            !requestedPickup ||
+            !requestedReturn
         ) {
 
             return res.status(400).json({
@@ -356,6 +385,10 @@ async function createBooking(
 
             });
 
+        }
+
+        if (normalizedDriverRequest === null) {
+            return res.status(400).json({ success: false, message: "Driver request must be true or false." });
         }
 
 
@@ -373,6 +406,14 @@ async function createBooking(
 
             });
 
+        }
+
+        if (Math.floor((requestedReturn - requestedPickup) / 86400000) + 1 > MAX_RENTAL_DAYS) {
+            return res.status(400).json({ success: false, message: `Rentals cannot exceed ${MAX_RENTAL_DAYS} days.` });
+        }
+
+        if (!isTodayOrFutureIndia(requestedPickup)) {
+            return res.status(400).json({ success: false, message: "Pickup date cannot be in the past." });
         }
 
 
@@ -479,26 +520,46 @@ async function createBooking(
             );
 
 
-        const totalAmount =
-            totalDays *
-            dailyPrice;
+        const subtotalAmount =
+            roundMoney(totalDays * dailyPrice);
+
+        let couponPricing;
+        try {
+            couponPricing = calculateCoupon(couponCode, subtotalAmount);
+        } catch (couponError) {
+            return res.status(400).json({
+                success: false,
+                message: couponError.message || "Invalid coupon code."
+            });
+        }
+
+        const totalAmount = couponPricing.totalAmount;
 
 
         /* -------------------------------------------------
            GENERATE BOOKING ID
         ------------------------------------------------- */
 
-        const bookingId =
-            "BOOK" +
-            Date.now();
+        const bookingId = `BOOK${Date.now()}${crypto.randomBytes(4).toString("hex")}`;
+
+        const reservation = await createCarDateReservations({ carId, bookingId, pickupDate: requestedPickup, returnDate: requestedReturn });
+        if (!reservation.ok) {
+            return res.status(reservation.reason === "unavailable" ? 409 : 400).json({
+                success: false,
+                message: reservation.reason === "unavailable"
+                    ? "This car was just reserved by another customer for those dates."
+                    : `Rentals cannot exceed ${MAX_RENTAL_DAYS} days.`
+            });
+        }
 
 
         /* -------------------------------------------------
            CREATE BOOKING
         ------------------------------------------------- */
 
-        const booking =
-            await Booking.create({
+        let booking;
+        try {
+            booking = await Booking.create({
 
                 bookingId,
 
@@ -534,6 +595,12 @@ async function createBooking(
 
                 dailyPrice,
 
+                subtotalAmount: couponPricing.subtotalAmount,
+
+                discountAmount: couponPricing.discountAmount,
+
+                couponCode: couponPricing.couponCode,
+
                 totalAmount,
 
                 status:
@@ -543,11 +610,15 @@ async function createBooking(
                     "pending",
 
                 driverRequired:
-                    Boolean(
-                        driverRequired
-                    )
+                    normalizedDriverRequest
 
             });
+            await activateCarDateReservations(bookingId);
+        } catch (creationError) {
+            // Keep the short-lived creating lease after uncertain persistence errors;
+            // deleting it could let a concurrent request double-book a saved booking.
+            throw creationError;
+        }
 
 
         /* -------------------------------------------------
@@ -585,83 +656,6 @@ async function createBooking(
         });
 
     }
-
-}
-
-
-
-/* =========================================================
-   DATE HELPER
-========================================================= */
-
-function parseDateOnly(
-    dateString
-) {
-
-    if (
-        typeof dateString !==
-        "string"
-    ) {
-
-        return null;
-
-    }
-
-
-    const match =
-        /^(\d{4})-(\d{2})-(\d{2})$/
-            .exec(
-                dateString
-            );
-
-
-    if (!match) {
-
-        return null;
-
-    }
-
-
-    const year =
-        Number(
-            match[1]
-        );
-
-    const month =
-        Number(
-            match[2]
-        );
-
-    const day =
-        Number(
-            match[3]
-        );
-
-
-    const date =
-        new Date(
-
-            Date.UTC(
-                year,
-                month - 1,
-                day
-            )
-
-        );
-
-
-    if (
-        Number.isNaN(
-            date.getTime()
-        )
-    ) {
-
-        return null;
-
-    }
-
-
-    return date;
 
 }
 
@@ -872,21 +866,29 @@ async function autoCompleteFinishedBookings() {
         impossible after the scheduled return date.
     */
 
+    const eligibleBookings = await Booking.find({
+        status: "confirmed",
+        returnStatus: "confirmed"
+    }).select("bookingId").lean();
+
+    if (eligibleBookings.length === 0) return;
+
+    const bookingIds = eligibleBookings.map(booking => booking.bookingId);
     await Booking.updateMany(
-
         {
+            bookingId: { $in: bookingIds },
             status: "confirmed",
-
             returnStatus: "confirmed"
         },
-
-        {
-            $set: {
-                status: "completed"
-            }
-        }
-
+        { $set: { status: "completed" } }
     );
+
+    await releaseCarDateReservations(bookingIds).catch(error => {
+        console.error("Unable to release completed booking reservations:", error.message);
+    });
+    await releaseDriverDateReservations(bookingIds).catch(error => {
+        console.error("Unable to release completed driver reservations:", error.message);
+    });
 
 }
 
@@ -942,6 +944,24 @@ async function getCustomerBookings(
                 }
 
             );
+
+        const bookingsWithLocationAccess = bookingData.filter(canViewHandoverInstructions);
+        if (bookingsWithLocationAccess.length > 0) {
+            const cars = await Car.find({
+                carId: { $in: bookingsWithLocationAccess.map(booking => booking.carId) }
+            }).select("carId +handoverInstructions").lean();
+            const carById = new Map(cars.map(car => [car.carId, car]));
+            bookingsWithLocationAccess.forEach(booking => {
+                const car = carById.get(booking.carId);
+                if (car?.handoverInstructions) booking.handoverInstructions = car.handoverInstructions;
+            });
+        }
+
+        const Driver = require("../models/Driver");
+        const driverIds = bookingData.map(item => item.driverId).filter(Boolean);
+        const assignedDrivers = await Driver.find({ _id: { $in: driverIds } }).populate("userId", "name phone").select("userId city status").lean();
+        const driverMap = new Map(assignedDrivers.map(item => [String(item._id), item]));
+        bookingData.forEach(item => { item.assignedDriver = item.driverId ? driverMap.get(String(item.driverId)) || null : null; });
 
 
         return res.json({
@@ -1135,6 +1155,15 @@ async function getHostBookings(
                         dailyPrice:
                             booking.dailyPrice,
 
+                        subtotalAmount:
+                            booking.subtotalAmount ?? booking.totalAmount,
+
+                        discountAmount:
+                            booking.discountAmount || 0,
+
+                        couponCode:
+                            booking.couponCode || "",
+
                         totalAmount:
                             booking.totalAmount,
 
@@ -1148,6 +1177,12 @@ async function getHostBookings(
 
                         paymentStatus:
                             booking.paymentStatus,
+
+                        refundStatus:
+                            booking.refundStatus || "none",
+
+                        refundedAmountPaise:
+                            booking.refundedAmountPaise || 0,
 
                         paymentId:
                             booking.paymentId,
@@ -1197,6 +1232,10 @@ async function getHostBookings(
 
                         driverRequired:
                             booking.driverRequired,
+
+                        driverId:
+                            booking.driverId,
+
 
                         createdAt:
                             booking.createdAt,
@@ -1410,16 +1449,62 @@ async function updateHostBookingStatus(
 
         }
 
+        if (booking.status === "cancelled") {
+            return res.status(409).json({
+                success: false,
+                message: "Cancelled bookings cannot be changed. Create a new booking if the customer still needs the vehicle."
+            });
+        }
+
+        if (status === "cancelled" && booking.pickupStatus === "confirmed") {
+            return res.status(409).json({
+                success: false,
+                message: "A booking cannot be cancelled after vehicle pickup has been confirmed."
+            });
+        }
+
+        if (
+            status === "confirmed" &&
+            ["pending_review", "processing", "failed"].includes(booking.refundStatus)
+        ) {
+            return res.status(409).json({
+                success: false,
+                message: "A cancellation and refund request is under review; this booking cannot be reconfirmed yet."
+            });
+        }
+
 
         /* -------------------------------------------------
            UPDATE
         ------------------------------------------------- */
+
+        if (status === "cancelled" && booking.paymentStatus === "paid") {
+            const queued = queueCancellationRefund(booking, req.user._id, req.body?.reason);
+            if (!queued.queued) {
+                return res.status(409).json({ success: false, message: queued.message });
+            }
+            await booking.save();
+            return res.status(202).json({
+                success: true,
+                cancellationRequested: true,
+                message: "Cancellation and refund request sent for administrator review. The booking remains active until the refund is processed.",
+                data: booking
+            });
+        }
 
         booking.status =
             status;
 
 
         await booking.save();
+        if (status === "cancelled") {
+            await releaseCarDateReservations(bookingId).catch(error => {
+                console.error("Unable to release cancelled booking reservations:", error.message);
+            });
+            await releaseDriverDateReservations(bookingId).catch(error => {
+                console.error("Unable to release cancelled driver reservations:", error.message);
+            });
+        }
 
 
         return res.json({
@@ -1570,7 +1655,6 @@ async function cancelCustomerBooking(
 
         }
 
-
         /* -------------------------------------------------
            RENTAL ALREADY STARTED
         ------------------------------------------------- */
@@ -1617,16 +1701,70 @@ async function cancelCustomerBooking(
 
         }
 
+        if (booking.paymentStatus === "paid") {
+            const queued = queueCancellationRefund(booking, req.user._id, req.body?.reason);
+            if (!queued.queued) {
+                return res.status(409).json({ success: false, message: queued.message });
+            }
+            await booking.save();
+            return res.status(202).json({
+                success: true,
+                cancellationRequested: true,
+                message: "Cancellation and refund request sent for administrator review. The booking remains active until the refund is processed.",
+                data: booking
+            });
+        }
+
 
         /* -------------------------------------------------
-           CANCEL
+           CANCEL UNPAID BOOKING ATOMICALLY
+           This prevents a stale customer request from overwriting a
+           concurrent captured-payment update.
         ------------------------------------------------- */
 
-        booking.status =
-            "cancelled";
+        const cancelledBooking = await Booking.findOneAndUpdate(
+            {
+                _id: booking._id,
+                userId: req.user._id,
+                status: { $in: ["pending", "confirmed"] },
+                paymentStatus: { $in: ["pending", "failed"] },
+                pickupStatus: { $ne: "confirmed" },
+                returnStatus: { $ne: "confirmed" }
+            },
+            { $set: { status: "cancelled" } },
+            { returnDocument: "after" }
+        );
 
+        if (!cancelledBooking) {
+            const latestBooking = await Booking.findById(booking._id);
+            if (latestBooking?.paymentStatus === "paid" && ["pending", "confirmed"].includes(latestBooking.status)) {
+                const queued = queueCancellationRefund(latestBooking, req.user._id, req.body?.reason);
+                if (!queued.queued) {
+                    return res.status(409).json({ success: false, message: queued.message });
+                }
+                await latestBooking.save();
+                return res.status(202).json({
+                    success: true,
+                    cancellationRequested: true,
+                    message: "Payment completed while cancellation was being submitted. A cancellation and refund request has been sent for administrator review.",
+                    data: latestBooking
+                });
+            }
+            if (latestBooking?.status === "cancelled") {
+                return res.status(400).json({ success: false, message: "This booking is already cancelled." });
+            }
+            return res.status(409).json({
+                success: false,
+                message: "The booking changed while cancellation was being submitted. Refresh the page and review its current status."
+            });
+        }
 
-        await booking.save();
+        await releaseCarDateReservations(bookingId).catch(error => {
+            console.error("Unable to release cancelled booking reservations:", error.message);
+        });
+        await releaseDriverDateReservations(bookingId).catch(error => {
+            console.error("Unable to release cancelled driver reservations:", error.message);
+        });
 
 
         return res.json({
@@ -1637,7 +1775,7 @@ async function cancelCustomerBooking(
                 "Booking cancelled successfully.",
 
             data:
-                booking
+                cancelledBooking
 
         });
 
@@ -1771,6 +1909,13 @@ async function confirmPickup(
 
             });
 
+        }
+
+        if (["pending_review", "processing", "failed"].includes(booking.refundStatus)) {
+            return res.status(409).json({
+                success: false,
+                message: "Pickup is paused while the cancellation and refund request is being reviewed."
+            });
         }
 
 
@@ -2206,6 +2351,13 @@ async function confirmReturn(
 
         await booking.save();
 
+        await releaseCarDateReservations(bookingId).catch(error => {
+            console.error("Unable to release completed booking reservations:", error.message);
+        });
+        await releaseDriverDateReservations(bookingId).catch(error => {
+            console.error("Unable to release completed driver reservations:", error.message);
+        });
+
 
         return res.json({
 
@@ -2256,6 +2408,7 @@ module.exports = {
     getCustomerBookings,
 
     cancelCustomerBooking,
+    canViewHandoverInstructions,
 
     getHostBookings,
 

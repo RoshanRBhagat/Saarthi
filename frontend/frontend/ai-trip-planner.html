@@ -14,8 +14,9 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
     <!-- Trip Planner CSS -->
-    <link rel="stylesheet" href="css/ai-trip-planner.css">
-    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/ai-trip-planner.css">
+    <link rel="stylesheet" href="../css/responsive.css">
 </head>
 
 <body>
@@ -31,7 +32,7 @@
             <div class="nav-links">
                 <a href="index.html">Home</a>
                 <a href="host.html">Host Your Car</a>
-                <a href="#" class="active">AI Trip Planner</a>
+                <a href="ai-trip-planner.html" class="active" aria-current="page">AI Trip Planner</a>
                 <a href="auth.html" class="btn-primary">Log In</a>
             </div>
         </div>
@@ -112,7 +113,7 @@
                             <label for="origin">Starting from</label>
                             <div class="input-with-icon">
                                 <i class="fa-solid fa-location-dot"></i>
-                                <input id="origin" type="text" placeholder="Nagpur, Maharashtra" value="Nagpur, Maharashtra">
+                                <input id="origin" type="text" aria-label="Trip origin" placeholder="Nagpur, Maharashtra" value="Nagpur, Maharashtra">
                             </div>
                         </div>
 
@@ -120,7 +121,7 @@
                             <label for="destination">Destination</label>
                             <div class="input-with-icon">
                                 <i class="fa-solid fa-map-pin"></i>
-                                <input id="destination" type="text" placeholder="Pench National Park" value="Pench National Park">
+                                <input id="destination" type="text" aria-label="Trip destination" placeholder="Pench National Park" value="Pench National Park">
                             </div>
                         </div>
 
@@ -152,7 +153,7 @@
                             <label for="budget">Budget</label>
                             <div class="input-with-icon currency-input">
                                 <span>₹</span>
-                                <input id="budget" type="number" min="1000" step="500" value="15000" placeholder="15000">
+                                <input id="budget" type="number" aria-label="Trip budget in rupees" min="1000" step="500" value="15000" placeholder="15000">
                             </div>
                         </div>
                     </div>
@@ -326,6 +327,7 @@
                                     <input
                                         id="modifyInput"
                                         type="text"
+                                        aria-label="Describe a change to the trip plan"
                                         placeholder="e.g. Make Day 2 more relaxed..."
                                     >
 
@@ -484,7 +486,8 @@
     </div>
 
 
-    <script src="js/pages/ai-trip-planner.js"></script>
+    <script src="../js/pages/ai-trip-planner.js"></script>
+    <script src="../js/core/auth-ui.js"></script>
 
 </body>
 </html>

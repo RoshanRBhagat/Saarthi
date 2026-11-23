@@ -968,10 +968,6 @@ a {
         padding-top: 46px;
     }
 
-    .nav-links a:not(.btn-primary) {
-        display: none;
-    }
-
     .planner-card {
         padding: 20px;
         border-radius: 18px;

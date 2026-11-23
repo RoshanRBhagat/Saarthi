@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const bookingId = params.get("bookingId");
     const phase = params.get("phase");
+    const inspectionSource = params.get("source") === "driver" ? "driver" : "host";
     const token = localStorage.getItem("saarthiToken");
 
     const angles = [
@@ -77,7 +78,8 @@ document.addEventListener("DOMContentLoaded", () => {
             "Record the vehicle's condition after it is returned by the customer.";
     }
 
-    dashboardLink.href = "host-dashboard.html";
+    dashboardLink.href = inspectionSource === "driver" ? "driver.html" : "host-dashboard.html";
+    dashboardLink.textContent = inspectionSource === "driver" ? "Driver Portal" : "Host Dashboard";
 
 
     /* ---------------------------------------------------------
@@ -337,7 +339,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         try {
             const response = await fetch(
-                `/api/bookings/host/${encodeURIComponent(bookingId)}/inspection/${phase}`,
+                inspectionSource === "driver"
+                    ? `/api/drivers/booking/${encodeURIComponent(bookingId)}/inspection/${phase}`
+                    : `/api/bookings/host/${encodeURIComponent(bookingId)}/inspection/${phase}`,
                 {
                     method: "POST",
                     headers: {
@@ -361,10 +365,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
             }
 
-            if (
-                response.status === 401 ||
-                response.status === 403
-            ) {
+            if (response.status === 401) {
                 localStorage.removeItem("saarthiToken");
                 localStorage.removeItem("saarthiUser");
 
@@ -374,6 +375,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
+            if (response.status === 403) {
+                throw new Error(result.message || "You are not authorized to upload photos for this booking.");
+            }
+
             if (!response.ok || !result.success) {
                 throw new Error(
                     result.message ||
@@ -381,9 +386,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
             }
 
-            inspectionSuccess.textContent =
-                `${phase === "pickup" ? "Pickup" : "Return"} inspection saved successfully. ` +
-                "Return to the Host Dashboard to continue the booking.";
+            inspectionSuccess.textContent = inspectionSource === "driver"
+                ? `${phase === "pickup" ? "Pickup" : "Return"} photos submitted. The host will review the inspection and confirm the handover.`
+                : `${phase === "pickup" ? "Pickup" : "Return"} inspection saved successfully. Return to the Host Dashboard to continue the booking.`;
 
             inspectionSuccess.classList.remove("hidden");
 
@@ -393,7 +398,7 @@ document.addEventListener("DOMContentLoaded", () => {
             `;
 
             dashboardLink.textContent =
-                "Continue to Host Dashboard";
+                inspectionSource === "driver" ? "Return to Driver Portal" : "Continue to Host Dashboard";
 
             dashboardLink.classList.add("saved-link");
 

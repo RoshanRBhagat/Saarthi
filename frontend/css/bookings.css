@@ -19,6 +19,21 @@
 
 }
 
+.booking-handover-instructions {
+    margin: 14px 0;
+    padding: 14px 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    background: #f8fafc;
+    color: #1e293b;
+}
+
+.booking-handover-instructions p {
+    margin: 6px 0 0;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
 
 /* =========================================================
    HEADER
@@ -838,4 +853,508 @@
 
     text-transform: capitalize;
 
+}
+
+.booking-coupon-discount-row strong {
+    color: #047857;
+}
+
+
+/* =========================================================
+   CUSTOMER INSPECTION PHOTOS
+========================================================= */
+
+.customer-inspection-section {
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid #edf0f3;
+}
+
+.customer-inspection-heading h4 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    color: #111827;
+    font-size: 0.98rem;
+    font-weight: 800;
+}
+
+.customer-inspection-heading h4 i {
+    color: #2563eb;
+}
+
+.customer-inspection-heading p {
+    margin: 6px 0 13px;
+    color: #64748b;
+    font-size: 0.82rem;
+    line-height: 1.5;
+}
+
+.customer-inspection-unavailable {
+    margin-top: 9px;
+    padding: 12px 13px;
+    border: 1px dashed #dbe3ef;
+    border-radius: 10px;
+    background: #f8fafc;
+}
+
+.customer-inspection-unavailable span {
+    color: #334155;
+    font-size: 0.83rem;
+    font-weight: 800;
+}
+
+.customer-inspection-unavailable p {
+    margin: 4px 0 0;
+    color: #64748b;
+    font-size: 0.78rem;
+    line-height: 1.45;
+}
+
+.customer-inspection-panel {
+    margin-top: 10px;
+    overflow: hidden;
+    border: 1px solid #dbe3ef;
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.customer-inspection-panel > summary {
+    min-height: 48px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    cursor: pointer;
+    list-style: none;
+    color: #1f2937;
+    font-size: 0.84rem;
+    font-weight: 800;
+}
+
+.customer-inspection-panel > summary::-webkit-details-marker {
+    display: none;
+}
+
+.customer-inspection-panel > summary::after {
+    content: "\f078";
+    margin-left: auto;
+    color: #64748b;
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: 0.72rem;
+    transition: transform 0.18s ease;
+}
+
+.customer-inspection-panel[open] > summary::after {
+    transform: rotate(180deg);
+}
+
+.customer-inspection-summary-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.customer-inspection-summary-label i {
+    color: #2563eb;
+}
+
+.customer-inspection-count {
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-size: 0.7rem;
+    white-space: nowrap;
+}
+
+.customer-inspection-panel-body {
+    padding: 0 12px 14px;
+    border-top: 1px solid #edf0f3;
+}
+
+.customer-inspection-date {
+    margin: 12px 0;
+    color: #64748b;
+    font-size: 0.75rem;
+}
+
+.customer-inspection-photo-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.customer-inspection-photo-card {
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    border-radius: 9px;
+    background: #f8fafc;
+}
+
+.customer-inspection-photo-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: #e2e8f0;
+}
+
+.customer-inspection-photo-frame img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+    background: #f1f5f9;
+}
+
+.customer-inspection-photo-frame img[hidden] {
+    display: none;
+}
+
+.customer-inspection-photo-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    color: #64748b;
+    text-align: center;
+    font-size: 0.72rem;
+    line-height: 1.4;
+}
+
+.customer-inspection-photo-placeholder[hidden] {
+    display: none;
+}
+
+.customer-inspection-photo-card figcaption {
+    padding: 7px 8px;
+    color: #334155;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.customer-inspection-notes {
+    margin: 12px 0 0;
+    padding: 10px 11px;
+    border-radius: 8px;
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.customer-inspection-notes strong {
+    color: #334155;
+}
+
+@media (min-width: 600px) {
+    .customer-inspection-photo-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 420px) {
+    .customer-inspection-panel > summary {
+        padding: 11px 10px;
+        gap: 7px;
+        font-size: 0.78rem;
+    }
+
+    .customer-inspection-panel-body {
+        padding-right: 9px;
+        padding-left: 9px;
+    }
+
+    .customer-inspection-photo-grid {
+        gap: 7px;
+    }
+}
+
+
+/* =========================================================
+   FULL-SCREEN CUSTOMER INSPECTION PHOTO GALLERY
+========================================================= */
+
+.customer-inspection-photo-open {
+    display: block;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: zoom-in;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.customer-inspection-photo-open:disabled {
+    cursor: wait;
+}
+
+.customer-inspection-photo-open:focus-visible {
+    outline: 3px solid #2563eb;
+    outline-offset: -3px;
+    z-index: 1;
+}
+
+.customer-inspection-photo-open:not(:disabled):hover img {
+    filter: brightness(0.94);
+}
+
+.customer-inspection-photo-zoom-hint {
+    position: absolute;
+    right: 7px;
+    bottom: 7px;
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(15, 23, 42, 0.78);
+    color: #fff;
+    font-size: 0.72rem;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+}
+
+.customer-inspection-photo-open:not(:disabled):hover .customer-inspection-photo-zoom-hint,
+.customer-inspection-photo-open:not(:disabled):focus-visible .customer-inspection-photo-zoom-hint {
+    opacity: 1;
+}
+
+.customer-inspection-lightbox-open {
+    overflow: hidden !important;
+    overscroll-behavior: none;
+}
+
+.customer-inspection-lightbox[hidden] {
+    display: none !important;
+}
+
+.customer-inspection-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    background: #080b12;
+    color: #fff;
+    isolation: isolate;
+}
+
+.customer-inspection-lightbox-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(3, 6, 12, 0.98);
+}
+
+.customer-inspection-lightbox-shell {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    padding: max(12px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+}
+
+.customer-inspection-lightbox-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 0 0 auto;
+    gap: 16px;
+    min-height: 48px;
+    padding: 2px 0 12px;
+}
+
+.customer-inspection-lightbox-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.customer-inspection-lightbox-title {
+    overflow: hidden;
+    color: #fff;
+    font-size: 0.96rem;
+    font-weight: 800;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.customer-inspection-lightbox-counter {
+    color: #aab6c8;
+    font-size: 0.78rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.customer-inspection-lightbox-close,
+.customer-inspection-lightbox-nav {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.16s ease, transform 0.16s ease;
+}
+
+.customer-inspection-lightbox-close:hover,
+.customer-inspection-lightbox-nav:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.customer-inspection-lightbox-close:focus-visible,
+.customer-inspection-lightbox-nav:focus-visible {
+    outline: 3px solid #93c5fd;
+    outline-offset: 3px;
+}
+
+.customer-inspection-lightbox-stage {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex: 1 1 auto;
+    min-height: 0;
+    touch-action: pan-y;
+}
+
+.customer-inspection-lightbox-image-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex: 1 1 auto;
+    width: 0;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+}
+
+.customer-inspection-lightbox-image {
+    display: block;
+    flex: 1 1 auto;
+    width: 100%;
+    height: 0;
+    min-width: 0;
+    min-height: 0;
+    object-fit: contain;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.customer-inspection-lightbox-caption {
+    flex: 0 0 auto;
+    max-width: 100%;
+    padding: 0 8px 4px;
+    color: #f8fafc;
+    text-align: center;
+    font-size: 0.94rem;
+    font-weight: 800;
+}
+
+.customer-inspection-lightbox-footer {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    min-height: 32px;
+    padding-top: 10px;
+    color: #94a3b8;
+    font-size: 0.72rem;
+}
+
+.customer-inspection-lightbox-nav[hidden] {
+    display: none !important;
+}
+
+@media (max-width: 600px) {
+    .customer-inspection-photo-zoom-hint {
+        width: 24px;
+        height: 24px;
+        right: 5px;
+        bottom: 5px;
+        opacity: 1;
+        font-size: 0.65rem;
+    }
+
+    .customer-inspection-lightbox-shell {
+        padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+    }
+
+    .customer-inspection-lightbox-header {
+        min-height: 42px;
+        padding-bottom: 8px;
+    }
+
+    .customer-inspection-lightbox-close,
+    .customer-inspection-lightbox-nav {
+        width: 40px;
+        height: 40px;
+    }
+
+    .customer-inspection-lightbox-stage {
+        position: relative;
+        gap: 0;
+    }
+
+    .customer-inspection-lightbox-image-wrap {
+        gap: 10px;
+    }
+
+    .customer-inspection-lightbox-nav {
+        position: absolute;
+        z-index: 2;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 38px;
+        height: 38px;
+        background: rgba(15, 23, 42, 0.72);
+        border-color: rgba(255, 255, 255, 0.24);
+    }
+
+    .customer-inspection-lightbox-prev {
+        left: 4px;
+    }
+
+    .customer-inspection-lightbox-next {
+        right: 4px;
+    }
+
+    .customer-inspection-lightbox-caption {
+        font-size: 0.9rem;
+    }
+
+    .customer-inspection-lightbox-footer {
+        justify-content: center;
+        text-align: center;
+        font-size: 0.68rem;
+    }
+
+    .customer-inspection-lightbox-key-hint {
+        display: none;
+    }
 }

@@ -11,6 +11,10 @@ const User = require("../models/User");
 const JWT_SECRET =
     process.env.JWT_SECRET;
 
+function getPublicRegistrationRole(role) {
+    return role === "host" || role === "driver" ? role : "customer";
+}
+
 
 // =========================================================
 // REGISTER USER
@@ -84,6 +88,14 @@ async function registerUser(req, res) {
 
             });
 
+        }
+
+        if (!JWT_SECRET) {
+            console.error("JWT_SECRET is not configured.");
+            return res.status(500).json({
+                success: false,
+                message: "Server authentication configuration is incomplete."
+            });
         }
 
 
@@ -185,13 +197,10 @@ async function registerUser(req, res) {
         // Public registration must never be allowed
         // to create an admin account.
         //
-        // For now users can register as customer or host.
+        // Public users can register as customer, host, or driver.
         // =================================================
 
-        const userRole =
-            role === "host"
-                ? "host"
-                : "customer";
+        const userRole = getPublicRegistrationRole(role);
 
 
         // =================================================
@@ -227,27 +236,6 @@ async function registerUser(req, res) {
         // =================================================
         // CREATE JWT
         // =================================================
-
-        if (
-            !JWT_SECRET
-        ) {
-
-            console.error(
-                "JWT_SECRET is not configured."
-            );
-
-
-            return res.status(500).json({
-
-                success: false,
-
-                message:
-                    "Server authentication configuration is incomplete."
-
-            });
-
-        }
-
 
         const token =
             jwt.sign(
@@ -386,7 +374,7 @@ async function loginUser(req, res) {
                 email:
                     normalizedEmail
 
-            });
+            }).select("+password");
 
 
         if (
@@ -569,6 +557,8 @@ module.exports = {
 
     registerUser,
 
-    loginUser
+    loginUser,
+
+    getPublicRegistrationRole
 
 };

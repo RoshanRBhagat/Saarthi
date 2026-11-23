@@ -4,19 +4,24 @@ const express =
 
 const {
     createPaymentOrder,
-    verifyPayment
+    verifyPayment,
+    handleRazorpayWebhook
 } =
     require("../controllers/paymentController");
 
 
-const {
-    authenticateUser
-} =
-    require("../middleware/authMiddleware");
+const { authenticateUser, requireAdmin } = require("../middleware/authMiddleware");
+const { listRefundRequests, reviewRefundRequest, refreshRefundStatus } = require("../controllers/refundController");
 
 
 const router =
     express.Router();
+
+router.post("/webhook", handleRazorpayWebhook);
+
+router.get("/refunds/pending", authenticateUser, requireAdmin, listRefundRequests);
+router.patch("/refunds/:bookingId/review", authenticateUser, requireAdmin, reviewRefundRequest);
+router.post("/refunds/:bookingId/refresh", authenticateUser, requireAdmin, refreshRefundStatus);
 
 
 /* =========================================================

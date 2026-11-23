@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: saarthi-staging
+    runtime: docker
+    plan: 0.5c-512mb
+    region: singapore
+    autoDeployTrigger: off
+    healthCheckPath: /api/health
+    disk:
+      name: saarthi-staging-uploads
+      mountPath: /var/lib/saarthi/uploads
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: MONGODB_URI
+        sync: false
+      - key: SAARTHI_UPLOAD_DIR
+        value: /var/lib/saarthi/uploads
+      - key: TRUST_PROXY_HOPS
+        value: "2"
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: RAZORPAY_WEBHOOK_SECRET
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false

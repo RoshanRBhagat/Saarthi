@@ -1,0 +1,24 @@
+Saarthi coupon discount feature update
+
+Install:
+1. Back up your current Saarthi project.
+2. Extract this ZIP into the project root (the folder that contains backend and frontend).
+3. Allow files to merge/replace in their matching paths.
+4. Restart the backend with: cd backend ; node server.js
+5. Hard-refresh the browser (Ctrl+F5), open a car details page, select dates, check availability, click Book Now, and try a coupon.
+
+Starter coupons (discount applies to rental subtotal only):
+- WELCOME10: 10% off, maximum Rs 500, minimum subtotal Rs 1,000
+- SAARTHI200: Rs 200 off, minimum subtotal Rs 2,000
+- TRIP15: 15% off, maximum Rs 750, minimum subtotal Rs 1,500
+
+The browser previews the discount through POST /api/bookings/validate-coupon. The create-booking endpoint recalculates the discount on the server and saves subtotalAmount, discountAmount, couponCode and discounted totalAmount. Razorpay already uses booking.totalAmount, so it will charge the discounted total after the host confirms the booking.
+
+These starter coupons are hard-coded in backend/services/couponService.js, not managed through an admin panel. Update COUPONS there to change the codes/rules. This patch does not turn on Razorpay Live Mode or deploy the site.
+
+Validation performed:
+- node --check on changed JavaScript files
+- Coupon calculation tests: valid codes, normalization, percentage/flat discounts, minimum subtotal, unknown code and no-coupon case
+- Checked HTML control IDs for duplicate IDs
+
+Please verify the API in your local running environment after applying; no live database or browser checkout was available here.

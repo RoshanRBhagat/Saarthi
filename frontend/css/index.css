@@ -1271,7 +1271,15 @@ footer {
 
     .nav-links {
 
-        display: none;
+        display: flex;
+
+        flex-wrap: wrap;
+
+        width: 100%;
+
+        justify-content: flex-start;
+
+        gap: 4px 8px;
 
     }
 

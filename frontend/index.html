@@ -23,6 +23,7 @@
     >
 
     <!-- Homepage CSS -->
+    <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="css/responsive.css">
 </head>
@@ -33,7 +34,7 @@
          NAVIGATION
     ====================================================== -->
 
-    <nav class="navbar homepage-navbar" aria-label="Main navigation">
+    <nav class="navbar homepage-navbar mobile-nav" aria-label="Main navigation" data-mobile-nav>
 
         <div class="nav-container">
 
@@ -75,6 +76,7 @@
                 <a href="host.html">
                     Host Your Car
                 </a>
+                <a href="driver.html">Drive with Saarthi</a>
 
                 <a
                     href="auth.html"
@@ -448,6 +450,7 @@
                 >
                     Become a Host
                 </a>
+                <a href="driver.html" class="btn-outline">Become a Driver</a>
 
             </div>
 
@@ -470,6 +473,7 @@
 
     <!-- City database -->
     <script src="js/core/mobile-nav.js"></script>
+    <script src="js/core/auth-ui.js"></script>
     <script src="js/data/cities.js"></script>
 
     <!-- Homepage page logic -->

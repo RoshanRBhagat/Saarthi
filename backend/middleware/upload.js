@@ -1,36 +1,21 @@
 const multer = require("multer");
 const path = require("path");
-const fs = require("fs");
+const fs = require("fs/promises");
+const { getCarUploadsDir } = require("../services/storagePaths");
+
+function isAllowedCarImage(file) {
+    const extension = path.extname(String(file?.originalname || "")).toLowerCase();
+    const mimeType = String(file?.mimetype || "").toLowerCase();
+    if ([".jpg", ".jpeg"].includes(extension)) {
+        return mimeType === "image/jpeg" || mimeType === "image/jpg";
+    }
+    return extension === ".png" && mimeType === "image/png";
+}
 
 
 // =========================================================
 // UPLOAD DIRECTORY
 // =========================================================
-
-const uploadDirectory =
-    path.join(
-        __dirname,
-        "..",
-        "uploads",
-        "cars"
-    );
-
-
-// =========================================================
-// MAKE SURE DIRECTORY EXISTS
-// =========================================================
-
-if (!fs.existsSync(uploadDirectory)) {
-
-    fs.mkdirSync(
-        uploadDirectory,
-        {
-            recursive: true
-        }
-    );
-
-}
-
 
 // =========================================================
 // STORAGE CONFIGURATION
@@ -44,12 +29,10 @@ const storage =
             file,
             cb
         ) => {
-
-            cb(
-                null,
-                uploadDirectory
-            );
-
+            const uploadDirectory = getCarUploadsDir();
+            fs.mkdir(uploadDirectory, { recursive: true })
+                .then(() => cb(null, uploadDirectory))
+                .catch(cb);
         },
 
 
@@ -70,7 +53,7 @@ const storage =
             const uniqueName =
                 `car-${Date.now()}-${Math.round(
                     Math.random() * 1e9
-                )}${path.extname(file.originalname)}`;
+                )}${path.extname(file.originalname).toLowerCase()}`;
 
 
             cb(
@@ -94,18 +77,7 @@ const fileFilter =
         cb
     ) => {
 
-        const allowedTypes = [
-            "image/jpeg",
-            "image/jpg",
-            "image/png"
-        ];
-
-
-        if (
-            allowedTypes.includes(
-                file.mimetype
-            )
-        ) {
+        if (isAllowedCarImage(file)) {
 
             cb(
                 null,
@@ -157,3 +129,4 @@ const upload =
 
 
 module.exports = upload;
+module.exports.isAllowedCarImage = isAllowedCarImage;

@@ -125,6 +125,12 @@ function redirectAfterAuth() {
 
     }
 
+    try {
+        const user = JSON.parse(localStorage.getItem("saarthiUser") || "{}");
+        if (user.role === "driver") { window.location.href = "driver.html"; return; }
+        if (user.role === "admin") { window.location.href = "admin-drivers.html"; return; }
+    } catch (_) {}
+
 
     /*
         Default destination
@@ -226,6 +232,15 @@ switchAuthMode.addEventListener(
 
     }
 );
+
+const requestedRole = authParams.get("role");
+if (["customer", "host", "driver"].includes(requestedRole)) {
+    registerRole.value = requestedRole;
+}
+
+if (authParams.get("mode") === "register") {
+    switchAuthMode.click();
+}
 
 
 /* =========================================================

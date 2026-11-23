@@ -143,10 +143,8 @@ function addLoggedOutUI(
     navLinks
 ) {
 
-    const loginLink =
-        document.createElement(
-            "a"
-        );
+    const loginLink = navLinks.querySelector('a[href*="auth.html"]') ||
+        document.createElement("a");
 
 
     loginLink.href =
@@ -156,17 +154,14 @@ function addLoggedOutUI(
         )}`;
 
 
-    loginLink.className =
-        "btn-primary auth-ui-dynamic";
+    loginLink.classList.add("btn-primary", "auth-ui-dynamic");
 
 
     loginLink.textContent =
         "Log In";
 
 
-    navLinks.appendChild(
-        loginLink
-    );
+    if (!loginLink.isConnected) navLinks.appendChild(loginLink);
 
 }
 
@@ -178,6 +173,12 @@ function addLoggedOutUI(
 function addLoggedInUI(
     navLinks
 ) {
+
+    // Pages render a fallback login link in their HTML. Remove it once the
+    // stored session is valid so users do not see both Login and Account.
+    navLinks
+        .querySelectorAll('a[href*="auth.html"]')
+        .forEach(link => link.remove());
 
     /* -----------------------------------------------------
        CUSTOMER
@@ -210,6 +211,24 @@ function addLoggedInUI(
             navLinks,
             "host-dashboard.html",
             "Host Dashboard"
+        );
+
+    }
+
+
+    /* -----------------------------------------------------
+       DRIVER
+    ----------------------------------------------------- */
+
+    if (
+        saarthiUser.role ===
+        "driver"
+    ) {
+
+        addNavigationLink(
+            navLinks,
+            "driver.html",
+            "Driver Portal"
         );
 
     }
@@ -326,11 +345,7 @@ function createAccountMenu(
         "Account";
 
 
-    const roleLabel =
-        saarthiUser.role ===
-            "host"
-            ? "Host"
-            : "Customer";
+    const roleLabel = getRoleLabel(saarthiUser.role);
 
 
     accountButton.innerHTML = `
@@ -554,6 +569,18 @@ function createAccountMenu(
         logoutUser
     );
 
+}
+
+
+function getRoleLabel(role) {
+    const roleLabels = {
+        admin: "Administrator",
+        customer: "Customer",
+        driver: "Driver",
+        host: "Host"
+    };
+
+    return roleLabels[role] || "Account";
 }
 
 

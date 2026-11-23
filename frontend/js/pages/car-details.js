@@ -165,6 +165,25 @@ const summaryTotalAmount =
     );
 
 
+const summarySubtotalAmount =
+    document.getElementById("summarySubtotalAmount");
+
+const summaryDiscountAmount =
+    document.getElementById("summaryDiscountAmount");
+
+const summaryDiscountRow =
+    document.getElementById("summaryDiscountRow");
+
+const couponCodeInput =
+    document.getElementById("couponCodeInput");
+
+const applyCouponBtn =
+    document.getElementById("applyCouponBtn");
+
+const couponMessage =
+    document.getElementById("couponMessage");
+
+
 const confirmBookingBtn =
     document.getElementById(
         "confirmBookingBtn"
@@ -209,6 +228,9 @@ let currentImageIndex =
 
 let currentDailyPrice =
     0;
+
+
+let appliedCoupon = null;
 
 
 /* =========================================================
@@ -1388,42 +1410,10 @@ function showBookingForm() {
     }
 
 
-    const totalDays =
-        calculateRentalDays(
-            pickupDate,
-            returnDate
-        );
-
-
-    const totalAmount =
-        totalDays *
-        currentDailyPrice;
-
-
-    summaryPickupDate.textContent =
-        formatDisplayDate(
-            pickupDate
-        );
-
-
-    summaryReturnDate.textContent =
-        formatDisplayDate(
-            returnDate
-        );
-
-
-    summaryTotalDays.textContent =
-        `${totalDays} ${
-            totalDays === 1
-                ? "day"
-                : "days"
-        }`;
-
-
-    summaryTotalAmount.textContent =
-        `₹${totalAmount.toLocaleString(
-            "en-IN"
-        )}`;
+    appliedCoupon = null;
+    if (couponCodeInput) couponCodeInput.value = "";
+    setCouponMessage("", "");
+    updateBookingSummary();
 
 
     bookingError.classList.add(
@@ -1446,6 +1436,130 @@ function showBookingForm() {
 
     });
 
+}
+
+
+/* =========================================================
+   COUPON CODE
+========================================================= */
+
+if (applyCouponBtn) {
+    applyCouponBtn.addEventListener("click", applyCoupon);
+}
+
+if (couponCodeInput) {
+    couponCodeInput.addEventListener("input", () => {
+        if (appliedCoupon) {
+            appliedCoupon = null;
+            updateBookingSummary();
+            setCouponMessage("Coupon changed. Apply it again to recalculate the total.", "info");
+        }
+    });
+}
+
+[pickupDateInput, returnDateInput].forEach((input) => {
+    if (!input) return;
+    input.addEventListener("change", () => {
+        if (appliedCoupon) {
+            appliedCoupon = null;
+            updateBookingSummary();
+            setCouponMessage("Rental dates changed. Apply the coupon again.", "info");
+        }
+    });
+});
+
+function updateBookingSummary() {
+    const pickupDate = pickupDateInput.value;
+    const returnDate = returnDateInput.value;
+    const validDates = pickupDate && returnDate && returnDate >= pickupDate;
+    const totalDays = validDates ? calculateRentalDays(pickupDate, returnDate) : 0;
+    const calculatedSubtotal = Math.round(totalDays * Number(currentDailyPrice || 0) * 100) / 100;
+    const subtotal = appliedCoupon ? Number(appliedCoupon.subtotalAmount) : calculatedSubtotal;
+    const discount = appliedCoupon ? Number(appliedCoupon.discountAmount) : 0;
+    const total = appliedCoupon ? Number(appliedCoupon.totalAmount) : calculatedSubtotal;
+
+    summaryPickupDate.textContent = pickupDate ? formatDisplayDate(pickupDate) : "—";
+    summaryReturnDate.textContent = returnDate ? formatDisplayDate(returnDate) : "—";
+    summaryTotalDays.textContent = totalDays
+        ? `${totalDays} ${totalDays === 1 ? "day" : "days"}`
+        : "—";
+
+    if (summarySubtotalAmount) {
+        summarySubtotalAmount.textContent = formatCurrency(subtotal);
+    }
+    if (summaryDiscountAmount) {
+        summaryDiscountAmount.textContent = `−${formatCurrency(discount)}`;
+    }
+    if (summaryDiscountRow) {
+        summaryDiscountRow.classList.toggle("hidden", discount <= 0);
+    }
+    summaryTotalAmount.textContent = formatCurrency(total);
+}
+
+async function applyCoupon() {
+    const code = couponCodeInput?.value.trim().toUpperCase() || "";
+    const pickupDate = pickupDateInput.value;
+    const returnDate = returnDateInput.value;
+
+    if (!code) {
+        setCouponMessage("Enter a coupon code first.", "error");
+        return;
+    }
+    if (!pickupDate || !returnDate || returnDate < pickupDate) {
+        setCouponMessage("Select valid pickup and return dates first.", "error");
+        return;
+    }
+
+    applyCouponBtn.disabled = true;
+    applyCouponBtn.textContent = "Checking…";
+    setCouponMessage("Validating coupon…", "info");
+
+    try {
+        const response = await fetch("/api/bookings/validate-coupon", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                carId,
+                pickupDate,
+                returnDate,
+                couponCode: code
+            })
+        });
+
+        const result = await response.json();
+        if (!response.ok || !result.success || !result.data) {
+            throw new Error(result.message || "Unable to apply this coupon.");
+        }
+
+        appliedCoupon = result.data;
+        couponCodeInput.value = appliedCoupon.couponCode;
+        updateBookingSummary();
+        setCouponMessage(
+            `${appliedCoupon.couponCode} applied — you save ${formatCurrency(appliedCoupon.discountAmount)}. ${appliedCoupon.description}`,
+            "success"
+        );
+    } catch (error) {
+        appliedCoupon = null;
+        updateBookingSummary();
+        setCouponMessage(error.message || "Unable to apply this coupon.", "error");
+    } finally {
+        applyCouponBtn.disabled = false;
+        applyCouponBtn.textContent = "Apply";
+    }
+}
+
+function setCouponMessage(message, type) {
+    if (!couponMessage) return;
+    couponMessage.textContent = message;
+    couponMessage.className = `coupon-message${type ? ` ${type}` : ""}${message ? "" : " hidden"}`;
+}
+
+function formatCurrency(value) {
+    const amount = Number(value || 0);
+    return `₹${amount.toLocaleString("en-IN", {
+        minimumFractionDigits: Number.isInteger(amount) ? 0 : 2,
+        maximumFractionDigits: 2
+    })}`;
 }
 
 
@@ -1630,6 +1744,19 @@ async function confirmBooking() {
 
     }
 
+    const enteredCouponCode =
+        couponCodeInput?.value.trim().toUpperCase() || "";
+
+    if (
+        enteredCouponCode &&
+        (!appliedCoupon || appliedCoupon.couponCode !== enteredCouponCode)
+    ) {
+        showBookingError(
+            "Apply the entered coupon code or clear the field before confirming your booking."
+        );
+        return;
+    }
+
 
     /* -----------------------------------------------------
        LOADING STATE
@@ -1694,7 +1821,9 @@ async function confirmBooking() {
 
                             returnDate,
 
-                            driverRequired
+                            driverRequired,
+
+                            couponCode: appliedCoupon?.couponCode || ""
 
                         })
 

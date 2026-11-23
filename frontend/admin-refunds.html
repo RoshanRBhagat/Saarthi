@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Refund review | Saarthi</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin-refunds.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <nav class="navbar admin-navbar" aria-label="Administrator navigation">
+        <div class="nav-container">
+            <a class="logo" href="index.html">Saarthi Admin</a>
+            <div class="nav-links">
+                <a href="admin-drivers.html">Driver applications</a>
+                <a href="admin-refunds.html" aria-current="page">Refund review</a>
+            </div>
+        </div>
+    </nav>
+    <main class="refund-page">
+        <header class="refund-header">
+            <p class="eyebrow">Payments</p>
+            <h1>Refund requests</h1>
+            <p>Review cancellation requests and refund captured payments. Refund amounts are entered in rupees; approve only the amount permitted by Saarthi’s policy.</p>
+        </header>
+        <p id="refundStatus" class="refund-status" role="status" aria-live="polite">Loading requests…</p>
+        <section id="refundList" class="refund-list" aria-label="Refund requests"></section>
+    </main>
+    <script src="js/pages/admin-refunds.js"></script>
+</body>
+</html>

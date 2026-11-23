@@ -1,6 +1,8 @@
 const Car = require("../models/Car");
 const Booking = require("../models/Booking");
+const CarReservation = require("../models/CarReservation");
 
+const MODEL_REQUEST_TIMEOUT_MS = 45_000;
 
 const GEMINI_MODELS = [
     process.env.GEMINI_MODEL || "gemini-3.8-flash",
@@ -125,6 +127,8 @@ async function callGemini(prompt) {
                             "x-goog-api-key":
                                 apiKey
                         },
+
+                        signal: AbortSignal.timeout(MODEL_REQUEST_TIMEOUT_MS),
 
                         body: JSON.stringify({
 
@@ -330,15 +334,12 @@ async function getAvailableCars(trip) {
         cars.length
     ) {
 
-        const bookings =
-            await Booking.find({
+        const candidateCarIds = cars.map(car => car.carId);
+        const [bookings, reservations] = await Promise.all([
+            Booking.find({
 
                 carId: {
-                    $in:
-                        cars.map(
-                            car =>
-                                car.carId
-                        )
+                    $in: candidateCarIds
                 },
 
                 status: {
@@ -363,17 +364,29 @@ async function getAvailableCars(trip) {
                 }
             })
             .select("carId")
-            .lean();
+            .lean(),
+            CarReservation.find({
+                carId: { $in: candidateCarIds },
+                dateKey: {
+                    $gte: trip.startDate,
+                    $lte: trip.endDate
+                },
+                $or: [
+                    { state: "active" },
+                    {
+                        state: "creating",
+                        expiresAt: { $gt: new Date() }
+                    }
+                ]
+            })
+                .select("carId")
+                .lean()
+        ]);
 
 
         const busyIds =
             new Set(
-                bookings.map(
-                    booking =>
-                        String(
-                            booking.carId
-                        )
-                )
+                [...bookings, ...reservations].map(record => String(record.carId))
             );
 
 
@@ -922,5 +935,6 @@ async function planTrip(body) {
 
 
 module.exports = {
-    planTrip
+    planTrip,
+    getAvailableCars
 };

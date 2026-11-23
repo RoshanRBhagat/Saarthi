@@ -104,6 +104,14 @@ const carSchema = new mongoose.Schema(
             required: true
         },
 
+        handoverInstructions: {
+            type: String,
+            trim: true,
+            maxlength: 500,
+            default: "",
+            select: false
+        },
+
         state: {
             type: String,
             required: true

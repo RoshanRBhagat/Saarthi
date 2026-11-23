@@ -407,3 +407,22 @@ body {
         font-size: 11px;
     }
 }
+
+@media (max-width: 420px) {
+    .angle-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .angle-card > p {
+        min-height: 0;
+    }
+
+    .submit-area {
+        align-items: stretch;
+    }
+
+    .submit-area > * {
+        width: 100%;
+        text-align: center;
+    }
+}

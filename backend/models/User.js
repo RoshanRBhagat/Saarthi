@@ -73,7 +73,9 @@ const userSchema =
 
                 required: true,
 
-                minlength: 6
+                minlength: 6,
+
+                select: false
 
             },
 
@@ -89,6 +91,7 @@ const userSchema =
                 enum: [
                     "customer",
                     "host",
+                    "driver",
                     "admin"
                 ],
 

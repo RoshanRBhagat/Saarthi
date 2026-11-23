@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Driver Management | Saarthi</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <style>
+        main { width: min(100% - 32px, 960px); margin: 40px auto; }
+        .application { padding: 20px; margin: 16px 0; background: #fff; border-radius: 14px; box-shadow: 0 4px 20px #0001; overflow-wrap: anywhere; }
+        .application h2 { margin: 10px 0; }
+        .driver-state { display: inline-block; padding: 5px 10px; border-radius: 999px; background: #eef2f7; color: #344054; font-size: .82rem; text-transform: capitalize; }
+        .driver-review-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+        .driver-review-actions button { min-height: 42px; padding: 10px 16px; border: 0; border-radius: 7px; cursor: pointer; }
+        .approve { background: #176b55; color: #fff; }
+        .reject { background: #9b2c2c; color: #fff; }
+        .driver-review-actions button:disabled { cursor: wait; opacity: .65; }
+        @media (max-width: 600px) {
+            main { width: min(100% - 24px, 960px); margin: 20px auto; }
+            .application { padding: 16px; }
+            .driver-review-actions { display: grid; grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar admin-navbar" aria-label="Administrator navigation">
+        <div class="nav-container">
+            <a class="logo" href="index.html">Saarthi Admin</a>
+            <div class="nav-links">
+                <a href="admin-drivers.html" aria-current="page">Driver management</a>
+                <a href="admin-refunds.html">Refund review</a>
+            </div>
+        </div>
+    </nav>
+    <main>
+        <h1>Driver management</h1>
+        <p>Review applications and manage active or suspended driver profiles.</p>
+        <p id="status" role="status" aria-live="polite"></p>
+        <section id="applications" aria-label="Driver profiles"></section>
+    </main>
+    <script src="js/pages/admin-drivers.js"></script>
+</body>
+</html>

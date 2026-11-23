@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Driver | Saarthi</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <style>
+        .driver-wrap { width: min(100% - 32px, 850px); margin: 48px auto; padding: 24px; }
+        .driver-box { margin: 18px 0; padding: 24px; border-radius: 16px; background: #fff; box-shadow: 0 5px 22px #14213d12; }
+        .driver-box input, .driver-box select { display: block; width: 100%; min-width: 0; min-height: 46px; margin: 8px 0 16px; padding: 12px; border: 1px solid #ccd2dc; border-radius: 8px; font: inherit; }
+        .driver-box button { min-height: 44px; padding: 12px 20px; border: 0; border-radius: 8px; background: #176b55; color: white; font: inherit; cursor: pointer; }
+        .driver-row { padding: 14px 0; border-top: 1px solid #eee; overflow-wrap: anywhere; }
+        .muted { color: #657080; }
+        @media (max-width: 600px) {
+            .driver-wrap { margin: 18px auto; padding: 12px 0; }
+            .driver-box { padding: 16px; }
+            .driver-box button { width: 100%; }
+        }
+        @media (max-width: 360px) {
+            .driver-wrap h1 { font-size: 1.6rem; }
+        }
+    </style>
+</head><body><nav class="navbar"><div class="nav-container"><a class="logo" href="index.html">Saarthi</a><a href="index.html">Home</a></div></nav><main class="driver-wrap"><h1>Driver portal</h1><p class="muted">Apply to drive Saarthi rentals, then track approved assignments here.</p><section class="driver-box"><h2>Driver application</h2><form id="apply"><label>Driving license number<input name="licenseNumber" required maxlength="30"></label><label>License expiry date<input name="licenseExpiry" type="date" required></label><label>Operating city<input name="city" required maxlength="80"></label><button>Submit application</button></form><p id="message" role="status"></p></section><section class="driver-box"><h2>My assigned bookings</h2><button id="load">Refresh assignments</button><div id="assignments"></div></section></main><script src="js/pages/driver.js"></script></body></html>

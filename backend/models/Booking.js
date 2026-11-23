@@ -39,8 +39,16 @@ const vehicleInspectionSchema = new mongoose.Schema(
     {
         status: {
             type: String,
-            enum: ["pending", "completed"],
+            enum: ["pending", "uploading", "completed"],
             default: "pending"
+        },
+        uploadLeaseToken: {
+            type: String,
+            default: ""
+        },
+        uploadLeaseExpiresAt: {
+            type: Date,
+            default: null
         },
         photos: {
             type: [inspectionPhotoSchema],
@@ -231,6 +239,31 @@ const bookingSchema =
 
 
             /* ---------------------------------------------
+               COUPON / DISCOUNT SNAPSHOT
+            --------------------------------------------- */
+
+            subtotalAmount: {
+                type: Number,
+                default: 0,
+                min: 0
+            },
+
+            discountAmount: {
+                type: Number,
+                default: 0,
+                min: 0
+            },
+
+            couponCode: {
+                type: String,
+                default: "",
+                trim: true,
+                uppercase: true,
+                maxlength: 32
+            },
+
+
+            /* ---------------------------------------------
                BOOKING STATUS
             --------------------------------------------- */
 
@@ -379,6 +412,8 @@ const bookingSchema =
 
                     "paid",
 
+                    "partially_refunded",
+
                     "failed",
 
                     "refunded"
@@ -423,6 +458,78 @@ const bookingSchema =
 
                 default: null
 
+            },
+
+            refundStatus: {
+                type: String,
+                enum: ["none", "pending_review", "processing", "processed", "partially_processed", "rejected", "failed"],
+                default: "none"
+            },
+
+            refundReason: {
+                type: String,
+                default: "",
+                trim: true,
+                maxlength: 500
+            },
+
+            refundRequestedAt: {
+                type: Date,
+                default: null
+            },
+
+            refundRequestedBy: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+                default: null
+            },
+
+            refundAmountPaise: {
+                type: Number,
+                default: 0,
+                min: 0
+            },
+
+            refundedAmountPaise: {
+                type: Number,
+                default: 0,
+                min: 0
+            },
+
+            refundId: {
+                type: String,
+                default: "",
+                trim: true
+            },
+
+            refundReceipt: {
+                type: String,
+                default: "",
+                trim: true,
+                maxlength: 40
+            },
+
+            refundAttemptStartedAt: {
+                type: Date,
+                default: null
+            },
+
+            refundProcessedAt: {
+                type: Date,
+                default: null
+            },
+
+            refundProcessedBy: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+                default: null
+            },
+
+            refundAdminNote: {
+                type: String,
+                default: "",
+                trim: true,
+                maxlength: 500
             },
 
 

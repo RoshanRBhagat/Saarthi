@@ -19,7 +19,7 @@ html {
 
 body {
     width: 100%;
-    min-width: 320px;
+    min-width: 0;
     max-width: 100%;
     overflow-x: clip;
 }
@@ -333,6 +333,31 @@ button {
 .confirm-booking-btn,
 .booking-btn {
     min-height: 42px;
+}
+
+.driver-inspection-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.driver-inspection-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 10px 14px;
+    border-radius: 9px;
+    background: #176b55;
+    color: #fff;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.driver-inspection-action:focus-visible {
+    outline: 3px solid rgba(23, 107, 85, 0.35);
+    outline-offset: 2px;
 }
 
 /* General form grids and status areas */
@@ -787,6 +812,14 @@ button {
         gap: 8px;
     }
 
+    .driver-inspection-actions {
+        flex-direction: column;
+    }
+
+    .driver-inspection-action {
+        width: 100%;
+    }
+
     .booking-detail-row {
         gap: 10px;
     }
@@ -1025,7 +1058,7 @@ button {
 
 
 /* Homepage mobile navigation: compact header with an accessible toggle. */
-.homepage-navbar .nav-menu-toggle {
+.mobile-nav .nav-menu-toggle {
     display: none;
     align-items: center;
     justify-content: center;
@@ -1041,19 +1074,19 @@ button {
     flex-shrink: 0;
 }
 
-.homepage-navbar .nav-menu-toggle:focus-visible {
+.mobile-nav .nav-menu-toggle:focus-visible {
     outline: 3px solid rgba(37, 99, 235, 0.35);
     outline-offset: 2px;
 }
 
 @media (max-width: 768px) {
-    .homepage-navbar {
+    .mobile-nav {
         position: sticky;
         top: 0;
         z-index: 1000;
     }
 
-    .homepage-navbar .nav-container {
+    .mobile-nav .nav-container {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
@@ -1064,18 +1097,18 @@ button {
         gap: 0 12px;
     }
 
-    .homepage-navbar .logo {
+    .mobile-nav .logo {
         display: inline-flex;
         align-items: center;
         min-height: 44px;
         margin-right: auto;
     }
 
-    .homepage-navbar .nav-menu-toggle {
+    .mobile-nav .nav-menu-toggle {
         display: inline-flex;
     }
 
-    .homepage-navbar .nav-links {
+    .mobile-nav .nav-links {
         display: none !important;
         flex: 0 0 100%;
         flex-direction: column;
@@ -1092,12 +1125,12 @@ button {
         box-shadow: 0 12px 28px rgba(15, 23, 42, 0.10);
     }
 
-    .homepage-navbar .nav-links.is-open {
+    .mobile-nav .nav-links.is-open {
         display: flex !important;
     }
 
-    .homepage-navbar .nav-links > a,
-    .homepage-navbar .nav-links > a.btn-primary {
+    .mobile-nav .nav-links > a,
+    .mobile-nav .nav-links > a.btn-primary {
         display: flex;
         align-items: center;
         justify-content: flex-start;
@@ -1111,15 +1144,15 @@ button {
         text-align: left;
     }
 
-    .homepage-navbar .nav-links > a:not(.btn-primary)::after {
+    .mobile-nav .nav-links > a:not(.btn-primary)::after {
         display: none;
     }
 
-    .homepage-navbar .nav-links > a:hover {
+    .mobile-nav .nav-links > a:hover {
         background: #f1f5ff;
     }
 
-    .homepage-navbar .nav-links > a.btn-primary {
+    .mobile-nav .nav-links > a.btn-primary {
         justify-content: center;
         margin-top: 3px;
     }

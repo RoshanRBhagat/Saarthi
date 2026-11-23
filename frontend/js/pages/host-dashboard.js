@@ -1439,6 +1439,54 @@ async function archiveVehicle(
 
 
 /* =========================================================
+   PRIVATE HOST INSPECTION PHOTO REVIEW
+========================================================= */
+
+const hostInspectionPhotoObjectUrls = new Set();
+
+window.addEventListener("pagehide", () => {
+    hostInspectionPhotoObjectUrls.forEach(url => URL.revokeObjectURL(url));
+    hostInspectionPhotoObjectUrls.clear();
+});
+
+async function loadHostInspectionGallery(gallery) {
+    if (gallery.dataset.loaded === "true" || gallery.dataset.loading === "true") return;
+
+    const bookingId = gallery.dataset.hostInspectionGallery;
+    const phase = gallery.dataset.phase;
+    const token = localStorage.getItem("saarthiToken");
+    if (!token) return;
+
+    gallery.dataset.loading = "true";
+    const images = Array.from(gallery.querySelectorAll("img[data-host-inspection-photo]"));
+
+    await Promise.all(images.map(async image => {
+        if (!image.hidden) return;
+        const message = image.parentElement.querySelector(".host-inspection-photo-message");
+        try {
+            const angle = image.dataset.hostInspectionPhoto;
+            const response = await fetch(
+                `/api/bookings/host/${encodeURIComponent(bookingId)}/inspection-photo/${phase}/${angle}`,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            if (!response.ok) throw new Error("Photo unavailable");
+
+            const url = URL.createObjectURL(await response.blob());
+            hostInspectionPhotoObjectUrls.add(url);
+            image.src = url;
+            image.hidden = false;
+            message.hidden = true;
+        } catch {
+            message.textContent = "Photo could not be loaded. Reopen this section to retry.";
+        }
+    }));
+
+    gallery.dataset.loading = "false";
+    gallery.dataset.loaded = images.every(image => !image.hidden) ? "true" : "false";
+}
+
+
+/* =========================================================
    RENDER BOOKING
 ========================================================= */
 
@@ -1499,6 +1547,9 @@ function renderBooking(
     const paymentStatus =
         booking.paymentStatus ||
         "pending";
+
+    const refundStatus = booking.refundStatus || "none";
+    const refundUnderReview = ["pending_review", "processing", "failed"].includes(refundStatus);
 
 
     /* -----------------------------------------------------
@@ -1574,6 +1625,30 @@ function renderBooking(
     const returnInspectionComplete =
         hasEightInspectionPhotos(booking.returnInspection);
 
+    const inspectionGalleryHTML = [
+        { phase: "pickup", inspection: booking.pickupInspection },
+        { phase: "return", inspection: booking.returnInspection }
+    ].filter(({ inspection }) => hasEightInspectionPhotos(inspection))
+        .map(({ phase }) => `
+            <details class="host-inspection-gallery" data-host-inspection-gallery="${escapeHTML(booking.bookingId)}" data-phase="${phase}">
+                <summary>Review ${phase} condition photos</summary>
+                <div class="host-inspection-photo-grid">
+                    ${[
+                        "front", "front-left", "left", "rear-left",
+                        "rear", "rear-right", "right", "front-right"
+                    ].map(angle => `
+                        <figure>
+                            <div class="host-inspection-photo-frame">
+                                <span class="host-inspection-photo-message">Open this section to load photo</span>
+                                <img alt="${phase} inspection photo: ${angle}" data-host-inspection-photo="${angle}" hidden>
+                            </div>
+                            <figcaption>${angle.replaceAll("-", " ")}</figcaption>
+                        </figure>
+                    `).join("")}
+                </div>
+            </details>
+        `).join("");
+
 
     /* -----------------------------------------------------
        AI DAMAGE REPORT (generated after return inspection)
@@ -1636,7 +1711,8 @@ function renderBooking(
                 ? `
                     <section style="margin-top:16px;padding:14px;border:1px solid #f0dfb7;border-radius:12px;background:#fffaf0;color:#79623b;font-size:12px;line-height:1.6;">
                         <strong><i class="fa-solid fa-circle-exclamation"></i> AI comparison did not complete.</strong>
-                        ${escapeHTML(returnDamageReport.message || 'The photos remain saved; repeat the return inspection upload to retry the comparison before confirming return.')}
+                        ${escapeHTML(returnDamageReport.message || 'The original photos remain saved. Retry the comparison against the same evidence.')}
+                        <button type="button" class="booking-action-btn confirm" data-retry-damage-analysis="${escapeHTML(booking.bookingId)}" style="margin-top:10px;">Retry AI comparison</button>
                     </section>
                 `
                 : "";
@@ -1649,6 +1725,7 @@ function renderBooking(
         status === "confirmed" &&
         paymentStatus === "paid" &&
         rentalStatus === "active" &&
+        !refundUnderReview &&
         !pickupConfirmed;
 
 
@@ -1659,6 +1736,7 @@ function renderBooking(
     const canConfirmReturn =
         status === "confirmed" &&
         paymentStatus === "paid" &&
+        !refundUnderReview &&
         pickupConfirmed &&
         !returnConfirmed;
 
@@ -2123,12 +2201,16 @@ function renderBooking(
 
         </div>
 
+        ${refundUnderReview ? `<div class="host-booking-refund-status" role="status">${refundStatus === "processing" ? "Refund is processing; pickup is paused until it completes." : refundStatus === "failed" ? "Refund processing failed and needs administrator attention." : "Customer cancellation and refund request is awaiting administrator review."}</div>` : refundStatus === "rejected" ? `<div class="host-booking-refund-status" role="status">Refund request was rejected; the booking remains active.</div>` : ""}
+
+        ${driverRequired && status === "confirmed" && paymentStatus === "paid" && !refundUnderReview ? `<div class="host-booking-actions"><select class="driver-select" aria-label="Select an approved driver"><option value="">Loading approved drivers…</option></select><button type="button" class="booking-action-btn confirm assign-driver-btn">${booking.driverId ? "Change driver" : "Assign driver"}</button>${booking.driverId ? `<button type="button" class="booking-action-btn cancel remove-driver-btn">Remove assignment</button>` : ""}</div>` : booking.driverId ? `<div class="driver-badge">Driver assigned</div>` : ""}
+
 
         <!-- BOOKING ACTIONS -->
 
         ${
             status ===
-            "pending"
+            "pending" && !refundUnderReview
 
                 ? `
 
@@ -2232,6 +2314,8 @@ function renderBooking(
 
         }
 
+        ${inspectionGalleryHTML}
+
         ${returnDamageReportHTML}
 
     `;
@@ -2284,7 +2368,8 @@ function renderBooking(
 
                     await updateBookingStatus(
                         booking.bookingId,
-                        newStatus
+                        newStatus,
+                        paymentStatus === "paid"
                     );
 
                 }
@@ -2352,6 +2437,53 @@ function renderBooking(
         card
     );
 
+    card.querySelectorAll("[data-host-inspection-gallery]").forEach(gallery => {
+        gallery.addEventListener("toggle", () => {
+            if (gallery.open) loadHostInspectionGallery(gallery);
+        });
+    });
+
+    const driverSelect = card.querySelector(".driver-select");
+    if (driverSelect) {
+        fetch("/api/drivers/active", { headers: { Authorization: `Bearer ${localStorage.getItem("saarthiToken")}` } })
+            .then(response => response.json())
+            .then(result => { driverSelect.innerHTML = `<option value="">Choose driver</option>${(result.data || []).map(d => `<option value="${escapeHTML(d._id)}" ${String(d._id) === String(booking.driverId) ? "selected" : ""}>${escapeHTML(d.userId?.name || "Driver")} · ${escapeHTML(d.userId?.phone || "")} · ${escapeHTML(d.city)}</option>`).join("")}`; })
+            .catch(() => { driverSelect.innerHTML = `<option value="">Could not load drivers</option>`; });
+        card.querySelector(".assign-driver-btn").addEventListener("click", async () => {
+            if (!driverSelect.value) return alert("Choose an approved driver first.");
+            const response = await fetch(`/api/drivers/booking/${encodeURIComponent(booking.bookingId)}/assign`, { method: "PATCH", headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("saarthiToken")}` }, body: JSON.stringify({ driverId: driverSelect.value }) });
+            const result = await response.json();
+            if (!response.ok || !result.success) return alert(result.message || "Could not assign driver.");
+            window.location.reload();
+        });
+    }
+    const removeDriverButton = card.querySelector(".remove-driver-btn");
+    if (removeDriverButton) removeDriverButton.addEventListener("click", async () => {
+        const response = await fetch(`/api/drivers/booking/${encodeURIComponent(booking.bookingId)}/assign`, { method: "DELETE", headers: { Authorization: `Bearer ${localStorage.getItem("saarthiToken")}` } });
+        const result = await response.json();
+        if (!response.ok || !result.success) return alert(result.message || "Could not remove assignment.");
+        window.location.reload();
+    });
+
+    const retryDamageButton = card.querySelector("[data-retry-damage-analysis]");
+    if (retryDamageButton) retryDamageButton.addEventListener("click", async () => {
+        retryDamageButton.disabled = true;
+        retryDamageButton.textContent = "Retrying AI comparison…";
+        try {
+            const response = await fetch(`/api/bookings/host/${encodeURIComponent(booking.bookingId)}/inspection/return/retry-analysis`, {
+                method: "POST",
+                headers: { Authorization: `Bearer ${localStorage.getItem("saarthiToken")}` }
+            });
+            const result = await response.json();
+            if (!response.ok || !result.success) throw new Error(result.message || "Unable to retry AI comparison.");
+            window.location.reload();
+        } catch (error) {
+            alert(error.message);
+            retryDamageButton.disabled = false;
+            retryDamageButton.textContent = "Retry AI comparison";
+        }
+    });
+
 }
 /* =========================================================*/
 
@@ -2361,7 +2493,8 @@ function renderBooking(
 
 async function updateBookingStatus(
     bookingId,
-    status
+    status,
+    isPaidBooking
 ) {
 
     const actionText =
@@ -2375,7 +2508,9 @@ async function updateBookingStatus(
 
     const confirmed =
         window.confirm(
-            `Are you sure you want to ${actionText} this booking?`
+            status === "cancelled" && isPaidBooking
+                ? "Send a cancellation and refund request to the administrator? The booking remains active while the request is reviewed."
+                : `Are you sure you want to ${actionText} this booking?`
         );
 
 
@@ -2450,6 +2585,7 @@ async function updateBookingStatus(
         }
 
 
+        if (result.cancellationRequested) alert(result.message);
         await loadDashboard();
 
 

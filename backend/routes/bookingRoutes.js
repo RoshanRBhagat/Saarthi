@@ -13,12 +13,21 @@ const {
 } = require("../controllers/bookingController");
 
 const {
-    saveBookingInspection
+    saveBookingInspection,
+    retryReturnDamageAnalysis
 } = require("../controllers/bookingInspectionController");
+
+const {
+    getCustomerInspectionPhoto,
+    getHostInspectionPhoto
+} = require("../controllers/bookingInspectionPhotoController");
 
 const {
     requireCompletedInspection
 } = require("../middleware/inspectionMiddleware");
+
+const { validateCoupon } =
+    require("../controllers/couponController");
 
 const {
     authenticateUser,
@@ -36,6 +45,13 @@ router.get(
     checkAvailability
 );
 
+// Preview a coupon against the current car and rental dates.
+// The discount is validated again when the booking is created.
+router.post(
+    "/validate-coupon",
+    validateCoupon
+);
+
 // Create a booking
 router.post(
     "/",
@@ -48,6 +64,22 @@ router.get(
     "/my",
     authenticateUser,
     getCustomerBookings
+);
+
+// Securely stream an inspection photo to the customer who owns the booking.
+// The underlying damage uploads are not publicly served.
+router.get(
+    "/my/:bookingId/inspection-photo/:phase/:angle",
+    authenticateUser,
+    getCustomerInspectionPhoto
+);
+
+// Hosts may review condition evidence only for bookings on their own vehicles.
+router.get(
+    "/host/:bookingId/inspection-photo/:phase/:angle",
+    authenticateUser,
+    requireHost,
+    getHostInspectionPhoto
 );
 
 // Cancel a customer's booking
@@ -89,6 +121,13 @@ router.post(
     authenticateUser,
     requireHost,
     saveBookingInspection
+);
+
+router.post(
+    "/host/:bookingId/inspection/return/retry-analysis",
+    authenticateUser,
+    requireHost,
+    retryReturnDamageAnalysis
 );
 
 

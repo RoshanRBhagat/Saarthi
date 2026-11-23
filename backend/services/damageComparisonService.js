@@ -1,5 +1,6 @@
 const fs = require("fs/promises");
 const path = require("path");
+const { getDamageUploadsDir, getLegacyDamageUploadsDir } = require("./storagePaths");
 
 const ANGLES = [
     "front",
@@ -18,6 +19,8 @@ const SEVERITY_ORDER = {
     moderate: 2,
     severe: 3
 };
+
+const MODEL_REQUEST_TIMEOUT_MS = 45_000;
 
 function getModelCandidates() {
     const configured =
@@ -55,14 +58,7 @@ async function readInspectionImages(bookingId, phase, photos) {
         throw new Error("Invalid booking ID for image comparison.");
     }
 
-    const root = path.resolve(
-        __dirname,
-        "..",
-        "uploads",
-        "damage",
-        String(bookingId),
-        phase
-    );
+    const root = path.resolve(getDamageUploadsDir(), String(bookingId), phase);
 
     const storedPhotos = Array.isArray(photos) ? photos : [];
     const map = new Map();
@@ -87,7 +83,14 @@ async function readInspectionImages(bookingId, phase, photos) {
             throw new Error("Invalid inspection image path.");
         }
 
-        const buffer = await fs.readFile(absolutePath);
+        let buffer;
+        try { buffer = await fs.readFile(absolutePath); }
+        catch (error) {
+            const legacyRoot = path.resolve(getLegacyDamageUploadsDir(), String(bookingId), phase);
+            const legacyPath = path.resolve(legacyRoot, filename);
+            if (!legacyPath.startsWith(legacyRoot + path.sep)) throw error;
+            buffer = await fs.readFile(legacyPath);
+        }
 
         map.set(angle, {
             mimeType: getMimeType(filename),
@@ -184,6 +187,7 @@ Rules:
                         "Content-Type": "application/json",
                         "x-goog-api-key": apiKey
                     },
+                    signal: AbortSignal.timeout(MODEL_REQUEST_TIMEOUT_MS),
                     body: JSON.stringify({
                         contents: [{ role: "user", parts }],
                         generationConfig: {
@@ -238,18 +242,20 @@ Rules:
 function normalizeAngleResult(angle, raw) {
     const changes = Array.isArray(raw?.changes)
         ? raw.changes
-            .filter(change => change && change.newDamageLikely !== false)
+            .filter(change => change && change.newDamageLikely === true)
             .map(change => ({
                 area: String(change.area || "Unspecified area").slice(0, 160),
                 type: String(change.type || "other").slice(0, 60),
                 description: String(change.description || "Visible change requires review.").slice(0, 1000),
-                severity: SEVERITY_ORDER[change.severity] ? change.severity : "minor",
+                severity: Object.hasOwn(SEVERITY_ORDER, change.severity)
+                    ? change.severity
+                    : "minor",
                 confidence: Math.max(0, Math.min(100, Number(change.confidence) || 0)),
                 newDamageLikely: change.newDamageLikely === true
             }))
         : [];
 
-    const damageDetected = raw?.damageDetected === true || changes.some(change => change.newDamageLikely);
+    const damageDetected = changes.some(change => change.newDamageLikely);
 
     return {
         angle,
@@ -270,7 +276,8 @@ function buildOverallReport(angleResults) {
     );
 
     const damageDetected = changes.some(change => change.newDamageLikely === true);
-    const severities = changes.map(change => change.severity);
+    const likelyNewDamage = changes.filter(change => change.newDamageLikely === true);
+    const severities = likelyNewDamage.map(change => change.severity);
     const severity = severities.reduce(
         (highest, current) =>
             (SEVERITY_ORDER[current] || 0) > (SEVERITY_ORDER[highest] || 0)
@@ -279,8 +286,8 @@ function buildOverallReport(angleResults) {
         "none"
     );
 
-    const damageConfidence = changes.length
-        ? Math.round(changes.reduce((sum, item) => sum + item.confidence, 0) / changes.length)
+    const damageConfidence = likelyNewDamage.length
+        ? Math.round(likelyNewDamage.reduce((sum, item) => sum + item.confidence, 0) / likelyNewDamage.length)
         : Math.round(
             angleResults.reduce((sum, item) => sum + (item.damageDetected ? 55 : 70), 0) /
             Math.max(angleResults.length, 1)
@@ -315,7 +322,7 @@ function buildOverallReport(angleResults) {
             severity,
             confidence: damageConfidence,
             summary: damageDetected
-                ? `${changes.length} possible new damage finding(s) identified across the inspection angles. Review each finding and the original photos.`
+                ? `${likelyNewDamage.length} possible new damage finding(s) identified across the inspection angles. Review each finding and the original photos.`
                 : "No reliable new damage was identified from the submitted matching views. This does not guarantee the vehicle is damage-free."
         },
         angleResults,
@@ -356,5 +363,8 @@ async function compareBookingInspections({ bookingId, pickupPhotos, returnPhotos
 }
 
 module.exports = {
-    compareBookingInspections
+    compareBookingInspections,
+    normalizeAngleResult,
+    buildOverallReport,
+    callGeminiForAngleBatch
 };
